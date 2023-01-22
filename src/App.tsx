@@ -1,25 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
+import { FC } from 'react';
 import './App.css';
+import Question from './components/Question/Question';
+import { QuestionType } from './types/survey';
 
-function App() {
+const App: FC = () => {
+
+  const answers = [
+    { id: 1, label: 'Первый ответ' },
+    { id: 2, label: 'Второй ответ' },
+    { id: 3, label: 'Третий ответ' },
+    { id: 4, label: 'Четвертый ответ' }
+  ];
+
+  const question = 'Здесь будет вопрос';
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Question
+        answers={answers}
+        question={question}
+        type={QuestionType.MultipleChoice}
+      />
+
+      <Question
+        answers={answers}
+        question={question}
+        type={QuestionType.OneChoice}
+      />
+    </>
   );
 }
 
