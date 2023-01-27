@@ -1,54 +1,58 @@
 import { FC, useState } from 'react';
 import { remove } from '../../helper';
-import { Answer } from '../../types/survey';
+import { IOption } from '../../types/survey';
 import Checkbox from '../../UI/Checkbox/Checkbox';
 
 interface SingleChoiceProps {
-    answers: Answer[];
+    id: number;
+    options: IOption[];
 }
 
-const MultipleChoice: FC<SingleChoiceProps> = ({answers}) => {
+const MultipleChoice: FC<SingleChoiceProps> = ({id, options}) => {
 
-    const [selectedAnswers, setSelectedAnswers] = useState<Number[]>([]);
+    const [selectedOptions, setSelectedOptions] = useState<Number[]>([]);
+
+    console.log(`В вопросе ${id} пользователь дал такие ответы: `);
+    console.log(selectedOptions);
 
     const checkboxHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-        const answer = Number(event.target.value);
+        const selectedOption = Number(event.target.value);
 
-        if (selectedAnswers.length !== 0) {
+        if (selectedOptions.length !== 0) {
 
-            let index = selectedAnswers.indexOf(answer);
+            let index = selectedOptions.indexOf(selectedOption);
 
             if (index === -1) {
 
-                setSelectedAnswers([...selectedAnswers, answer]);
+                setSelectedOptions([...selectedOptions, selectedOption]);
 
             } else {
 
-                setSelectedAnswers(remove(selectedAnswers, index));
+                setSelectedOptions(remove(selectedOptions, index));
             }
 
         } else {
 
-            setSelectedAnswers([answer]);
+            setSelectedOptions([selectedOption]);
         }
     }
 
-    const renderAnswers = () => {
-        return answers.map((answer: Answer) =>
+    const renderOptions = () => {
+        return options.map((answer: IOption) =>
             <Checkbox
                 key={answer.id}
                 id={answer.id}
                 label={answer.label}
                 onChangeHandler={checkboxHandler}
-                checked={selectedAnswers.includes(answer.id)}
+                checked={selectedOptions.includes(answer.id)}
             />
         )
     }
 
     return (
         <>
-            { renderAnswers() }
+            { renderOptions() }
         </>
     );
 }

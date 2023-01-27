@@ -1,35 +1,38 @@
 import { FC, useState } from 'react';
-import { Answer } from '../../types/survey';
+import { IOption } from '../../types/survey';
 import Radio from '../../UI/Radio/Radio';
 
 interface SingleChoiceProps {
-    answers: Answer[];
+    id: number;
+    options: IOption[];
 }
 
-const SingleChoice: FC<SingleChoiceProps> = ({answers}) => {
+const SingleChoice: FC<SingleChoiceProps> = ({id, options}) => {
 
-    const [selectedAnswer, setSelectedAnswer] = useState<Number>();
+    const [selectedOption, setSelectedOption] = useState<Number>();
+
+    console.log(`В вопросе ${id} пользователь дал ответ: ${selectedOption}`);
 
     const radioHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-        setSelectedAnswer(Number(event.target.value));
+        setSelectedOption(Number(event.target.value));
     }
 
-    const renderAnswers = () => {
-        return answers.map((answer: Answer) =>
+    const renderOptions = () => {
+        return options.map((option: IOption) =>
             <Radio
-                key={answer.id}
-                id={answer.id}
-                label={answer.label}
+                key={option.id}
+                id={option.id}
+                label={option.label}
                 onChangeHandler={radioHandler}
-                checked={selectedAnswer === answer.id}
+                checked={selectedOption === option.id}
             />
         )
     }
 
     return (
         <>
-            { renderAnswers() }
+            { renderOptions() }
         </>
     );
 }
