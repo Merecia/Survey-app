@@ -5,5 +5,12 @@ export interface Answer {
 
 export enum QuestionType {
     OneChoice,
-    MultipleChoice    
+    MultipleChoice,
+    ShortTextField,
+    DetailedTextField    
+}
+
+export enum TextFieldType {
+    Short,
+    Detailed
 }
