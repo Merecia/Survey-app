@@ -1,15 +1,15 @@
 import { SurveyState, SurveyAction, SurveyActionTypes } from './../../types/survey';
 
 const initialState: SurveyState = {
-    answers: []
+    answersQuestions: []
 }
 
 export const surveyReducer = (state = initialState, action: SurveyAction): SurveyState => {
     switch (action.type) {
-        case SurveyActionTypes.UPDATE_ANSWERS:
+        case SurveyActionTypes.UPDATE_ANSWERS_QUESTIONS:
             return {
                 ...state,
-                answers: action.payload
+                answersQuestions: action.payload
             }
         default:
             return state

@@ -1,48 +1,42 @@
 import { FC } from 'react';
-import { answer, options1, options2, question } from '../../data/data';
-import { useActions } from '../../hooks/useActions';
+import { survey } from '../../data/data';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import { QuestionType } from '../../types/survey';
+import Button from '../../UI/Button/Button';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
 
 const Survey: FC = () => {
 
-    const {answers} = useTypedSelector(state => state.survey);
-    const {updateAnswers} = useActions();
+    const renderQuestions = () => {
+        return survey.questions.map(question =>
+            <Question 
+                key = {question.id}
+                question = {question}
+                margin = '20px'
+            />
+        )
+    }
 
-    console.log(answers);
+    const answersQuestions = useTypedSelector(state => state.survey.answersQuestions);
+
+    const saveResults = () => {
+        console.log(`ID опроса: ${survey.id}`);
+        console.log(`Заголовок опроса: ${survey.title}`);
+        console.log('Ответы на вопросы:' );
+        console.log(answersQuestions);
+    }
 
     return (
         <div className={style.Survey}>
             <div className={style.Wrapper}>
-                <Question
-                    id = {1}
-                    options={options1}
-                    question={question.topic}
-                    type={QuestionType.MultipleChoice}
-                    margin='20px'
+                <h1 style = {{textAlign: 'center'}}> {survey.title} </h1>
+                {renderQuestions()}
+                <Button 
+                    label = 'Save Results'
+                    clickHandler = {saveResults}
+                    margin = '2% 30%'
+                    width = '40%'
                 />
-                <Question
-                    id = {2}
-                    options={options2}
-                    question={question.topic}
-                    type={QuestionType.OneChoice}
-                    margin='20px'
-                />
-                <Question
-                    id = {3}
-                    question={question.topic}
-                    type={QuestionType.ShortTextField}
-                    margin='20px'
-                />
-                <Question
-                    id = {4}
-                    question={question.topic}
-                    type={QuestionType.DetailedTextField}
-                    margin='20px'
-                />
-                <button onClick = {() => updateAnswers([answer])}> Нажми на меня </button>
             </div>
         </div>
     );

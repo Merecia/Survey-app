@@ -1,54 +1,55 @@
 import { FC } from 'react';
-import { IOption, QuestionType, TextFieldType } from '../../types/survey';
+import { IQuestion, QuestionType, TextFieldType } from '../../types/survey';
 import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
 import TextField from '../TextField/TextField';
 import style from './Question.module.scss';
 
 interface QuestionProps {
-    id: number;
-    options?: IOption[],
-    question: string;
-    type: QuestionType;
+    question: IQuestion;
     margin: string;
 }
 
-const Question: FC<QuestionProps> = ({ id, options, question, type, margin }) => {
+const Question: FC<QuestionProps> = ({ question, margin }) => {
 
     const renderResponseField = () => {
 
-        if (type === QuestionType.OneChoice && options) {
+        if (question.type === QuestionType.OneChoice && question.options) {
             return <SingleChoice
-                id = {id}
-                options={options}
+                id = {question.id}
+                options = {question.options}
+                topic = {question.topic}
             />
         }
 
-        else if (type === QuestionType.MultipleChoice && options) {
+        else if (question.type === QuestionType.MultipleChoice && question.options) {
             return <MultipleChoice
-                id = {id}
-                options={options}
+                id = {question.id}
+                options = {question.options}
+                topic = {question.topic}
             />
         }
 
-        else if (type === QuestionType.ShortTextField) {
+        else if (question.type === QuestionType.ShortTextField) {
             return <TextField
-                id = {id}
+                id = {question.id}
                 type = {TextFieldType.Short}
+                topic = {question.topic}
             />
         }
 
-        else if (type === QuestionType.DetailedTextField) {
-            return <TextField 
-                id = {id}
+        else if (question.type === QuestionType.DetailedTextField) {
+            return <TextField
+                id = {question.id} 
                 type = {TextFieldType.Detailed}
+                topic = {question.topic}
             />
         }
     }
 
     return (
         <div className={style.Question} style={{ margin }}>
-            <p> {question} </p>
+            <p> {question.topic} </p>
             {renderResponseField()}
         </div>
     );

@@ -1,23 +1,25 @@
 import { FC, useState } from 'react';
 import { remove } from '../../helper';
-import { IOption } from '../../types/survey';
+import { useActions } from '../../hooks/useActions';
+import { IOption, IQuestion, QuestionType } from '../../types/survey';
 import Checkbox from '../../UI/Checkbox/Checkbox';
 
 interface SingleChoiceProps {
     id: number;
     options: IOption[];
+    topic: string;
 }
 
-const MultipleChoice: FC<SingleChoiceProps> = ({id, options}) => {
+const MultipleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
 
-    const [selectedOptions, setSelectedOptions] = useState<Number[]>([]);
-
-    console.log(`В вопросе ${id} пользователь дал такие ответы: `);
-    console.log(selectedOptions);
+    const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
+    const {updateAnswersQuestions} = useActions();
 
     const checkboxHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-        const selectedOption = Number(event.target.value);
+        const selectedOption = parseInt(event.target.value);
+
+        let updatedSelectedOptions: number[] = [];
 
         if (selectedOptions.length !== 0) {
 
@@ -25,17 +27,41 @@ const MultipleChoice: FC<SingleChoiceProps> = ({id, options}) => {
 
             if (index === -1) {
 
-                setSelectedOptions([...selectedOptions, selectedOption]);
+                updatedSelectedOptions = [...selectedOptions, selectedOption];
 
             } else {
 
-                setSelectedOptions(remove(selectedOptions, index));
+                updatedSelectedOptions = remove(selectedOptions, index);
             }
 
         } else {
 
-            setSelectedOptions([selectedOption]);
+            updatedSelectedOptions = [selectedOption];
         }
+
+        setSelectedOptions(updatedSelectedOptions);
+
+        const answers: IOption[] = updatedSelectedOptions.map(selectedOption => {
+
+            const label = options.find(option => option.id === selectedOption)?.label || '';
+            
+            return {
+                id: selectedOption,
+                label
+            }
+        })
+
+        const question: IQuestion = {
+            id,
+            topic,
+            options,
+            type: QuestionType.MultipleChoice
+        }
+
+        updateAnswersQuestions({
+            question: question,
+            answer: answers
+        });
     }
 
     const renderOptions = () => {
@@ -52,7 +78,7 @@ const MultipleChoice: FC<SingleChoiceProps> = ({id, options}) => {
 
     return (
         <>
-            { renderOptions() }
+            {renderOptions()}
         </>
     );
 }

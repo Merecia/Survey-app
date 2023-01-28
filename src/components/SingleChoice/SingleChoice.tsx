@@ -1,21 +1,43 @@
 import { FC, useState } from 'react';
-import { IOption } from '../../types/survey';
+import { useActions } from '../../hooks/useActions';
+import { IOption, IQuestion, QuestionType } from '../../types/survey';
 import Radio from '../../UI/Radio/Radio';
 
 interface SingleChoiceProps {
     id: number;
     options: IOption[];
+    topic: string;
 }
 
-const SingleChoice: FC<SingleChoiceProps> = ({id, options}) => {
+const SingleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
 
+    const {updateAnswersQuestions} = useActions();
     const [selectedOption, setSelectedOption] = useState<Number>();
-
-    console.log(`В вопросе ${id} пользователь дал ответ: ${selectedOption}`);
 
     const radioHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-        setSelectedOption(Number(event.target.value));
+        const selectedOptionId = Number(event.target.value);
+        
+        setSelectedOption(selectedOptionId);
+
+        const label = options.find(option => option.id === selectedOptionId)?.label || '';
+
+        const question: IQuestion = {
+            id,
+            topic,
+            options,
+            type: QuestionType.OneChoice
+        };
+
+        const option: IOption = {
+            id: selectedOptionId,
+            label
+        };
+
+        updateAnswersQuestions({
+            question,
+            answer: option
+        });
     }
 
     const renderOptions = () => {
@@ -32,7 +54,7 @@ const SingleChoice: FC<SingleChoiceProps> = ({id, options}) => {
 
     return (
         <>
-            { renderOptions() }
+            {renderOptions()}
         </>
     );
 }

@@ -1,3 +1,5 @@
+// Interfaces
+
 export interface IOption {
     id: number;
     label: string;
@@ -12,17 +14,25 @@ export interface ISurvey {
 export interface IQuestion {
     id: number;
     topic: string;
-    options?: IOption | IOption[];
+    options?: IOption[];
     type: QuestionType;
 }
 
-export interface IAnswer {
-    id: number;
+export interface IAnswerQuestion {
     question: IQuestion;
-    answer: IOption | IOption[] | string;
+    answer: Answer;
 }
 
-// ---------------------------------------------
+export interface SurveyState {
+    answersQuestions: IAnswerQuestion[];
+}
+
+export interface UpdateAnswersQuestionsAction {
+    type: SurveyActionTypes.UPDATE_ANSWERS_QUESTIONS;
+    payload: IAnswerQuestion[];
+}
+
+// Enum
 
 export enum QuestionType {
     OneChoice,
@@ -36,20 +46,12 @@ export enum TextFieldType {
     Detailed
 }
 
-// ---------------------------------------------
-
-export interface SurveyState {
-    answers: IAnswer[];
-}
-
 export enum SurveyActionTypes {
-    UPDATE_ANSWERS = 'UPDATE_ANSWERS'
+    UPDATE_ANSWERS_QUESTIONS = 'UPDATE_ANSWERS_QUESTIONS'
 }
 
-interface UpdateAnswerAction {
-    type: SurveyActionTypes.UPDATE_ANSWERS;
-    payload: IAnswer[];
-}
+// Types
 
-export type SurveyAction = 
-    UpdateAnswerAction
+export type Answer = IOption | IOption[] | string;
+
+export type SurveyAction = UpdateAnswersQuestionsAction
