@@ -1,29 +1,44 @@
 import { FC, useState } from 'react';
 import { useActions } from '../../hooks/useActions';
-import { IQuestion, QuestionType, TextFieldType } from '../../types/survey';
+import { Answer, IQuestion, ITextAnswer, QuestionType, TextFieldType } from '../../types/survey';
 import Input from '../../UI/Input/Input';
 import Textarea from '../../UI/Textarea/Textarea';
 
 interface TextFieldProps {
     id: number;
     type: TextFieldType;
+    correctAnswer?: ITextAnswer;
     topic: string;
 }
 
-const TextField: FC<TextFieldProps> = ({ id, type, topic }) => {
+const TextField: FC<TextFieldProps> = ({ id, type, topic, correctAnswer }) => {
 
     const [text, setText] = useState<string>('');
 
     const {updateAnswersQuestions} = useActions();
 
     const updateTextAnswer = (value: string, type: QuestionType) => {
+
         setText(value);
 
-        const question: IQuestion = {id, topic, type};
+        let answer: Answer;
+
+        if (correctAnswer) {
+
+            const earnedScore = correctAnswer.text === value ? correctAnswer.score : 0;
+
+            answer = {text: value, score: earnedScore};
+
+        } else {
+
+            answer = {text: value};
+        }
+
+        const question: IQuestion = {id, topic, type, correctAnswer};
 
         updateAnswersQuestions({
             question,
-            answer: value
+            answer
         });
     }
 

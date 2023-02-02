@@ -12,42 +12,43 @@ interface SingleChoiceProps {
 
 const MultipleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
 
-    const [selectedOptions, setSelectedOptions] = useState<number[]>([]);
+    const [selectedOptionsId, setSelectedOptionsId] = useState<number[]>([]);
     const {updateAnswersQuestions} = useActions();
 
     const checkboxHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
-        const selectedOption = parseInt(event.target.value);
+        const selectedOptionId = parseInt(event.target.value);
 
-        let updatedSelectedOptions: number[] = [];
+        let newSelectedOptionsId: number[] = [];
 
-        if (selectedOptions.length !== 0) {
+        if (selectedOptionsId.length !== 0) {
 
-            let index = selectedOptions.indexOf(selectedOption);
+            let index = selectedOptionsId.indexOf(selectedOptionId);
 
             if (index === -1) {
 
-                updatedSelectedOptions = [...selectedOptions, selectedOption];
+                newSelectedOptionsId = [...selectedOptionsId, selectedOptionId];
 
             } else {
 
-                updatedSelectedOptions = remove(selectedOptions, index);
+                newSelectedOptionsId = remove(selectedOptionsId, index);
             }
 
         } else {
 
-            updatedSelectedOptions = [selectedOption];
+            newSelectedOptionsId = [selectedOptionId];
         }
 
-        setSelectedOptions(updatedSelectedOptions);
+        setSelectedOptionsId(newSelectedOptionsId);
 
-        const answers: IOption[] = updatedSelectedOptions.map(selectedOption => {
+        const answers: IOption[] = newSelectedOptionsId.map(selectedOptionId => {
 
-            const label = options.find(option => option.id === selectedOption)?.label || '';
+            const selectedOption = options.find(option => option.id === selectedOptionId);
             
             return {
-                id: selectedOption,
-                label
+                id: selectedOptionId,
+                label: selectedOption?.label || '',
+                score: selectedOption?.score
             }
         })
 
@@ -55,7 +56,7 @@ const MultipleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
             id,
             topic,
             options,
-            type: QuestionType.MultipleChoice
+            type: QuestionType.MultipleChoice,
         }
 
         updateAnswersQuestions({
@@ -71,7 +72,7 @@ const MultipleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
                 id={answer.id}
                 label={answer.label}
                 onChangeHandler={checkboxHandler}
-                checked={selectedOptions.includes(answer.id)}
+                checked={selectedOptionsId.includes(answer.id)}
             />
         )
     }

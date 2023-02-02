@@ -3,18 +3,26 @@
 export interface IOption {
     id: number;
     label: string;
+    score?: number;
+}
+
+export interface ITextAnswer {
+    text: string;
+    score?: number;
 }
 
 export interface ISurvey {
     id: number;
     title: string;
     questions: IQuestion[];
+    isEvaluated: boolean;
 }
 
 export interface IQuestion {
     id: number;
     topic: string;
     options?: IOption[];
+    correctAnswer?: ITextAnswer;
     type: QuestionType;
 }
 
@@ -52,6 +60,6 @@ export enum SurveyActionTypes {
 
 // Types
 
-export type Answer = IOption | IOption[] | string;
+export type Answer = IOption | IOption[] | ITextAnswer;
 
 export type SurveyAction = UpdateAnswersQuestionsAction

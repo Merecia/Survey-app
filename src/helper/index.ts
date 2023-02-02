@@ -6,3 +6,4 @@ export function remove<T>(array: T[], index: number): T[] {
 
     return updatedArray;
 }
+

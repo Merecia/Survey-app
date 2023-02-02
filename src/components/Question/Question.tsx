@@ -1,4 +1,5 @@
 import { FC } from 'react';
+import { correctAnswer } from '../../data/data';
 import { IQuestion, QuestionType, TextFieldType } from '../../types/survey';
 import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
@@ -16,33 +17,41 @@ const Question: FC<QuestionProps> = ({ question, margin }) => {
 
         if (question.type === QuestionType.OneChoice && question.options) {
             return <SingleChoice
-                id = {question.id}
-                options = {question.options}
-                topic = {question.topic}
+                id={question.id}
+                options={question.options}
+                topic={question.topic}
             />
         }
 
         else if (question.type === QuestionType.MultipleChoice && question.options) {
             return <MultipleChoice
-                id = {question.id}
-                options = {question.options}
-                topic = {question.topic}
+                id={question.id}
+                options={question.options}
+                topic={question.topic}
             />
         }
 
         else if (question.type === QuestionType.ShortTextField) {
-            return <TextField
+
+            if (correctAnswer) return <TextField
+                id={question.id}
+                type={TextFieldType.Short}
+                correctAnswer={question.correctAnswer}
+                topic={question.topic}
+            />
+
+            return <TextField 
                 id = {question.id}
-                type = {TextFieldType.Short}
-                topic = {question.topic}
+                type={TextFieldType.Short}
+                topic={question.topic}
             />
         }
 
         else if (question.type === QuestionType.DetailedTextField) {
             return <TextField
-                id = {question.id} 
-                type = {TextFieldType.Detailed}
-                topic = {question.topic}
+                id={question.id}
+                type={TextFieldType.Detailed}
+                topic={question.topic}
             />
         }
     }

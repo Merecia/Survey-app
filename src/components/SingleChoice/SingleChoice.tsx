@@ -9,18 +9,18 @@ interface SingleChoiceProps {
     topic: string;
 }
 
-const SingleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
+const SingleChoice: FC<SingleChoiceProps> = ({ id, options, topic}) => {
 
     const {updateAnswersQuestions} = useActions();
-    const [selectedOption, setSelectedOption] = useState<Number>();
+    const [selectedOptionId, setSelectedOptionId] = useState<Number>();
 
     const radioHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         const selectedOptionId = Number(event.target.value);
         
-        setSelectedOption(selectedOptionId);
+        setSelectedOptionId(selectedOptionId);
 
-        const label = options.find(option => option.id === selectedOptionId)?.label || '';
+        const selectedOption = options.find(option => option.id === selectedOptionId);
 
         const question: IQuestion = {
             id,
@@ -31,7 +31,8 @@ const SingleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
 
         const option: IOption = {
             id: selectedOptionId,
-            label
+            label: selectedOption?.label || '',
+            score: selectedOption?.score
         };
 
         updateAnswersQuestions({
@@ -47,7 +48,7 @@ const SingleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
                 id={option.id}
                 label={option.label}
                 onChangeHandler={radioHandler}
-                checked={selectedOption === option.id}
+                checked={selectedOptionId === option.id}
             />
         )
     }
