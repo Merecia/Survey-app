@@ -1,20 +1,20 @@
 import { store } from './../index';
-import { 
-    IAnswerQuestion, 
-    QuestionType, 
-    SurveyAction, 
-    SurveyActionTypes 
+import {
+    IAnswerToQuestion,
+    SurveyAction,
+    SurveyActionTypes
 } from './../../types/survey';
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
+import { isOption, isTextAnswer } from '../../helper';
 
-export const updateAnswersQuestions = (answerQuestion: IAnswerQuestion) => {
+export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
 
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
 
-        const answersQuestions = getState().survey.answersQuestions;
-        const answeredQuestions = answersQuestions.map(answerQuestion => answerQuestion.question);
-        const currentQuestion = answerQuestion.question;
+        const answersToQuestions = getState().survey.answersToQuestions;
+        const answeredQuestions = answersToQuestions.map(answerToQuestion => answerToQuestion.question);
+        const currentQuestion = answerToQuestion.question;
 
         /* 
             We are checking questions that user has already answered and we try to find among
@@ -32,33 +32,22 @@ export const updateAnswersQuestions = (answerQuestion: IAnswerQuestion) => {
 
         if (index === -1) {
             dispatch({
-                type: SurveyActionTypes.UPDATE_ANSWERS_QUESTIONS,
-                payload: [...answersQuestions, {
+                type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
+                payload: [...answersToQuestions, {
                     question: currentQuestion,
-                    answer: answerQuestion.answer
+                    answer: answerToQuestion.answer
                 }]
             })
 
         } else {
-            answersQuestions[index] = answerQuestion;
+            answersToQuestions[index] = answerToQuestion;
 
             dispatch({
-                type: SurveyActionTypes.UPDATE_ANSWERS_QUESTIONS,
-                payload: answersQuestions
+                type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
+                payload: answersToQuestions
             })
         }
     }
-}
-
-export const scoreTest = () => {
-
-    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-
-        const maximumScore: number = calculateMaximumScore();
-
-        console.log(maximumScore);
-    }
-
 }
 
 /*
@@ -66,73 +55,43 @@ export const scoreTest = () => {
      answersQuestions should be replaced to questions (new state), that include all questions.
      name answersQuestions should be changed to results, because this name is more informative.
 */
-const calculateMaximumScore = () => {
 
-    const answersQuestions = store.getState().survey.answersQuestions;
+export const finishTest = () => {
 
-    let maximumScore: number = 0;
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
 
-    answersQuestions.forEach(answerQuestion => {
+        console.log(getState().survey.answersToQuestions);
 
-        if (answerQuestion.question.type === QuestionType.OneChoice ||
-            answerQuestion.question.type === QuestionType.MultipleChoice
-        ) {
+        console.log('Оценка за тест: ' + scoreTest());
+    }
+}
 
-            answerQuestion.question.options?.forEach(option => {
+export const scoreTest = (): number => {
 
-                const score = option.score;
+    const answersToQuestions = store.getState().survey.answersToQuestions;
 
-                if (score && score > 0) maximumScore += score;
+    let totalScore: number = 0;
+
+    answersToQuestions.forEach(answerToQuestion => {
+
+        const answer = answerToQuestion.answer;
+
+        if (isOption(answer) || isTextAnswer(answer)) {
+
+            const score = answer.score ?? 0;
+
+            totalScore += score;
+
+        } else {
+
+            answer.forEach(option => {
+
+                const score = option.score ?? 0;
+
+                totalScore += score;
             })
-
-        } else if (answerQuestion.question.type === QuestionType.ShortTextField) {
-
-            const score = answerQuestion.question.correctAnswer?.score;
-
-            if (score && score > 0) maximumScore += score;
         }
     })
 
-    return maximumScore;
+    return totalScore;
 }
-
-// export const scoreTest = () => {
-
-//     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-
-//         const answersQuestions = getState().survey.answersQuestions;
-
-//         answersQuestions.forEach(answerQuestion => {
-
-//             const correctAnswer = answerQuestion.question.correctAnswer;
-//             const userAnswer = answerQuestion.answer;
-//             let isUserAnswerCorrect;
-
-//             switch(answerQuestion.question.type) {
-//                 case QuestionType.OneChoice:
-//                     isUserAnswerCorrect =
-//                     (userAnswer as IOption).id ===
-//                     (correctAnswer as IOption).id;
-//                     break;
-
-//                 case QuestionType.MultipleChoice:
-//                     isUserAnswerCorrect =
-//                     JSON.stringify(userAnswer as IOption[]) ===
-//                     JSON.stringify(correctAnswer as IOption[]);
-//                     break;
-
-//                 case QuestionType.ShortTextField:
-//                 case QuestionType.DetailedTextField:
-//                     isUserAnswerCorrect =
-//                     (userAnswer as String).toUpperCase() ===
-//                     (correctAnswer as String).toUpperCase();
-//                     break;
-//             }
-
-//             console.log(userAnswer);
-//             console.log(correctAnswer);
-//             console.log(isUserAnswerCorrect);
-//             console.log('____________________________');
-//         })
-//     }
-// }

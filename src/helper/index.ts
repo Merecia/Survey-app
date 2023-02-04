@@ -1,4 +1,6 @@
-export function remove<T>(array: T[], index: number): T[] {
+import { IOption, ITextAnswer } from './../types/survey';
+
+export const remove = <T>(array: T[], index: number): T[] => {
 
     const updatedArray: T[] = [...array];
 
@@ -6,4 +8,12 @@ export function remove<T>(array: T[], index: number): T[] {
 
     return updatedArray;
 }
+
+export const isOption = (entity: any): entity is IOption => (
+    'id' in entity && 'label' in entity
+)
+
+export const isTextAnswer = (entity: any): entity is ITextAnswer => (
+    'text' in entity
+)
 

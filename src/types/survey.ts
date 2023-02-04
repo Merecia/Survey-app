@@ -26,18 +26,18 @@ export interface IQuestion {
     type: QuestionType;
 }
 
-export interface IAnswerQuestion {
+export interface IAnswerToQuestion {
     question: IQuestion;
     answer: Answer;
 }
 
 export interface SurveyState {
-    answersQuestions: IAnswerQuestion[];
+    answersToQuestions: IAnswerToQuestion[];
 }
 
 export interface UpdateAnswersQuestionsAction {
-    type: SurveyActionTypes.UPDATE_ANSWERS_QUESTIONS;
-    payload: IAnswerQuestion[];
+    type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS;
+    payload: IAnswerToQuestion[];
 }
 
 // Enum
@@ -55,7 +55,7 @@ export enum TextFieldType {
 }
 
 export enum SurveyActionTypes {
-    UPDATE_ANSWERS_QUESTIONS = 'UPDATE_ANSWERS_QUESTIONS'
+    UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_QUESTIONS'
 }
 
 // Types

@@ -2,8 +2,8 @@ import { FC } from 'react';
 
 interface InputProps {
     string: string;
-    onChangeHandler: any;
     width: string;
+    onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const Input: FC<InputProps> = ({ onChangeHandler, string, width }) => {
