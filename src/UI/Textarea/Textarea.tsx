@@ -4,7 +4,7 @@ interface TextareaProps {
     text: string;
     width: string;
     height: string;
-    onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    onChangeHandler: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 const Textarea: FC<TextareaProps> = ({
@@ -16,7 +16,7 @@ const Textarea: FC<TextareaProps> = ({
     return (
         <textarea
             value={text}
-            onChange={() => onChangeHandler}
+            onChange={onChangeHandler}
             style={{
                 'resize': 'none', 
                 width,

@@ -1,0 +1,29 @@
+import { FC } from 'react';
+
+interface SelectProps {
+    id: number;
+    value: string;
+    options: string[];
+    onChangeHandler: (parameters: any) => void;
+}
+
+const Select: FC<SelectProps> = ({id, options, onChangeHandler, value}) => {
+
+    const renderOptions = () => options.map((option, index) => 
+        renderOption(option, index)
+    );
+
+    const renderOption = (label: string, index: number) => (
+        <option key = {index} value = {label}> 
+            {label} 
+        </option>
+    );
+
+    return (
+        <select key = {id} value = {value} onChange = {onChangeHandler}>
+            {renderOptions()}
+        </select>
+    );
+}
+
+export default Select;

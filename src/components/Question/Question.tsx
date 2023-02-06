@@ -1,6 +1,8 @@
 import { FC } from 'react';
 import { correctAnswer } from '../../data/data';
+import { isMatches } from '../../helper';
 import { IQuestion, QuestionType, TextFieldType } from '../../types/survey';
+import Matchmaking from '../Matchmaking/Matchmaking';
 import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
 import TextField from '../TextField/TextField';
@@ -15,44 +17,61 @@ const Question: FC<QuestionProps> = ({ question, margin }) => {
 
     const renderResponseField = () => {
 
-        if (question.type === QuestionType.OneChoice && question.options) {
-            return <SingleChoice
-                id={question.id}
-                options={question.options}
-                topic={question.topic}
-            />
-        }
+        if (question.options) {
 
-        else if (question.type === QuestionType.MultipleChoice && question.options) {
-            return <MultipleChoice
-                id={question.id}
-                options={question.options}
-                topic={question.topic}
-            />
-        }
+            if (!isMatches(question.options)) {
 
-        else if (question.type === QuestionType.ShortTextField) {
+                if (question.type === QuestionType.OneChoice) {
+                    return <SingleChoice
+                        id={question.id}
+                        options={question.options}
+                        topic={question.topic}
+                    />
+                }
 
-            if (correctAnswer) return <TextField
-                id={question.id}
-                type={TextFieldType.Short}
-                correctAnswer={question.correctAnswer}
-                topic={question.topic}
-            />
+                else if (question.type === QuestionType.MultipleChoice) {
+                    return <MultipleChoice
+                        id={question.id}
+                        options={question.options}
+                        topic={question.topic}
+                    />
+                }
 
-            return <TextField 
-                id = {question.id}
-                type={TextFieldType.Short}
-                topic={question.topic}
-            />
-        }
+            } else if (isMatches(question.options) &&
+                question.type === QuestionType.Matchmaking) {
+                return <Matchmaking
+                    id={question.id}
+                    topic={question.topic}
+                    leftList={question.options.leftList}
+                    rightList={question.options.rightList}
+                />
+            }
 
-        else if (question.type === QuestionType.DetailedTextField) {
-            return <TextField
-                id={question.id}
-                type={TextFieldType.Detailed}
-                topic={question.topic}
-            />
+        } else {
+
+            if (question.type === QuestionType.ShortTextField) {
+
+                if (correctAnswer) return <TextField
+                    id={question.id}
+                    type={TextFieldType.Short}
+                    correctAnswer={question.correctAnswer}
+                    topic={question.topic}
+                />
+
+                return <TextField
+                    id={question.id}
+                    type={TextFieldType.Short}
+                    topic={question.topic}
+                />
+
+            } else if (question.type === QuestionType.DetailedTextField) {
+
+                return <TextField
+                    id={question.id}
+                    type={TextFieldType.Detailed}
+                    topic={question.topic}
+                />
+            }
         }
     }
 

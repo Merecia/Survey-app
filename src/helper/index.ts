@@ -1,4 +1,4 @@
-import { IOption, ITextAnswer } from './../types/survey';
+import { IMatches, IOption, ITextAnswer } from './../types/survey';
 
 export const remove = <T>(array: T[], index: number): T[] => {
 
@@ -16,4 +16,65 @@ export const isOption = (entity: any): entity is IOption => (
 export const isTextAnswer = (entity: any): entity is ITextAnswer => (
     'text' in entity
 )
+
+export const isMatches = (entity: any): entity is IMatches => (
+    'leftList' in entity && 'rightList' in entity
+)
+
+export const replaceNumberWithLetter = (number: number): string => {
+
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+    try {
+
+        if (number > alphabet.length || number < 1) {
+
+            throw new Error(
+                `It is impossible to replace this 
+                number with a letter of the alphabet`
+            );
+
+        } else {
+
+            return alphabet[number - 1];
+        }
+
+    } catch(error) {
+
+        console.log(error);
+        
+        return '';
+    }
+}
+
+export const replaceLetterWithNumber = (letter: string): number => {
+
+    const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
+
+    try {
+
+        if (letter.length !== 1) {
+
+            throw new Error(`A letter must be passed in the parameters`);
+
+        } else {
+
+            const index = alphabet.findIndex(letterFromAlphabet => 
+            letterFromAlphabet === letter.toLowerCase());
+
+            if (index === -1) {
+
+                throw new Error(`There is no such letter in the alphabet`);
+            }
+
+            return index + 1;
+        }
+
+    } catch(error) {
+
+        console.log(error);
+
+        return -1;
+    }
+}
 

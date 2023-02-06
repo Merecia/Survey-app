@@ -6,6 +6,11 @@ export interface IOption {
     score?: number;
 }
 
+export interface IMatches {
+    leftList: IOption[];
+    rightList: IOption[];
+}
+
 export interface ITextAnswer {
     text: string;
     score?: number;
@@ -21,7 +26,7 @@ export interface ISurvey {
 export interface IQuestion {
     id: number;
     topic: string;
-    options?: IOption[];
+    options?: IOption[] | IMatches;
     correctAnswer?: ITextAnswer;
     type: QuestionType;
 }
@@ -46,7 +51,8 @@ export enum QuestionType {
     OneChoice,
     MultipleChoice,
     ShortTextField,
-    DetailedTextField    
+    DetailedTextField,
+    Matchmaking   
 }
 
 export enum TextFieldType {
@@ -55,7 +61,7 @@ export enum TextFieldType {
 }
 
 export enum SurveyActionTypes {
-    UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_QUESTIONS'
+    UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_TO_QUESTIONS'
 }
 
 // Types

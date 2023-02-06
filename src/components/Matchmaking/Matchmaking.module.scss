@@ -1,0 +1,30 @@
+.Matchmaking {
+    display: flex;
+
+    .LeftList {
+        width: 50%;
+        .ListItem {
+            display: flex;
+            .Option {
+                padding-left: 3%;
+                width: 60%;
+            }  
+
+            .Select {
+                width: 10%;
+            }
+        }
+    }
+
+    .RightList {
+        .ListItem {
+            display: flex;
+            justify-content: end;
+            padding-right: 15%;
+        }
+        width: 50%;
+        .Option {
+            padding-left: 3%;
+        }
+    }
+}

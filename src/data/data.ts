@@ -1,4 +1,4 @@
-import { IQuestion, ISurvey, QuestionType } from "../types/survey";
+import { IMatches, IOption, IQuestion, ISurvey, QuestionType } from "../types/survey";
 
 // ----------------------------------------------------------------
 
@@ -85,10 +85,35 @@ export const testQuestion3: IQuestion = {
     type: QuestionType.ShortTextField
 };
 
+const leftList: IOption[] = [
+    {id: 1, label: 'Красный'},
+    {id: 2, label: 'Синий'},
+    {id: 3, label: 'Оранжевый'}
+];
+
+const rightList: IOption[] = [
+    {id: 1, label: 'Blue'},
+    {id: 2, label: 'Red'},
+    {id: 3, label: 'Orange'},
+    {id: 4, label: 'Purple'}
+]
+
+export const matches: IMatches = {
+    leftList,
+    rightList
+}
+export const testQuestion4: IQuestion = {
+    id: 4,
+    topic: 'Choose correct translate',
+    options: matches,
+    type: QuestionType.Matchmaking
+}
+
 export const testQuestions: IQuestion[] = [
     testQuestion1,
     testQuestion2,
-    testQuestion3
+    testQuestion3,
+    testQuestion4
 ];
 
 export const test: ISurvey = {
@@ -97,4 +122,6 @@ export const test: ISurvey = {
     questions: testQuestions,
     isEvaluated: true
 }
+
+
 

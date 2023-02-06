@@ -47,7 +47,7 @@ const TextField: FC<TextFieldProps> = ({ id, type, topic, correctAnswer }) => {
     }
 
 
-    const textareaChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const textareaChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         updateTextAnswer(event.target.value, QuestionType.DetailedTextField);        
     }
 

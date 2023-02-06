@@ -2,6 +2,7 @@ import { FC } from 'react';
 import { test } from '../../data/data';
 import { useActions } from '../../hooks/useActions';
 import Button from '../../UI/Button/Button';
+import Matchmaking from '../Matchmaking/Matchmaking';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
 
