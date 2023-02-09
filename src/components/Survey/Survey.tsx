@@ -1,14 +1,17 @@
 import { FC } from 'react';
 import { test } from '../../data/data';
 import { useActions } from '../../hooks/useActions';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
 import Button from '../../UI/Button/Button';
-import Matchmaking from '../Matchmaking/Matchmaking';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
 
 const Survey: FC = () => {
 
     const {finishTest} = useActions();
+    const {answersToQuestions} = useTypedSelector(state => state.survey);
+
+    console.log(answersToQuestions);
 
     const renderQuestions = () => {
         return test.questions.map(question =>

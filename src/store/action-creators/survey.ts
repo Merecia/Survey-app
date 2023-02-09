@@ -6,7 +6,7 @@ import {
 } from './../../types/survey';
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
-import { isOption, isTextAnswer } from '../../helper';
+import { isMatches, isOption, isTextAnswer } from '../../helper';
 
 export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
 
@@ -81,6 +81,15 @@ export const scoreTest = (): number => {
             const score = answer.score ?? 0;
 
             totalScore += score;
+
+        } else if (isMatches(answer)) {
+
+            answer.leftList.forEach(option => {
+
+                const score = option.score ?? 0;
+
+                totalScore += score;
+            })
 
         } else {
 

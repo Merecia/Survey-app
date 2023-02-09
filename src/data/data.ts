@@ -86,9 +86,9 @@ export const testQuestion3: IQuestion = {
 };
 
 const leftList: IOption[] = [
-    {id: 1, label: 'Красный'},
-    {id: 2, label: 'Синий'},
-    {id: 3, label: 'Оранжевый'}
+    {id: 1, label: 'Красный', score: 1, relatedOptionId: 2},
+    {id: 2, label: 'Синий', score: 1, relatedOptionId: 1},
+    {id: 3, label: 'Оранжевый', score: 1, relatedOptionId: 3}
 ];
 
 const rightList: IOption[] = [
@@ -102,6 +102,7 @@ export const matches: IMatches = {
     leftList,
     rightList
 }
+
 export const testQuestion4: IQuestion = {
     id: 4,
     topic: 'Choose correct translate',

@@ -4,6 +4,7 @@ export interface IOption {
     id: number;
     label: string;
     score?: number;
+    relatedOptionId?: number;
 }
 
 export interface IMatches {
@@ -66,6 +67,6 @@ export enum SurveyActionTypes {
 
 // Types
 
-export type Answer = IOption | IOption[] | ITextAnswer;
+export type Answer = IOption | IOption[] | ITextAnswer | IMatches;
 
 export type SurveyAction = UpdateAnswersQuestionsAction

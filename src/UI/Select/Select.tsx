@@ -7,7 +7,7 @@ interface SelectProps {
     onChangeHandler: (parameters: any) => void;
 }
 
-const Select: FC<SelectProps> = ({id, options, onChangeHandler, value}) => {
+const Select: FC<SelectProps> = ({id, options, value, onChangeHandler}) => {
 
     const renderOptions = () => options.map((option, index) => 
         renderOption(option, index)
@@ -20,7 +20,11 @@ const Select: FC<SelectProps> = ({id, options, onChangeHandler, value}) => {
     );
 
     return (
-        <select key = {id} value = {value} onChange = {onChangeHandler}>
+        <select 
+            key = {id} 
+            value = {value} 
+            onChange = {onChangeHandler} 
+        >
             {renderOptions()}
         </select>
     );

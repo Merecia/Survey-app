@@ -25,7 +25,9 @@ const TextField: FC<TextFieldProps> = ({ id, type, topic, correctAnswer }) => {
 
         if (correctAnswer) {
 
-            const earnedScore = correctAnswer.text === value ? correctAnswer.score : 0;
+            const earnedScore = correctAnswer.text.toLowerCase() === value.toLowerCase() 
+                ? correctAnswer.score 
+                : 0;
 
             answer = {text: value, score: earnedScore};
 
