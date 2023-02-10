@@ -1,8 +1,8 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { replaceLetterWithNumber, replaceNumberWithLetter } from '../../helper';
 import { useActions } from '../../hooks/useActions';
 import { 
-    Answer, 
+    IAnswer, 
     IOption, 
     IQuestion, 
     QuestionType 
@@ -10,49 +10,62 @@ import {
 import Select from '../../UI/Select/Select';
 import style from './Matchmaking.module.scss';
 
-interface MatchmakingProps {
+interface IMatchmakingProps {
     id: number;
     topic: string;
+    required: boolean;
     leftList: IOption[];
     rightList: IOption[];
 }
 
-interface Match {
+interface IMatch {
     leftListOptionId: number;
     rightListOptionId: number;
 }
 
-const Matchmaking: FC<MatchmakingProps> = ({ id, topic, leftList, rightList }) => {
-
+const Matchmaking: FC<IMatchmakingProps> = ({ 
+    id, 
+    topic, 
+    required, 
+    leftList, 
+    rightList 
+}) => {
     /*
         We will save matches as pairs of two numbers. Examples of the matches: 
         (1,2), (2,3), etc. The number of pairs will depend on the number of 
         options in the left list. For example, if in the left list 5 options,
         amount of pairs (amount of matches) will be 5.
     */
-    const [matches, setMatches] = useState<Match[]>([]);
+    const [matches, setMatches] = useState<IMatch[]>([]);
     const {updateAnswersQuestions} = useActions();
 
-    useEffect(() => {
-
-        const initialMatches: Match[] = leftList.map(option => {
-            return {
-                leftListOptionId: option.id,
-                rightListOptionId: 1
-            }
-        });
-
-        setMatches(initialMatches);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-    const getCorrectAnswers = (): Match[] => {
+    const getCorrectAnswers = (): IMatch[] => {
 
         return leftList.map(option => ({
             leftListOptionId: option.id,
             rightListOptionId: option.relatedOptionId || 0
         }));
+    }
+
+    const updateLeftList = (updatedMatches: IMatch[]): IOption[] => {
+
+        const correctAnswers = getCorrectAnswers();
+
+        return leftList.map(option => {
+
+            const match = updatedMatches.find(match => match.leftListOptionId === option.id);
+
+            const correctAnswer = correctAnswers.find(answer => answer.leftListOptionId === option.id);
+
+            const score = JSON.stringify(match) === JSON.stringify(correctAnswer) ? option.score : 0;
+
+            return {
+                id: option.id,
+                label: option.label,
+                score: score,
+                relatedOptionId: match?.rightListOptionId
+            };
+        });
     }
 
     const onChangeHandler = (
@@ -63,7 +76,7 @@ const Matchmaking: FC<MatchmakingProps> = ({ id, topic, leftList, rightList }) =
         const matchIndex = matches.findIndex(selectedOption =>
         selectedOption.leftListOptionId === selectedOptionIdFromLeftList);
 
-        let updatedMatches: Match[];
+        let updatedMatches: IMatch[];
 
         if (matchIndex !== -1) {
 
@@ -85,35 +98,20 @@ const Matchmaking: FC<MatchmakingProps> = ({ id, topic, leftList, rightList }) =
 
         setMatches(updatedMatches);
 
-        const correctAnswers = getCorrectAnswers();
+        const updatedLeftList = updateLeftList(updatedMatches);
 
-        const updatedLeftList = leftList.map(option => {
-
-            const match = updatedMatches.find(match => match.leftListOptionId === option.id);
-
-            const correctAnswer = correctAnswers.find(answer => answer.leftListOptionId === option.id);
-
-            const score = JSON.stringify(match) === JSON.stringify(correctAnswer) ? option.score : 0;
-
-            return {
-                id: option.id,
-                label: option.label,
-                score: score,
-                relatedOptionId: match?.rightListOptionId
-            }
-        })
-
-        const answer: Answer = {
+        const answer: IAnswer = {
             leftList: updatedLeftList,
             rightList
-        }
+        };
 
         const question: IQuestion = {
             id, 
             topic,
+            required,
             options: {leftList, rightList},
             type: QuestionType.Matchmaking 
-        }
+        };
 
         updateAnswersQuestions({answer, question});
     }
@@ -129,8 +127,7 @@ const Matchmaking: FC<MatchmakingProps> = ({ id, topic, leftList, rightList }) =
     /*
         This function will find the match for the leftListOptionId from the selectedOptions.
         If we can't find a match (for example, in cases when the user doesn't 
-        choose the option yet), we take the default value 1 (that is A if this ID 
-        will be translated to the letter). Therefore, all matches are set to A by default.
+        choose the option yet).
     */
     const findMatch = (leftListOptionId: number): number | undefined => {
         return matches.find(selectedOption =>
@@ -141,13 +138,14 @@ const Matchmaking: FC<MatchmakingProps> = ({ id, topic, leftList, rightList }) =
     const renderLeftList = () => {
         return leftList.map(option => {
             const match = findMatch(option.id);
+
             return (
                 <div className={style.ListItem} key={option.id}>
                     {renderOption(option.id, option.label)}
                     <div className={style.Select}>
                         <Select
                             id={option.id}
-                            value={match ? makeOptionIdLetter(match) : 'A'}
+                            value={match ? makeOptionIdLetter(match) : ''}
                             options={rightList.map(option => makeOptionIdLetter(option.id))}
                             onChangeHandler={(event: React.ChangeEvent<HTMLSelectElement>) =>
                                 onChangeHandler(option.id, event)}

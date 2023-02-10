@@ -24,23 +24,26 @@ const Question: FC<QuestionProps> = ({ question, margin }) => {
                 if (question.type === QuestionType.OneChoice) {
                     return <SingleChoice
                         id={question.id}
-                        options={question.options}
+                        required={question.required}
                         topic={question.topic}
+                        options={question.options}
                     />
                 }
 
                 else if (question.type === QuestionType.MultipleChoice) {
                     return <MultipleChoice
                         id={question.id}
-                        options={question.options}
+                        required={question.required}
                         topic={question.topic}
+                        options={question.options}
                     />
                 }
 
-            } else if (isMatches(question.options) &&
-                question.type === QuestionType.Matchmaking) {
+            } else if (isMatches(question.options)
+                && question.type === QuestionType.Matchmaking) {
                 return <Matchmaking
                     id={question.id}
+                    required={question.required}
                     topic={question.topic}
                     leftList={question.options.leftList}
                     rightList={question.options.rightList}
@@ -54,6 +57,7 @@ const Question: FC<QuestionProps> = ({ question, margin }) => {
                 if (correctAnswer) return <TextField
                     id={question.id}
                     type={TextFieldType.Short}
+                    required={question.required}
                     correctAnswer={question.correctAnswer}
                     topic={question.topic}
                 />
@@ -61,6 +65,7 @@ const Question: FC<QuestionProps> = ({ question, margin }) => {
                 return <TextField
                     id={question.id}
                     type={TextFieldType.Short}
+                    required={question.required}
                     topic={question.topic}
                 />
 
@@ -69,6 +74,7 @@ const Question: FC<QuestionProps> = ({ question, margin }) => {
                 return <TextField
                     id={question.id}
                     type={TextFieldType.Detailed}
+                    required={question.required}
                     topic={question.topic}
                 />
             }

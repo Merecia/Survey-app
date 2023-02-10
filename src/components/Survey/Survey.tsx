@@ -31,8 +31,8 @@ const Survey: FC = () => {
                 <Button 
                     label = 'Save Results'
                     clickHandler = {finishTest}
-                    margin = '2% 30%'
-                    width = '40%'
+                    width = '70%'
+                    margin = '2% 15%'
                 />
             </div>
         </div>

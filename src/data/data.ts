@@ -12,7 +12,7 @@ export const options1 = [
 export const options2 = [
     { id: 1, label: '5', score: 1 },
     { id: 2, label: '-5', score: 1 },
-    { id: 3, label: '6', score: 0 }
+    { id: 3, label: '6', score: -0.5 }
 ];
 
 // ----------------------------------------------------------------
@@ -20,6 +20,7 @@ export const options2 = [
 export const surveyQuestion1: IQuestion = {
     id: 1,
     type: QuestionType.OneChoice,
+    required: true,
     topic: 'There is only one the right option',
     options: options1,
 };
@@ -27,6 +28,7 @@ export const surveyQuestion1: IQuestion = {
 export const surveyQuestion2: IQuestion = {
     id: 2,
     type: QuestionType.MultipleChoice,
+    required: true,
     topic: 'Choose a few of the right options',
     options: options2,
 };
@@ -34,12 +36,14 @@ export const surveyQuestion2: IQuestion = {
 export const surveyQuestion3: IQuestion = {
     id: 3,
     type: QuestionType.ShortTextField,
+    required: true,
     topic: 'What is your name?',
 };
 
 export const surveyQuestion4: IQuestion = {
     id: 4,
     topic: 'Write a small essay about your attitude to smoke',
+    required: true,
     type: QuestionType.DetailedTextField
 };
 
@@ -61,6 +65,7 @@ export const survey: ISurvey = {
 
 export const testQuestion1: IQuestion = {
     id: 1,
+    required: true,
     topic: 'What color is the sky?',
     options: options1,
     type: QuestionType.OneChoice
@@ -68,6 +73,7 @@ export const testQuestion1: IQuestion = {
 
 export const testQuestion2: IQuestion = {
     id: 2,
+    required: true,
     topic: '|x| = 5',
     options: options2,
     type: QuestionType.MultipleChoice
@@ -80,6 +86,7 @@ export const correctAnswer = {
 
 export const testQuestion3: IQuestion = {
     id: 3,
+    required: true,
     topic: 'What is your name?',
     correctAnswer,
     type: QuestionType.ShortTextField
@@ -105,6 +112,7 @@ export const matches: IMatches = {
 
 export const testQuestion4: IQuestion = {
     id: 4,
+    required: true,
     topic: 'Choose correct translate',
     options: matches,
     type: QuestionType.Matchmaking

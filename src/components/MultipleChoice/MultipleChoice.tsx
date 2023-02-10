@@ -4,13 +4,14 @@ import { useActions } from '../../hooks/useActions';
 import { IOption, IQuestion, QuestionType } from '../../types/survey';
 import Checkbox from '../../UI/Checkbox/Checkbox';
 
-interface SingleChoiceProps {
+interface ISingleChoiceProps {
     id: number;
     options: IOption[];
     topic: string;
+    required: boolean;
 }
 
-const MultipleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
+const MultipleChoice: FC<ISingleChoiceProps> = ({ id, options, topic, required }) => {
 
     const [selectedOptionsId, setSelectedOptionsId] = useState<number[]>([]);
     const {updateAnswersQuestions} = useActions();
@@ -56,6 +57,7 @@ const MultipleChoice: FC<SingleChoiceProps> = ({ id, options, topic }) => {
             id,
             topic,
             options,
+            required,
             type: QuestionType.MultipleChoice,
         }
 

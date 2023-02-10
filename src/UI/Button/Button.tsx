@@ -4,8 +4,8 @@ import style from './Button.module.scss';
 interface ButtonProps {
     label: string;
     clickHandler: any;
-    margin: string;
-    width: string;
+    margin?: string;
+    width?: string;
 }
 
 const Button: FC<ButtonProps> = ({label, clickHandler, margin, width}) => {

@@ -27,14 +27,15 @@ export interface ISurvey {
 export interface IQuestion {
     id: number;
     topic: string;
+    type: QuestionType;
+    required: boolean;
     options?: IOption[] | IMatches;
     correctAnswer?: ITextAnswer;
-    type: QuestionType;
 }
 
 export interface IAnswerToQuestion {
     question: IQuestion;
-    answer: Answer;
+    answer: IAnswer;
 }
 
 export interface SurveyState {
@@ -67,6 +68,6 @@ export enum SurveyActionTypes {
 
 // Types
 
-export type Answer = IOption | IOption[] | ITextAnswer | IMatches;
+export type IAnswer = IOption | IOption[] | ITextAnswer | IMatches;
 
 export type SurveyAction = UpdateAnswersQuestionsAction

@@ -1,17 +1,24 @@
 import { FC, useState } from 'react';
 import { useActions } from '../../hooks/useActions';
-import { Answer, IQuestion, ITextAnswer, QuestionType, TextFieldType } from '../../types/survey';
+import { IAnswer, IQuestion, ITextAnswer, QuestionType, TextFieldType } from '../../types/survey';
 import Input from '../../UI/Input/Input';
 import Textarea from '../../UI/Textarea/Textarea';
 
-interface TextFieldProps {
+interface ITextFieldProps {
     id: number;
     type: TextFieldType;
-    correctAnswer?: ITextAnswer;
     topic: string;
+    required: boolean;
+    correctAnswer?: ITextAnswer;
 }
 
-const TextField: FC<TextFieldProps> = ({ id, type, topic, correctAnswer }) => {
+const TextField: FC<ITextFieldProps> = ({ 
+    id, 
+    type, 
+    topic, 
+    correctAnswer, 
+    required 
+}) => {
 
     const [text, setText] = useState<string>('');
 
@@ -21,7 +28,7 @@ const TextField: FC<TextFieldProps> = ({ id, type, topic, correctAnswer }) => {
 
         setText(value);
 
-        let answer: Answer;
+        let answer: IAnswer;
 
         if (correctAnswer) {
 
@@ -36,7 +43,7 @@ const TextField: FC<TextFieldProps> = ({ id, type, topic, correctAnswer }) => {
             answer = {text: value};
         }
 
-        const question: IQuestion = {id, topic, type, correctAnswer};
+        const question: IQuestion = {id, topic, type, correctAnswer, required};
 
         updateAnswersQuestions({
             question,

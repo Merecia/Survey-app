@@ -3,21 +3,22 @@ import { useActions } from '../../hooks/useActions';
 import { IOption, IQuestion, QuestionType } from '../../types/survey';
 import Radio from '../../UI/Radio/Radio';
 
-interface SingleChoiceProps {
+interface ISingleChoiceProps {
     id: number;
-    options: IOption[];
     topic: string;
+    required: boolean;
+    options: IOption[];
 }
 
-const SingleChoice: FC<SingleChoiceProps> = ({ id, options, topic}) => {
+const SingleChoice: FC<ISingleChoiceProps> = ({ id, options, topic, required }) => {
 
-    const {updateAnswersQuestions} = useActions();
+    const { updateAnswersQuestions } = useActions();
     const [selectedOptionId, setSelectedOptionId] = useState<Number>();
 
     const radioHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
 
         const selectedOptionId = Number(event.target.value);
-        
+
         setSelectedOptionId(selectedOptionId);
 
         const selectedOption = options.find(option => option.id === selectedOptionId);
@@ -25,6 +26,7 @@ const SingleChoice: FC<SingleChoiceProps> = ({ id, options, topic}) => {
         const question: IQuestion = {
             id,
             topic,
+            required,
             options,
             type: QuestionType.OneChoice
         };

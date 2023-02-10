@@ -25,6 +25,7 @@ const Select: FC<SelectProps> = ({id, options, value, onChangeHandler}) => {
             value = {value} 
             onChange = {onChangeHandler} 
         >
+            <option value = ''/>
             {renderOptions()}
         </select>
     );

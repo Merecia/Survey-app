@@ -60,7 +60,7 @@ export const replaceLetterWithNumber = (letter: string): number => {
         } else {
 
             const index = alphabet.findIndex(letterFromAlphabet => 
-            letterFromAlphabet === letter.toLowerCase());
+                                  letterFromAlphabet === letter.toLowerCase());
 
             if (index === -1) {
 

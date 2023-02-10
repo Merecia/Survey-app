@@ -50,12 +50,6 @@ export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
     }
 }
 
-/*
-     answersQuestions includes not all questions, only questions that user has answered.
-     answersQuestions should be replaced to questions (new state), that include all questions.
-     name answersQuestions should be changed to results, because this name is more informative.
-*/
-
 export const finishTest = () => {
 
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
