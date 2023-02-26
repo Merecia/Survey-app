@@ -7,11 +7,11 @@ import {
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
 import { isMatches, isOption, isTextAnswer } from '../../helper';
+import { test } from '../../data/data';
 
 export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
 
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-
         const answersToQuestions = getState().survey.answersToQuestions;
         const answeredQuestions = answersToQuestions.map(answerToQuestion => answerToQuestion.question);
         const currentQuestion = answerToQuestion.question;
@@ -53,10 +53,23 @@ export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
 export const finishTest = () => {
 
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-
         console.log(getState().survey.answersToQuestions);
 
         console.log('Оценка за тест: ' + scoreTest());
+    }
+}
+
+export const loadQuestions = () => {
+    /*
+        There will be logic for load questions from firebase database.
+        We will load this data by some URL, that will be gived 
+        to the parameters of this funtion. 
+    */
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: test.questions
+        })
     }
 }
 

@@ -1,38 +1,86 @@
-import { FC } from 'react';
-import { test } from '../../data/data';
+import { FC, useEffect } from 'react';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import Button from '../../UI/Button/Button';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
 
-const Survey: FC = () => {
+interface ISurveyProps {
+    title: string;
+}
 
-    const {finishTest} = useActions();
-    const {answersToQuestions} = useTypedSelector(state => state.survey);
+const Survey: FC<ISurveyProps> = ({ title }) => {
+    const {
+        finishTest,
+        loadQuestions
+    } = useActions();
+    const { answersToQuestions, questions } = useTypedSelector(state => state.survey);
 
-    console.log(answersToQuestions);
+    useEffect(() => {
+        loadQuestions();
+    }, [])
 
     const renderQuestions = () => {
-        return test.questions.map(question =>
-            <Question 
-                key = {question.id}
-                question = {question}
-                margin = '20px'
+        return questions.map(question =>
+            <Question
+                key={question.id}
+                question={question}
+                margin='20px'
             />
-        )
+        );
     }
+
+    /*
+        This function should be in Redux, because components must contain only
+        simple logic for rendering, styling etc., but this logic is hard and
+        it is not related to component logic. This is logic of the passing test,
+        so it must be in Redux.
+    */
+    const areAllRequiredQuestionsAnswered = (): boolean => {
+        const requiredQuestionsId: number[] = [];
+
+        questions.forEach(question => {
+            if (question.required) {
+                requiredQuestionsId.push(question.id);
+            }
+        })
+
+        const answeredQuestionsId: number[] = answersToQuestions.map(
+            answerToQuestion => answerToQuestion.question.id
+        );
+
+        let allRequiredQuestionsAreAnswered = true;
+
+        requiredQuestionsId.forEach(requiredQuestionId => {
+            if (!answeredQuestionsId.includes(requiredQuestionId)) {
+                allRequiredQuestionsAreAnswered = false;
+            }
+        })
+        
+        return allRequiredQuestionsAreAnswered;
+    }
+
+    const finishButtonClickHandler = () => {
+        if (areAllRequiredQuestionsAnswered()) {
+            finishTest();
+        } else {
+            console.log('You need to answer all required questions');
+        }
+    }
+
+    console.log(questions);
+    console.log(answersToQuestions);
 
     return (
         <div className={style.Survey}>
             <div className={style.Wrapper}>
-                <h1 style = {{textAlign: 'center'}}> {test.title} </h1>
+                <h1 style={{ textAlign: 'center' }}> {title} </h1>
                 {renderQuestions()}
-                <Button 
-                    label = 'Save Results'
-                    clickHandler = {finishTest}
-                    width = '70%'
-                    margin = '2% 15%'
+                <Button
+                    label='Save Results'
+                    clickHandler={finishButtonClickHandler}
+                    width='70%'
+                    margin='2% 15%'
                 />
             </div>
         </div>

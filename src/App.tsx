@@ -5,7 +5,7 @@ import Survey from './components/Survey/Survey';
 const App: FC = () => {
   return (
     <div className={style.App}>
-      <Survey />
+      <Survey title = {'Опрос'}/>
     </div>
   );
 }
