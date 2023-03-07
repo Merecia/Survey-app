@@ -1,3 +1,4 @@
+import { isSetOfOptions } from './../../helper/index';
 import { store } from './../index';
 import {
     IAnswerToQuestion,
@@ -7,10 +8,9 @@ import {
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
 import { isMatches, isOption, isTextAnswer } from '../../helper';
-import { test } from '../../data/data';
+import { answers, quiz } from '../../data/data';
 
 export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
-
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         const answersToQuestions = getState().survey.answersToQuestions;
         const answeredQuestions = answersToQuestions.map(answerToQuestion => answerToQuestion.question);
@@ -50,60 +50,59 @@ export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
     }
 }
 
-export const finishTest = () => {
-
+export const finishSurvey = (surveyId: number) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         console.log(getState().survey.answersToQuestions);
-
-        console.log('Оценка за тест: ' + scoreTest());
+        console.log(`User has finished survey ${surveyId}`);
+        console.log('Score: ' + scoreTest());
     }
 }
 
-export const loadQuestions = () => {
+export const loadQuestions = (surveyId: number) => {
     /*
         There will be logic for load questions from firebase database.
         We will load this data by some URL, that will be gived 
         to the parameters of this funtion. 
     */
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        console.log(`Questions from Survey ${surveyId} have been loaded`);
+
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
-            payload: test.questions
+            payload: quiz.questions
+        })
+    }
+}
+
+export const loadAnswersToQuestions = (surveyId: number) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        console.log(`Answers to Questions from Survey ${surveyId} have been loaded`);
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
+            payload: answers
         })
     }
 }
 
 export const scoreTest = (): number => {
-
     const answersToQuestions = store.getState().survey.answersToQuestions;
-
     let totalScore: number = 0;
 
     answersToQuestions.forEach(answerToQuestion => {
-
         const answer = answerToQuestion.answer;
 
         if (isOption(answer) || isTextAnswer(answer)) {
-
             const score = answer.score ?? 0;
-
             totalScore += score;
-
         } else if (isMatches(answer)) {
-
             answer.leftList.forEach(option => {
-
                 const score = option.score ?? 0;
-
                 totalScore += score;
             })
-
-        } else {
-
+        } else if (isSetOfOptions(answer)){
             answer.forEach(option => {
-
                 const score = option.score ?? 0;
-
                 totalScore += score;
             })
         }

@@ -33,6 +33,13 @@ export interface IQuestion {
     correctAnswer?: ITextAnswer;
 }
 
+export interface IFeedback {
+    totalScore: number;
+    maximumScore: number;
+    note: string;
+    correctAnswers: string[];
+}
+
 export interface IAnswerToQuestion {
     question: IQuestion;
     answer: IAnswer;
@@ -63,10 +70,7 @@ export enum QuestionType {
     Matchmaking   
 }
 
-export enum TextFieldType {
-    Short,
-    Detailed
-}
+export enum TextFieldType { Short, Detailed }
 
 export enum SurveyActionTypes {
     UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_TO_QUESTIONS',

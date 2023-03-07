@@ -5,10 +5,17 @@ interface CheckboxProps {
     id: number;
     label: string;
     checked?: boolean;
+    disabled?: boolean;
     onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const Checkbox: FC<CheckboxProps> = ({id, label, checked, onChangeHandler}) => {
+const Checkbox: FC<CheckboxProps> = ({
+    id, 
+    label, 
+    checked,
+    disabled, 
+    onChangeHandler
+}) => {
     return (
         <div className = {style.Checkbox}>
             <input 
@@ -16,6 +23,7 @@ const Checkbox: FC<CheckboxProps> = ({id, label, checked, onChangeHandler}) => {
                 name={label} 
                 checked={checked}
                 value={id}
+                disabled = {disabled}
                 onChange={onChangeHandler}
             />
             <label 

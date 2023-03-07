@@ -1,11 +1,12 @@
-import { FC, useState } from 'react';
-import { replaceLetterWithNumber, replaceNumberWithLetter } from '../../helper';
+import { FC, useState, useEffect } from 'react';
+import { isOption, makeOptionIdLetter, replaceLetterWithNumber } from '../../helper';
 import { useActions } from '../../hooks/useActions';
-import { 
-    IAnswer, 
-    IOption, 
-    IQuestion, 
-    QuestionType 
+import {
+    IAnswer,
+    IMatches,
+    IOption,
+    IQuestion,
+    QuestionType
 } from '../../types/survey';
 import Select from '../../UI/Select/Select';
 import style from './Matchmaking.module.scss';
@@ -16,6 +17,8 @@ interface IMatchmakingProps {
     required: boolean;
     leftList: IOption[];
     rightList: IOption[];
+    disabled?: boolean;
+    selectedMatches?: IMatches;
 }
 
 interface IMatch {
@@ -23,12 +26,14 @@ interface IMatch {
     rightListOptionId: number;
 }
 
-const Matchmaking: FC<IMatchmakingProps> = ({ 
-    id, 
-    topic, 
-    required, 
-    leftList, 
-    rightList 
+const Matchmaking: FC<IMatchmakingProps> = ({
+    id,
+    topic,
+    required,
+    leftList,
+    rightList,
+    disabled,
+    selectedMatches
 }) => {
     /*
         We will save matches as pairs of two numbers. Examples of the matches: 
@@ -37,7 +42,25 @@ const Matchmaking: FC<IMatchmakingProps> = ({
         amount of pairs (amount of matches) will be 5.
     */
     const [matches, setMatches] = useState<IMatch[]>([]);
-    const {updateAnswersQuestions} = useActions();
+    const { updateAnswersQuestions } = useActions();
+
+    console.log(selectedMatches);
+
+    useEffect(() => {
+        if (selectedMatches) {
+            const matches: IMatch[] = [];
+
+            selectedMatches.leftList.forEach(option => {
+                matches.push({
+                    leftListOptionId: option.id,
+                    rightListOptionId: option.relatedOptionId as number
+                });
+            })
+
+            setMatches(matches);
+        }
+        // eslint-disable-next-line
+    }, [])
 
     const getCorrectAnswers = (): IMatch[] => {
 
@@ -48,15 +71,11 @@ const Matchmaking: FC<IMatchmakingProps> = ({
     }
 
     const updateLeftList = (updatedMatches: IMatch[]): IOption[] => {
-
         const correctAnswers = getCorrectAnswers();
 
         return leftList.map(option => {
-
             const match = updatedMatches.find(match => match.leftListOptionId === option.id);
-
             const correctAnswer = correctAnswers.find(answer => answer.leftListOptionId === option.id);
-
             const score = JSON.stringify(match) === JSON.stringify(correctAnswer) ? option.score : 0;
 
             return {
@@ -72,24 +91,17 @@ const Matchmaking: FC<IMatchmakingProps> = ({
         selectedOptionIdFromLeftList: number,
         event: React.ChangeEvent<HTMLSelectElement>
     ) => {
-
         const matchIndex = matches.findIndex(selectedOption =>
-        selectedOption.leftListOptionId === selectedOptionIdFromLeftList);
+            selectedOption.leftListOptionId === selectedOptionIdFromLeftList);
 
         let updatedMatches: IMatch[];
 
         if (matchIndex !== -1) {
-
             const match = matches[matchIndex];
-
             match.rightListOptionId = replaceLetterWithNumber(event.target.value);
-
             updatedMatches = [...matches];
-
             updatedMatches[matchIndex] = match;
-
         } else {
-
             updatedMatches = [...matches, {
                 leftListOptionId: selectedOptionIdFromLeftList,
                 rightListOptionId: replaceLetterWithNumber(event.target.value)
@@ -106,19 +118,13 @@ const Matchmaking: FC<IMatchmakingProps> = ({
         };
 
         const question: IQuestion = {
-            id, 
-            topic,
-            required,
-            options: {leftList, rightList},
-            type: QuestionType.Matchmaking 
+            id, topic, required,
+            options: { leftList, rightList },
+            type: QuestionType.Matchmaking
         };
 
-        updateAnswersQuestions({answer, question});
+        updateAnswersQuestions({ answer, question });
     }
-
-    const makeOptionIdLetter = (id: number): string => (
-        replaceNumberWithLetter(id).toUpperCase()
-    )
 
     const renderOption = (id: number | string, label: string) => (
         <div className={style.Option} key={id}> {id}. {label} </div>
@@ -131,9 +137,30 @@ const Matchmaking: FC<IMatchmakingProps> = ({
     */
     const findMatch = (leftListOptionId: number): number | undefined => {
         return matches.find(selectedOption =>
-        selectedOption.leftListOptionId === leftListOptionId)
-        ?.rightListOptionId || undefined;
+            selectedOption.leftListOptionId === leftListOptionId
+        )?.rightListOptionId || undefined;
     }
+
+    const isCorrectOption = (option: IAnswer) => {
+        if (isOption(option)) {
+            const match = findMatch(option.id);
+
+            if (option.relatedOptionId === match) {
+                return true;
+            }
+
+            return false;
+        }
+        return undefined;
+    }
+
+    const renderMark = (option: IAnswer) => {
+        return isCorrectOption(option) ? renderCheckmark() : renderCrossmark();
+    }
+
+    const renderCheckmark = () => <span className={style.Checkmark}> &#10003; </span>
+
+    const renderCrossmark = () => <span className={style.Crossmark}> &#10060; </span>
 
     const renderLeftList = () => {
         return leftList.map(option => {
@@ -147,9 +174,13 @@ const Matchmaking: FC<IMatchmakingProps> = ({
                             id={option.id}
                             value={match ? makeOptionIdLetter(match) : ''}
                             options={rightList.map(option => makeOptionIdLetter(option.id))}
-                            onChangeHandler={(event: React.ChangeEvent<HTMLSelectElement>) =>
-                                onChangeHandler(option.id, event)}
+                            disabled={disabled}
+                            onChangeHandler={
+                                (event: React.ChangeEvent<HTMLSelectElement>) =>
+                                    onChangeHandler(option.id, event)
+                            }
                         />
+                        {renderMark(option)}
                     </div>
                 </div>
             );

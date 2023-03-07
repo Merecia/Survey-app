@@ -4,12 +4,14 @@ interface TextareaProps {
     text: string;
     width: string;
     height: string;
+    disabled?: boolean;
     onChangeHandler: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
 }
 
 const Textarea: FC<TextareaProps> = ({
     onChangeHandler,
     text,
+    disabled,
     width,
     height
 }) => {
@@ -17,6 +19,7 @@ const Textarea: FC<TextareaProps> = ({
         <textarea
             value={text}
             onChange={onChangeHandler}
+            disabled = {disabled}
             style={{
                 'resize': 'none', 
                 width,

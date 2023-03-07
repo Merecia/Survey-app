@@ -1,4 +1,8 @@
-import { SurveyState, SurveyAction, SurveyActionTypes } from './../../types/survey';
+import { 
+    SurveyState, 
+    SurveyAction, 
+    SurveyActionTypes 
+} from './../../types/survey';
 
 const initialState: SurveyState = {
     questions: [],

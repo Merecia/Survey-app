@@ -6,18 +6,24 @@ import Question from '../Question/Question';
 import style from './Survey.module.scss';
 
 interface ISurveyProps {
+    id: number;
     title: string;
 }
 
-const Survey: FC<ISurveyProps> = ({ title }) => {
+const Survey: FC<ISurveyProps> = ({ id, title }) => {
     const {
-        finishTest,
+        finishSurvey,
         loadQuestions
     } = useActions();
-    const { answersToQuestions, questions } = useTypedSelector(state => state.survey);
+    
+    const { 
+        answersToQuestions, 
+        questions 
+    } = useTypedSelector(state => state.survey);
 
     useEffect(() => {
-        loadQuestions();
+        loadQuestions(id);
+        // eslint-disable-next-line
     }, [])
 
     const renderQuestions = () => {
@@ -29,13 +35,7 @@ const Survey: FC<ISurveyProps> = ({ title }) => {
             />
         );
     }
-
-    /*
-        This function should be in Redux, because components must contain only
-        simple logic for rendering, styling etc., but this logic is hard and
-        it is not related to component logic. This is logic of the passing test,
-        so it must be in Redux.
-    */
+    
     const areAllRequiredQuestionsAnswered = (): boolean => {
         const requiredQuestionsId: number[] = [];
 
@@ -56,13 +56,13 @@ const Survey: FC<ISurveyProps> = ({ title }) => {
                 allRequiredQuestionsAreAnswered = false;
             }
         })
-        
+
         return allRequiredQuestionsAreAnswered;
     }
 
     const finishButtonClickHandler = () => {
         if (areAllRequiredQuestionsAnswered()) {
-            finishTest();
+            finishSurvey(id);
         } else {
             console.log('You need to answer all required questions');
         }

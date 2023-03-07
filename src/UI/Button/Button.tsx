@@ -6,14 +6,22 @@ interface ButtonProps {
     clickHandler: any;
     margin?: string;
     width?: string;
+    disabled?: boolean;
 }
 
-const Button: FC<ButtonProps> = ({label, clickHandler, margin, width}) => {
+const Button: FC<ButtonProps> = ({
+    label, 
+    clickHandler, 
+    margin, 
+    width,
+    disabled
+}) => {
     return (
         <button 
             className = {style.Button}
             onClick = {clickHandler}
             style = {{margin, width}}
+            disabled = {disabled}
         >
             {label}
         </button>

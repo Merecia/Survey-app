@@ -1,5 +1,4 @@
 import { FC } from 'react';
-import { correctAnswer } from '../../data/data';
 import { isMatches } from '../../helper';
 import { IQuestion, QuestionType, TextFieldType } from '../../types/survey';
 import Matchmaking from '../Matchmaking/Matchmaking';
@@ -10,17 +9,21 @@ import style from './Question.module.scss';
 
 interface IQuestionProps {
     question: IQuestion;
-    margin: string;
+    margin?: string;
 }
 
 const Question: FC<IQuestionProps> = ({ question, margin }) => {
-
     const renderResponseField = () => {
-
         if (question.options) {
-
-            if (!isMatches(question.options)) {
-
+            if (isMatches(question.options)) {
+                return <Matchmaking
+                    id={question.id}
+                    required={question.required}
+                    topic={question.topic}
+                    leftList={question.options.leftList}
+                    rightList={question.options.rightList}
+                />
+            } else {
                 if (question.type === QuestionType.OneChoice) {
                     return <SingleChoice
                         id={question.id}
@@ -29,7 +32,6 @@ const Question: FC<IQuestionProps> = ({ question, margin }) => {
                         options={question.options}
                     />
                 }
-
                 else if (question.type === QuestionType.MultipleChoice) {
                     return <MultipleChoice
                         id={question.id}
@@ -38,35 +40,14 @@ const Question: FC<IQuestionProps> = ({ question, margin }) => {
                         options={question.options}
                     />
                 }
-
-            } else if (isMatches(question.options) && question.type === QuestionType.Matchmaking) {
-                return <Matchmaking
-                    id={question.id}
-                    required={question.required}
-                    topic={question.topic}
-                    leftList={question.options.leftList}
-                    rightList={question.options.rightList}
-                />
             }
-
         } else {
-
             if (question.type === QuestionType.ShortTextField) {
-
-                if (correctAnswer) {
-                    return <TextField
-                        id={question.id}
-                        type={TextFieldType.Short}
-                        required={question.required}
-                        correctAnswer={question.correctAnswer}
-                        topic={question.topic}
-                    />
-                }
-
                 return <TextField
                     id={question.id}
                     type={TextFieldType.Short}
                     required={question.required}
+                    correctAnswer={question.correctAnswer ?? undefined}
                     topic={question.topic}
                 />
 

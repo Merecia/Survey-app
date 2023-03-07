@@ -1,4 +1,11 @@
-import { IMatches, IOption, IQuestion, ISurvey, QuestionType } from "../types/survey";
+import { 
+    IAnswerToQuestion, 
+    IMatches, 
+    IOption, 
+    IQuestion, 
+    ISurvey, 
+    QuestionType 
+} from "../types/survey";
 
 // ----------------------------------------------------------------
 
@@ -125,12 +132,190 @@ export const testQuestions: IQuestion[] = [
     testQuestion4
 ];
 
-export const test: ISurvey = {
+export const quiz: ISurvey = {
     id: 2,
-    title: 'Тест',
+    title: 'Quiz',
     questions: testQuestions,
     isEvaluated: true
 }
 
+export const answers: IAnswerToQuestion[] = [
+    {
+        "question": {
+            "id": 1,
+            "topic": "What color is the sky?",
+            "required": true,
+            "options": [
+                {
+                    "id": 1,
+                    "label": "Blue",
+                    "score": 1
+                },
+                {
+                    "id": 2,
+                    "label": "Red",
+                    "score": 0
+                },
+                {
+                    "id": 3,
+                    "label": "Green",
+                    "score": 0
+                },
+                {
+                    "id": 4,
+                    "label": "White",
+                    "score": 0
+                }
+            ],
+            "type": 0
+        },
+        "answer": {
+            "id": 1,
+            "label": "Blue",
+            "score": 1
+        }
+    },
+    {
+        "question": {
+            "id": 2,
+            "topic": "|x| = 5",
+            "options": [
+                {
+                    "id": 1,
+                    "label": "x = 5",
+                    "score": 1
+                },
+                {
+                    "id": 2,
+                    "label": "x = -5",
+                    "score": 1
+                },
+                {
+                    "id": 3,
+                    "label": "x = 6",
+                    "score": -0.5
+                }
+            ],
+            "required": true,
+            "type": 1
+        },
+        "answer": [
+            {
+                "id": 2,
+                "label": "-5",
+                "score": 1
+            },
+            {
+                "id": 3,
+                "label": "6",
+                "score": -0.5
+            }
+        ]
+    },
+    {
+        "question": {
+            "id": 3,
+            "topic": "What is your name?",
+            "type": 2,
+            "correctAnswer": {
+                "text": "Саша",
+                "score": 1
+            },
+            "required": true
+        },
+        "answer": {
+            "text": "Oleg",
+            "score": 0
+        }
+    },
+    {
+        "answer": {
+            "leftList": [
+                {
+                    "id": 1,
+                    "label": "Красный",
+                    "score": 1,
+                    "relatedOptionId": 2
+                },
+                {
+                    "id": 2,
+                    "label": "Синий",
+                    "score": 0,
+                    "relatedOptionId": 4
+                },
+                {
+                    "id": 3,
+                    "label": "Оранжевый",
+                    "score": 0,
+                    "relatedOptionId": 1
+                }
+            ],
+            "rightList": [
+                {
+                    "id": 1,
+                    "label": "Blue"
+                },
+                {
+                    "id": 2,
+                    "label": "Red"
+                },
+                {
+                    "id": 3,
+                    "label": "Orange"
+                },
+                {
+                    "id": 4,
+                    "label": "Purple"
+                }
+            ]
+        },
+        "question": {
+            "id": 4,
+            "topic": "Choose correct translate",
+            "required": true,
+            "options": {
+                "leftList": [
+                    {
+                        "id": 1,
+                        "label": "Красный",
+                        "score": 1,
+                        "relatedOptionId": 2
+                    },
+                    {
+                        "id": 2,
+                        "label": "Синий",
+                        "score": 1,
+                        "relatedOptionId": 1
+                    },
+                    {
+                        "id": 3,
+                        "label": "Оранжевый",
+                        "score": 1,
+                        "relatedOptionId": 3
+                    }
+                ],
+                "rightList": [
+                    {
+                        "id": 1,
+                        "label": "Blue"
+                    },
+                    {
+                        "id": 2,
+                        "label": "Red"
+                    },
+                    {
+                        "id": 3,
+                        "label": "Orange"
+                    },
+                    {
+                        "id": 4,
+                        "label": "Purple"
+                    }
+                ]
+            },
+            "type": 4
+        }
+    }
+]
 
 

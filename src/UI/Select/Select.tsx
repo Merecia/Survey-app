@@ -1,14 +1,21 @@
 import { FC } from 'react';
+import style from './Select.module.scss';
 
 interface SelectProps {
     id: number;
     value: string;
     options: string[];
+    disabled?: boolean;
     onChangeHandler: (parameters: any) => void;
 }
 
-const Select: FC<SelectProps> = ({id, options, value, onChangeHandler}) => {
-
+const Select: FC<SelectProps> = ({
+    id, 
+    options, 
+    value, 
+    onChangeHandler, 
+    disabled
+}) => {
     const renderOptions = () => options.map((option, index) => 
         renderOption(option, index)
     );
@@ -24,6 +31,8 @@ const Select: FC<SelectProps> = ({id, options, value, onChangeHandler}) => {
             key = {id} 
             value = {value} 
             onChange = {onChangeHandler} 
+            disabled = {disabled}
+            className = {style.Select}
         >
             <option value = ''/>
             {renderOptions()}
