@@ -1,30 +1,26 @@
 import { FC } from 'react';
+import style from './Textarea.module.scss';
 
 interface TextareaProps {
-    text: string;
-    width: string;
-    height: string;
-    disabled?: boolean;
+    value: string;
     onChangeHandler: (event: React.ChangeEvent<HTMLTextAreaElement>) => void;
+    cssProperties?: React.CSSProperties;
+    disabled?: boolean;
 }
 
 const Textarea: FC<TextareaProps> = ({
     onChangeHandler,
-    text,
+    value,
     disabled,
-    width,
-    height
+    cssProperties
 }) => {
     return (
         <textarea
-            value={text}
+            value={value}
             onChange={onChangeHandler}
             disabled = {disabled}
-            style={{
-                'resize': 'none', 
-                width,
-                height
-            }}
+            style={cssProperties}
+            className={style.Textarea}
         />
     );
 }

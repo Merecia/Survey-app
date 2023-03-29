@@ -12,6 +12,11 @@ export interface IMatches {
     rightList: IOption[];
 }
 
+export interface IMatch {
+    leftListOptionId: number;
+    rightListOptionId: number;
+}
+
 export interface ITextAnswer {
     text: string;
     score?: number;
@@ -30,7 +35,7 @@ export interface IQuestion {
     type: QuestionType;
     required: boolean;
     options?: IOption[] | IMatches;
-    correctAnswer?: ITextAnswer;
+    correctAnswer?: ITextAnswer | IOption | IOption[];
 }
 
 export interface IFeedback {

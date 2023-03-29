@@ -6,8 +6,13 @@ import {
     isSetOfOptions,
     makeOptionIdLetter
 } from '../../helper';
-import { IAnswer, IAnswerToQuestion, IFeedback, IOption } from '../../types/survey';
-import { IQuestion, QuestionType, TextFieldType } from '../../types/survey';
+import {
+    IAnswer,
+    IAnswerToQuestion,
+    IFeedback,
+    IOption
+} from '../../types/survey';
+import { IQuestion, QuestionType } from '../../types/survey';
 import style from './Answer.module.scss';
 import Matchmaking from '../Matchmaking/Matchmaking';
 import MultipleChoice from '../MultipleChoice/MultipleChoice';
@@ -17,69 +22,51 @@ import Feedback from '../Feedback/Feedback';
 
 interface IAnswerProps {
     answerToQuestion: IAnswerToQuestion;
-    margin?: string;
+    cssProperties?: React.CSSProperties;
 }
 
-const Answer: FC<IAnswerProps> = ({ answerToQuestion, margin }) => {
+const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
 
     const renderResponseField = (question: IQuestion, answer: IAnswer) => {
-        if (question.options) {
-            if (isMatches(question.options)) {
-                return <Matchmaking
-                    id={question.id}
-                    required={question.required}
-                    topic={question.topic}
-                    disabled={true}
-                    leftList={question.options.leftList}
-                    rightList={question.options.rightList}
+        if (question.type === QuestionType.Matchmaking) {
+            return (
+                <Matchmaking
+                    question={question}
                     selectedMatches={isMatches(answer) ? answer : undefined}
                 />
-            } else {
-                if (question.type === QuestionType.OneChoice) {
-                    return <SingleChoice
-                        id={question.id}
-                        required={question.required}
-                        disabled={true}
-                        topic={question.topic}
-                        options={question.options}
-                        selectedOption={isOption(answer) ? answer.id : undefined}
-                    />
-                }
-                else if (question.type === QuestionType.MultipleChoice) {
-                    return <MultipleChoice
-                        id={question.id}
-                        disabled={true}
-                        required={question.required}
-                        topic={question.topic}
-                        options={question.options}
-                        selectedOptions={
-                            isSetOfOptions(answer)
-                                ? answer.map(option => option.id)
-                                : undefined
-                        }
-                    />
-                }
-            }
-        } else {
-            if (question.type === QuestionType.ShortTextField) {
-                return <TextField
-                    id={question.id}
-                    type={TextFieldType.Short}
-                    disabled={true}
-                    required={question.required}
-                    correctAnswer={question.correctAnswer}
+            );
+        }
+        else if (question.type === QuestionType.OneChoice) {
+            return (
+                <SingleChoice
+                    question={question}
+                    selectedOption={isOption(answer) ? answer : undefined}
+                />
+            );
+        }
+        else if (question.type === QuestionType.MultipleChoice) {
+            return (
+                <MultipleChoice
+                    question={question}
+                    selectedOptions={isSetOfOptions(answer) ? answer : undefined}
+                />
+            );
+        }
+        else if (question.type === QuestionType.ShortTextField) {
+            return (
+                <TextField
+                    question={question}
                     givedAnswer={isTextAnswer(answer) ? answer : undefined}
-                    topic={question.topic}
                 />
-            } else if (question.type === QuestionType.DetailedTextField) {
-                return <TextField
-                    id={question.id}
-                    disabled={true}
-                    type={TextFieldType.Detailed}
-                    required={question.required}
-                    topic={question.topic}
+            );
+        }
+        else if (question.type === QuestionType.DetailedTextField) {
+            return (
+                <TextField
+                    question={question}
+                    givedAnswer={isTextAnswer(answer) ? answer : undefined}
                 />
-            }
+            );
         }
     }
 
@@ -108,7 +95,7 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, margin }) => {
             }
 
         } else if (question.type === QuestionType.ShortTextField) {
-            if (question.correctAnswer?.score) {
+            if (isTextAnswer(question.correctAnswer) && question.correctAnswer?.score) {
                 maximumScore += question.correctAnswer.score;
             }
         }
@@ -188,24 +175,22 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, margin }) => {
             })
         }
 
-        return {
-            totalScore,
-            maximumScore,
-            correctAnswers
-        } as IFeedback;
+        return { totalScore, maximumScore, correctAnswers } as IFeedback;
     }
 
     const renderFeedback = (feedback: IFeedback) => {
-        return <Feedback
-            feedback={feedback}
-            margin='20px 0px 0px 0px'
-        />
+        return (
+            <Feedback
+                feedback={feedback}
+                cssProperties={{ margin: '20px 0px 0px 0px' }}
+            />
+        );
     }
 
     const feedback = getFeedback(answerToQuestion);
 
     return (
-        <div className={style.Answer} style={{ margin }}>
+        <div className={style.Answer} style={cssProperties}>
             <p> {answerToQuestion.question.topic} </p>
             {renderResponseField(answerToQuestion.question, answerToQuestion.answer)}
             {feedback ? renderFeedback(feedback) : null}

@@ -1,33 +1,22 @@
 import { FC, useState, useEffect } from 'react';
-import { isOption, remove } from '../../helper';
+import { isOption, isSetOfOptions, remove } from '../../helper';
 import { useActions } from '../../hooks/useActions';
-import { IAnswer, IOption, IQuestion, QuestionType } from '../../types/survey';
+import { IAnswer, IOption, IQuestion } from '../../types/survey';
 import Checkbox from '../../UI/Checkbox/Checkbox';
 import style from './MultipleChoice.module.scss';
 
-interface ISingleChoiceProps {
-    id: number;
-    options: IOption[];
-    topic: string;
-    required: boolean;
-    disabled?: boolean;
-    selectedOptions?: number[];
+interface IMultipleChoiceProps {
+    question: IQuestion;
+    selectedOptions?: IOption[];
 }
 
-const MultipleChoice: FC<ISingleChoiceProps> = ({
-    id,
-    options,
-    topic,
-    required,
-    disabled,
-    selectedOptions
-}) => {
+const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions }) => {
     const [selectedOptionsId, setSelectedOptionsId] = useState<number[]>([]);
-    const { updateAnswersQuestions } = useActions();
+    const { updateAnswersToQuestions } = useActions();
 
     useEffect(() => {
         if (selectedOptions) {
-            setSelectedOptionsId(selectedOptions);
+            setSelectedOptionsId(selectedOptions.map(selectedOption => selectedOption.id));
         }
     }, [])
 
@@ -49,67 +38,70 @@ const MultipleChoice: FC<ISingleChoiceProps> = ({
 
         setSelectedOptionsId(newSelectedOptionsId);
 
-        const answers: IOption[] = newSelectedOptionsId.map(selectedOptionId => {
-            const selectedOption = options.find(option => option.id === selectedOptionId);
+        const answer: IOption[] = newSelectedOptionsId.map(selectedOptionId => {
+            const selectedOption = isSetOfOptions(question.options)
+                ? question.options.find(option => option.id === selectedOptionId)
+                : null;
 
             return {
                 id: selectedOptionId,
                 label: selectedOption?.label || '',
-                score: selectedOption?.score
-            }
+                score: selectedOption?.score || 0
+            };
         })
 
-        const question: IQuestion = {
-            id, topic, options, required,
-            type: QuestionType.MultipleChoice,
-        }
-
-        updateAnswersQuestions({
-            question: question,
-            answer: answers
-        });
+        updateAnswersToQuestions({ question, answer });
     }
 
     const isCorrectOption = (option: IAnswer) => {
         if (isOption(option)) {
             if (option.score && option.score > 0) {
-                return  true;
+                return true;
             }
             return false;
         }
         return undefined;
     }
 
-    const renderMark = (option: IAnswer) => {
-        return isCorrectOption(option) ? renderCheckmark() : renderCrossmark();
-    }
+    const renderMark = (option: IAnswer) => isCorrectOption(option) ? renderCheckmark() : renderCrossmark()
 
-    const renderCheckmark = () => <span className = {style.Checkmark}> &#10003; </span>
+    const renderCheckmark = () => <span className={style.Checkmark}> &#10003; </span>
 
-    const renderCrossmark = () => <span className = {style.Crossmark}> &#10060; </span>
+    const renderCrossmark = () => <span className={style.Crossmark}> &#10060; </span>
 
-    const renderOptions = () => {
-        return options.map((answer: IOption) => 
-            <div className = {style.Option}>
+    const renderOption = (option: IOption) => {
+        return (
+            <div className={style.Option} key = {option.id}>
                 <Checkbox
-                    key={answer.id}
-                    id={answer.id}
-                    label={answer.label}
+                    value={String(option.id)}
+                    label={option.label}
                     onChangeHandler={checkboxHandler}
-                    checked={selectedOptionsId.includes(answer.id)}
-                    disabled={disabled}
+                    checked={selectedOptionsId.includes(option.id)}
+                    disabled={false}
                 />
 
-                {selectedOptionsId.includes(answer.id) ? renderMark(answer) : null}
+                {
+                    selectedOptions?.map(selectedOption => selectedOption.id).includes(option.id) 
+                        ? renderMark(option) 
+                        : null
+                }
             </div>
         );
     }
 
-    return (
-        <>
-            {renderOptions()}
-        </>
-    );
+    const renderOptions = () => {
+        return (
+            <ul className = {style.Options}>
+                {
+                    isSetOfOptions(question.options)
+                    ? question.options.map(option => renderOption(option)) 
+                    : null
+                }
+            </ul>
+        );
+    }
+
+    return renderOptions();
 }
 
 export default MultipleChoice;

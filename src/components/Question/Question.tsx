@@ -1,6 +1,5 @@
 import { FC } from 'react';
-import { isMatches } from '../../helper';
-import { IQuestion, QuestionType, TextFieldType } from '../../types/survey';
+import { IQuestion, QuestionType } from '../../types/survey';
 import Matchmaking from '../Matchmaking/Matchmaking';
 import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
@@ -9,61 +8,51 @@ import style from './Question.module.scss';
 
 interface IQuestionProps {
     question: IQuestion;
-    margin?: string;
+    cssProperties?: React.CSSProperties;
 }
 
-const Question: FC<IQuestionProps> = ({ question, margin }) => {
-    const renderResponseField = () => {
-        if (question.options) {
-            if (isMatches(question.options)) {
-                return <Matchmaking
-                    id={question.id}
-                    required={question.required}
-                    topic={question.topic}
-                    leftList={question.options.leftList}
-                    rightList={question.options.rightList}
-                />
-            } else {
-                if (question.type === QuestionType.OneChoice) {
-                    return <SingleChoice
-                        id={question.id}
-                        required={question.required}
-                        topic={question.topic}
-                        options={question.options}
-                    />
-                }
-                else if (question.type === QuestionType.MultipleChoice) {
-                    return <MultipleChoice
-                        id={question.id}
-                        required={question.required}
-                        topic={question.topic}
-                        options={question.options}
-                    />
-                }
-            }
-        } else {
-            if (question.type === QuestionType.ShortTextField) {
-                return <TextField
-                    id={question.id}
-                    type={TextFieldType.Short}
-                    required={question.required}
-                    correctAnswer={question.correctAnswer ?? undefined}
-                    topic={question.topic}
-                />
+const Question: FC<IQuestionProps> = ({ question, cssProperties }) => {
 
-            } else if (question.type === QuestionType.DetailedTextField) {
-                return <TextField
-                    id={question.id}
-                    type={TextFieldType.Detailed}
-                    required={question.required}
-                    topic={question.topic}
+    const renderResponseField = () => {
+        if (question.type === QuestionType.Matchmaking) {
+            return (
+                <Matchmaking
+                    question={question}
                 />
-            }
+            );
+        }
+        else if (question.type === QuestionType.OneChoice) {
+            return (
+                <SingleChoice
+                    question={question}
+                />
+            );
+        }
+        else if (question.type === QuestionType.MultipleChoice) {
+            return (
+                <MultipleChoice
+                    question={question}
+                />
+            );
+        }
+        else if (question.type === QuestionType.ShortTextField) {
+            return (
+                <TextField
+                    question={question}
+                />
+            );
+        }
+        else if (question.type === QuestionType.DetailedTextField) {
+            return (
+                <TextField
+                    question={question}
+                />
+            );
         }
     }
 
     return (
-        <div className={style.Question} style={{ margin }}>
+        <div className={style.Question} style={cssProperties}>
             <p> {question.topic} </p>
             {renderResponseField()}
         </div>

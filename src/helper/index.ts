@@ -22,6 +22,8 @@ export const isSetOfOptions = (entity: any): entity is IOption[] => (
     Array.isArray(entity) && entity.every(item => isOption(item))
 )
 
+export const isNumber = (val: any) => typeof val === "number" && val === val;
+
 export const replaceNumberWithLetter = (number: number): string => {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');
 

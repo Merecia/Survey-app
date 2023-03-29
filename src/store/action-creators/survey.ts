@@ -2,6 +2,7 @@ import { isSetOfOptions } from './../../helper/index';
 import { store } from './../index';
 import {
     IAnswerToQuestion,
+    IQuestion,
     SurveyAction,
     SurveyActionTypes
 } from './../../types/survey';
@@ -10,7 +11,7 @@ import { RootState } from '../reducers';
 import { isMatches, isOption, isTextAnswer } from '../../helper';
 import { answers, quiz } from '../../data/data';
 
-export const updateAnswersQuestions = (answerToQuestion: IAnswerToQuestion) => {
+export const updateAnswersToQuestions = (answerToQuestion: IAnswerToQuestion) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         const answersToQuestions = getState().survey.answersToQuestions;
         const answeredQuestions = answersToQuestions.map(answerToQuestion => answerToQuestion.question);
@@ -58,18 +59,11 @@ export const finishSurvey = (surveyId: number) => {
     }
 }
 
-export const loadQuestions = (surveyId: number) => {
-    /*
-        There will be logic for load questions from firebase database.
-        We will load this data by some URL, that will be gived 
-        to the parameters of this funtion. 
-    */
-    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-        console.log(`Questions from Survey ${surveyId} have been loaded`);
-
+export const updateQuestions = (questions: IQuestion[]) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
-            payload: quiz.questions
+            payload: questions
         })
     }
 }

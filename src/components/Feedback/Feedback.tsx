@@ -4,10 +4,10 @@ import style from './Feedback.module.scss';
 
 interface IFeedbackProps {
     feedback: IFeedback;
-    margin: string;
+    cssProperties?: React.CSSProperties;
 }
 
-const Feedback: FC<IFeedbackProps> = ({ feedback, margin }) => {
+const Feedback: FC<IFeedbackProps> = ({ feedback, cssProperties }) => {
     const renderNote = () => {
         if (feedback.totalScore <= 0) {
             return 'You answered the question wrong.'
@@ -21,7 +21,13 @@ const Feedback: FC<IFeedbackProps> = ({ feedback, margin }) => {
     const renderFootnote = () => {
         return (
             <div className={style.Footnote}>
-                <p> {feedback.correctAnswers.length > 1 ? 'Correct answers: ' : 'Correct answer: '} </p>
+                <p> 
+                    {
+                        feedback.correctAnswers.length > 1 
+                        ? 'Correct answers: ' 
+                        : 'Correct answer: '
+                    } 
+                </p>
                 {renderCorrectAnswers()}
             </div>
         );
@@ -31,10 +37,12 @@ const Feedback: FC<IFeedbackProps> = ({ feedback, margin }) => {
         (correctAnswer, index) => renderCorrectAnswer(correctAnswer, index)
     );
 
-    const renderCorrectAnswer = (correctAnswer: string, index: number) => <p key={index}> {correctAnswer} </p>
+    const renderCorrectAnswer = (correctAnswer: string, index: number) => {
+        return <p key={index}> {correctAnswer} </p>
+    }
 
     return (
-        <div className={style.Feedback} style={{ margin }}>
+        <div className={style.Feedback} style={cssProperties}>
             <div className={style.Header}>
                 {renderNote()}
                 <div className={style.Score}>
@@ -42,7 +50,7 @@ const Feedback: FC<IFeedbackProps> = ({ feedback, margin }) => {
                 </div>
             </div>
 
-            { feedback.totalScore !== feedback.maximumScore ? renderFootnote() : null }
+            {feedback.totalScore !== feedback.maximumScore ? renderFootnote() : null}
         </div >
     );
 }

@@ -1,30 +1,29 @@
 import { FC } from 'react';
 
+type InputType = 'text' | 'number'
+
 interface InputProps {
-    string: string;
+    value: string;
+    onChangeHandler: (parameters: any) => void;
+    type?: InputType;
     disabled?: boolean;
-    width?: string;
-    border?: string;
-    onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    cssProperties?: React.CSSProperties;
 }
 
 const Input: FC<InputProps> = ({ 
     disabled, 
-    onChangeHandler, 
-    string, 
-    width,
-    border
+    onChangeHandler,
+    type, 
+    value,
+    cssProperties
 }) => {
-    console.log(border);
     return (
         <input
             disabled = {disabled}
-            type="text"
-            value={string}
+            type={type || 'text'}
+            value={value}
             onChange={onChangeHandler}
-            style = {{
-                width, border
-            }}
+            style = {cssProperties}
         />
     );
 }

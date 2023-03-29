@@ -1,38 +1,23 @@
 import { FC, useState, useEffect } from 'react';
+import { isTextAnswer } from '../../helper';
 import { useActions } from '../../hooks/useActions';
 import {
-    IAnswer,
-    IQuestion,
+    IAnswer, 
+    IQuestion, 
     ITextAnswer,
-    QuestionType,
-    TextFieldType
+    QuestionType
 } from '../../types/survey';
 import Input from '../../UI/Input/Input';
 import Textarea from '../../UI/Textarea/Textarea';
 
 interface ITextFieldProps {
-    id: number;
-    type: TextFieldType;
-    topic: string;
-    required: boolean;
-    disabled?: boolean;
+    question: IQuestion;
     givedAnswer?: ITextAnswer;
-    correctAnswer?: ITextAnswer;
 }
 
-const TextField: FC<ITextFieldProps> = ({
-    id,
-    type,
-    topic,
-    correctAnswer,
-    required,
-    disabled,
-    givedAnswer
-}) => {
+const TextField: FC<ITextFieldProps> = ({ question, givedAnswer }) => {
     const [text, setText] = useState<string>('');
-    const { updateAnswersQuestions } = useActions();
-
-    console.log(givedAnswer);
+    const { updateAnswersToQuestions } = useActions();
 
     useEffect(() => {
         if (givedAnswer) {
@@ -41,32 +26,33 @@ const TextField: FC<ITextFieldProps> = ({
         // eslint-disable-next-line
     }, [])
 
-    const updateTextAnswer = (value: string, type: QuestionType) => {
+    const updateTextAnswer = (value: string) => {
         setText(value);
-        let answer: IAnswer;
 
-        if (correctAnswer) {
-            const earnedScore =
-                correctAnswer.text.toLowerCase() === value.toLowerCase()
-                    ? correctAnswer.score
-                    : 0;
+        let answer: IAnswer;
+        const correctAnswer = question.correctAnswer;
+
+        if (isTextAnswer(correctAnswer)) {
+            let earnedScore: number = 0;
+
+            if (correctAnswer.text.toLowerCase() === value.toLowerCase()) {
+                earnedScore = correctAnswer.score || 0;
+            }
 
             answer = { text: value, score: earnedScore };
-        } else {
-            answer = { text: value };
-        }
+            
+        } else answer = { text: value };
 
-        const question: IQuestion = { id, topic, type, correctAnswer, required };
-        updateAnswersQuestions({ question, answer });
+        updateAnswersToQuestions({ question, answer });
     }
 
     const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        updateTextAnswer(event.target.value, QuestionType.ShortTextField);
+        updateTextAnswer(event.target.value);
     }
 
 
     const textareaChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        updateTextAnswer(event.target.value, QuestionType.DetailedTextField);
+        updateTextAnswer(event.target.value);
     }
 
     const getBorder = () => {
@@ -82,32 +68,32 @@ const TextField: FC<ITextFieldProps> = ({
     }
 
     const renderTextField = () => {
-        if (type === TextFieldType.Short) {
-            return <Input
-                string={text}
-                onChangeHandler={inputChangeHandler}
-                disabled={disabled}
-                width={'100%'}
-                border={getBorder()}
-            />
+        if (question.type === QuestionType.ShortTextField) {
+            return (
+                <Input
+                    value={text}
+                    onChangeHandler={inputChangeHandler}
+                    disabled={false}
+                    cssProperties={{ 'width': '100%', 'border': getBorder() }}
+                />
+            );
         }
 
-        else if (type === TextFieldType.Detailed) {
-            return <Textarea
-                text={text}
-                onChangeHandler={textareaChangeHandler}
-                disabled={disabled}
-                width={'100%'}
-                height={'100px'}
-            />
+        else if (question.type === QuestionType.DetailedTextField) {
+            return (
+                <Textarea
+                    value={text}
+                    onChangeHandler={textareaChangeHandler}
+                    disabled={false}
+                    cssProperties={{ 'width': '100%', 'height': '100px' }}
+                />
+            );
         }
+
+        else return null;
     }
 
-    return (
-        <>
-            {renderTextField()}
-        </>
-    );
+    return renderTextField();
 }
 
 export default TextField;

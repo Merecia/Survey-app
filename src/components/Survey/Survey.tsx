@@ -1,41 +1,50 @@
 import { FC, useEffect } from 'react';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
+import { IQuestion, ISurvey } from '../../types/survey';
 import Button from '../../UI/Button/Button';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
 
 interface ISurveyProps {
-    id: number;
-    title: string;
+    survey: ISurvey;
 }
 
-const Survey: FC<ISurveyProps> = ({ id, title }) => {
+const Survey: FC<ISurveyProps> = ({ survey }) => {
     const {
         finishSurvey,
-        loadQuestions
+        updateQuestions
     } = useActions();
-    
-    const { 
-        answersToQuestions, 
-        questions 
+
+    const {
+        answersToQuestions,
+        questions
     } = useTypedSelector(state => state.survey);
 
     useEffect(() => {
-        loadQuestions(id);
+        updateQuestions(survey.questions);
         // eslint-disable-next-line
     }, [])
 
     const renderQuestions = () => {
-        return questions.map(question =>
-            <Question
-                key={question.id}
-                question={question}
-                margin='20px'
-            />
+        return (
+            <ul className={style.Questions}>
+                {survey.questions.map(question => renderQuestion(question))}
+            </ul>
         );
     }
-    
+
+    const renderQuestion = (question: IQuestion) => {
+        return (
+            <li className={style.Question} key = {question.id}>
+                <Question
+                    question={question}
+                    cssProperties={{ margin: '20px' }}
+                />
+            </li>
+        );
+    }
+
     const areAllRequiredQuestionsAnswered = (): boolean => {
         const requiredQuestionsId: number[] = [];
 
@@ -62,7 +71,7 @@ const Survey: FC<ISurveyProps> = ({ id, title }) => {
 
     const finishButtonClickHandler = () => {
         if (areAllRequiredQuestionsAnswered()) {
-            finishSurvey(id);
+            finishSurvey(survey.id);
         } else {
             console.log('You need to answer all required questions');
         }
@@ -74,13 +83,15 @@ const Survey: FC<ISurveyProps> = ({ id, title }) => {
     return (
         <div className={style.Survey}>
             <div className={style.Wrapper}>
-                <h1 style={{ textAlign: 'center' }}> {title} </h1>
+                <h1 style={{ textAlign: 'center' }}> {survey.title} </h1>
                 {renderQuestions()}
                 <Button
                     label='Save Results'
                     clickHandler={finishButtonClickHandler}
-                    width='70%'
-                    margin='2% 15%'
+                    cssProperties={{
+                        width: '70%',
+                        margin: '2% 15%'
+                    }}
                 />
             </div>
         </div>

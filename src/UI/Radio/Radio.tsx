@@ -2,7 +2,7 @@ import { FC } from 'react';
 import style from './Radio.module.scss';
 
 interface RadioProps {
-    id: number;
+    value: string;
     label: string;
     checked?: boolean;
     disabled?: boolean;
@@ -10,7 +10,7 @@ interface RadioProps {
 }
 
 const RadioButton: FC<RadioProps> = ({
-    id,
+    value,
     checked,
     label,
     disabled,
@@ -23,7 +23,7 @@ const RadioButton: FC<RadioProps> = ({
                 type='radio'
                 checked={checked}
                 disabled={disabled}
-                value={id}
+                value={value}
                 onChange = {onChangeHandler}
             />
             <label

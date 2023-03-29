@@ -1,10 +1,16 @@
-.Option {
-    .Checkmark, .Crossmark {
-        margin-left: 10%;
-    }
-    .Checkmark {
-        font-weight: bold;
-        color: green;
-        font-size: 20px;   
+.Options {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    
+    .Option {
+        .Checkmark, .Crossmark {
+            margin-left: 10%;
+        }
+        .Checkmark {
+            font-weight: bold;
+            color: green;
+            font-size: 20px;   
+        }
     }
 }

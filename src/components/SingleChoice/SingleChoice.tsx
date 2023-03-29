@@ -1,33 +1,22 @@
 import { FC, useState, useEffect } from 'react';
-import { isOption } from '../../helper';
+import { isOption, isSetOfOptions } from '../../helper';
 import { useActions } from '../../hooks/useActions';
-import { IAnswer, IOption, IQuestion, QuestionType } from '../../types/survey';
+import { IAnswer, IOption, IQuestion } from '../../types/survey';
 import Radio from '../../UI/Radio/Radio';
 import style from './SingleChoice.module.scss';
 
 interface ISingleChoiceProps {
-    id: number;
-    topic: string;
-    required: boolean;
-    options: IOption[];
-    disabled?: boolean;
-    selectedOption?: number;
+    question: IQuestion;
+    selectedOption?: IOption;
 }
 
-const SingleChoice: FC<ISingleChoiceProps> = ({
-    id,
-    options,
-    topic,
-    required,
-    disabled,
-    selectedOption
-}) => {
-    const { updateAnswersQuestions } = useActions();
+const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
+    const { updateAnswersToQuestions } = useActions();
     const [selectedOptionId, setSelectedOptionId] = useState<Number>();
 
     useEffect(() => {
         if (selectedOption) {
-            setSelectedOptionId(selectedOption);
+            setSelectedOptionId(selectedOption.id);
         }
     }, [])
 
@@ -35,68 +24,70 @@ const SingleChoice: FC<ISingleChoiceProps> = ({
         const selectedOptionId = Number(event.target.value);
         setSelectedOptionId(selectedOptionId);
 
-        const selectedOption = options.find(option => option.id === selectedOptionId);
+        const selectedOption = isSetOfOptions(question.options)
+            ? question.options.find(option => option.id === selectedOptionId)
+            : undefined;
 
-        const question: IQuestion = {
-            id, topic, required, options,
-            type: QuestionType.OneChoice
-        };
-
-        const option: IOption = {
+        const answer: IOption = {
             id: selectedOptionId,
             label: selectedOption?.label || '',
-            score: selectedOption?.score
+            score: selectedOption?.score || 0
         };
 
-        updateAnswersQuestions({
-            question,
-            answer: option
-        });
+        updateAnswersToQuestions({ question, answer });
     }
 
     const isCorrectOption = (option: IAnswer) => {
         if (isOption(option)) {
             if (option.score && option.score > 0) {
-                return  true;
+                return true;
             }
             return false;
         }
         return undefined;
     }
 
-    const renderMark = (option: IAnswer) => {
-        return isCorrectOption(option) ? renderCheckmark() : renderCrossmark()
+    const renderMark = (selectedOption: IAnswer) => {
+        return isCorrectOption(selectedOption) ? renderCheckmark() : renderCrossmark();
     }
 
     const renderCheckmark = () => {
-        return <span className = {style.Checkmark}> &#10003; </span>
+        return <span className={style.Checkmark}> &#10003; </span>
     }
 
     const renderCrossmark = () => {
-        return <span className = {style.Crossmark}> &#10060; </span>
+        return <span className={style.Crossmark}> &#10060; </span>
     }
 
-    const renderOptions = () => {
-        return options.map((option: IOption) =>
-            <div className = {style.Option}>
+    const renderOption = (option: IOption) => {
+        return (
+            <li className={style.Option} key={option.id}>
                 <Radio
-                    key={option.id}
-                    id={option.id}
+                    value={String(option.id)}
                     label={option.label}
                     onChangeHandler={radioHandler}
                     checked={selectedOptionId === option.id}
-                    disabled={disabled}
+                    disabled={false}
                 />
-                {selectedOptionId === option.id ? renderMark(option) : null}
-            </div>
+
+                {selectedOption ? renderMark(selectedOption) : null} 
+            </li>
         );
     }
 
-    return (
-        <>
-            {renderOptions()}
-        </>
-    );
+    const renderOptions = () => {
+        return (
+            <ul className={style.Options}>
+                {
+                    isSetOfOptions(question.options) 
+                    ? question.options.map(option => renderOption(option))
+                    : null
+                }
+            </ul>
+        );
+    }
+
+    return renderOptions();
 }
 
 export default SingleChoice;
