@@ -3,6 +3,7 @@ import { store } from './../index';
 import {
     IAnswerToQuestion,
     IQuestion,
+    QuestionType,
     SurveyAction,
     SurveyActionTypes
 } from './../../types/survey';
@@ -68,6 +69,68 @@ export const updateQuestions = (questions: IQuestion[]) => {
     }
 }
 
+export const updateQuestion = (question: IQuestion) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        const updatedQuestions = [...getState().survey.questions];
+        updatedQuestions[question.id - 1] = question;
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: updatedQuestions
+        })
+    }
+}
+
+export const updateQuestionType = (question: IQuestion, type: QuestionType) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        question.type = type;
+
+        if (
+            question.type === QuestionType.OneChoice ||
+            question.type === QuestionType.MultipleChoice
+        ) {
+            if (question.hasOwnProperty('correctAnswer')) {
+                delete question.correctAnswer;
+            }
+
+            const initialOptions = [{ id: 1, label: "", score: 0 }]
+            question.options = initialOptions;
+        } else if (
+            question.type === QuestionType.ShortTextField ||
+            question.type === QuestionType.DetailedTextField
+        ) {
+            if (question.hasOwnProperty('options')) {
+                delete question.options;
+            }
+
+            const initialCorrectAnswer = { text: '', score: 0 }
+            question.correctAnswer = initialCorrectAnswer;
+        } else if (
+            question.type === QuestionType.Matchmaking
+        ) {
+            if (question.hasOwnProperty('correctAnswer')) {
+                delete question.correctAnswer;
+            }
+
+            const initialLeftList = [{ id: 1, label: '', relatedOptionId: 1, score: 1 }]
+            const initialRightList = [{ id: 1, label: '' }];
+            
+            question.options = {
+                leftList: initialLeftList, 
+                rightList: initialRightList
+            };
+        }
+
+        const updatedQuestions = [...getState().survey.questions];
+        updatedQuestions[question.id - 1] = question;
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: updatedQuestions
+        })
+    }
+}
+
 export const loadAnswersToQuestions = (surveyId: number) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         console.log(`Answers to Questions from Survey ${surveyId} have been loaded`);
@@ -94,7 +157,7 @@ export const scoreTest = (): number => {
                 const score = option.score ?? 0;
                 totalScore += score;
             })
-        } else if (isSetOfOptions(answer)){
+        } else if (isSetOfOptions(answer)) {
             answer.forEach(option => {
                 const score = option.score ?? 0;
                 totalScore += score;

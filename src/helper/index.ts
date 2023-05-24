@@ -1,4 +1,4 @@
-import { IMatches, IOption, ITextAnswer } from './../types/survey';
+import { IMatches, IOption, ITextAnswer, IQuestion } from './../types/survey';
 
 export const remove = <T>(array: T[], index: number): T[] => {
     const updatedArray: T[] = [...array];
@@ -16,6 +16,10 @@ export const isTextAnswer = (entity: any): entity is ITextAnswer => (
 
 export const isMatches = (entity: any): entity is IMatches => (
     'leftList' in entity && 'rightList' in entity
+)
+
+export const isQuestion = (entity: any): entity is IQuestion => (
+    'id' in entity && 'topic' in entity && 'type' in entity && 'required' in entity
 )
 
 export const isSetOfOptions = (entity: any): entity is IOption[] => (

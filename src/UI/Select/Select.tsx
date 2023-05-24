@@ -7,13 +7,15 @@ interface SelectProps {
     options: string[];
     disabled?: boolean;
     onChangeHandler: (parameters: any) => void;
+    cssProperties?: React.CSSProperties;
 }
 
 const Select: FC<SelectProps> = ({
     id, 
     options, 
     value, 
-    onChangeHandler, 
+    onChangeHandler,
+    cssProperties, 
     disabled
 }) => {
     const renderOptions = () => options.map((option, index) => 
@@ -33,6 +35,7 @@ const Select: FC<SelectProps> = ({
             onChange = {onChangeHandler} 
             disabled = {disabled}
             className = {style.Select}
+            style = {cssProperties}
         >
             <option value = ''/>
             {renderOptions()}

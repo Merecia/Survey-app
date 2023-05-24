@@ -20,6 +20,7 @@ export interface IMatch {
 export interface ITextAnswer {
     text: string;
     score?: number;
+    ignoreRegister?: boolean;
 }
 
 export interface ISurvey {

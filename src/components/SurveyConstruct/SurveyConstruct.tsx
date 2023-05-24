@@ -1,134 +1,89 @@
-import React, { FC, useState } from 'react';
-import { IOption } from '../../types/survey';
-import Button from '../../UI/Button/Button';
-import Input from '../../UI/Input/Input';
-import Textarea from '../../UI/Textarea/Textarea';
+import React, { FC, useState, useEffect } from 'react';
 import style from './SurveyConstruct.module.scss';
+import { useActions } from '../../hooks/useActions';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
+import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
+import { IQuestion, QuestionType } from '../../types/survey';
+import Button from '../../UI/Button/Button';
 
 const SurveyConstruct: FC = () => {
-    const initialOptions = [
-        { id: 1, label: '', score: 0 },
-        { id: 2, label: '', score: 0 }
-    ];
+    const { updateQuestions } = useActions();
+    const { questions } = useTypedSelector(state => state.survey);
 
-    const [question, setQuestion] = useState("");
-    const [options, setOptions] = useState<IOption[]>(initialOptions);
+    useEffect(() => {
+        const initialQuestion = {
+            id: 1,
+            topic: "",
+            type: QuestionType.OneChoice,
+            required: false,
+            options: [{ id: 1, label: "", score: 0 }]
+        }
 
-    const questionChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setQuestion(event.target.value);
+        const initialQuestions = [initialQuestion];
+
+        updateQuestions(initialQuestions);
+    }, [])
+
+    console.log(questions);
+
+    const renderQuestions = () => {
+        return questions.map(question => renderQuestion(question));
     }
 
-    const renderOptions = () => {
-        return options.map(option => renderOption(option));
-    }
-
-    const optionChangeHandler = (
-        option: IOption,
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        const updatedOptions = options.map(item => {
-            if (item.id === option.id) {
-                return {
-                    id: item.id,
-                    label: event.target.value,
-                    score: item.score
-                }
-            } else return item;
-        })
-
-        setOptions(updatedOptions);
-    }
-
-    const scoreInputChangeHandler = (
-        option: IOption,
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        const updatedOptions = options.map(item => {
-            if (item.id === option.id) {
-                return {
-                    id: item.id,
-                    label: item.label,
-                    score: Number(event.target.value)
-                }
-            } else return item;
-        })
-
-        setOptions(updatedOptions);
-    }
-
-    const renderOption = (option: IOption) => {
+    const renderQuestion = (question: IQuestion) => {
         return (
-            <div className={style.Option}>
-                <span> {option.id} </span>
-                <Input
-                    value={option.label || ''}
-                    onChangeHandler={
-                        (event: React.ChangeEvent<HTMLInputElement>) =>
-                            optionChangeHandler(option, event)
-                    }
-                />
-                <Input
-                    value={String(option.score) || '0'}
-                    onChangeHandler={
-                        (event: React.ChangeEvent<HTMLInputElement>) =>
-                            scoreInputChangeHandler(option, event)
-                    }
-                    type='number'
-                />
-                <Button 
-                    label = 'Удалить'
-                    clickHandler = {() => deleteButtonClickHandler(option)}
-                />
-            </div>
+            <QuestionConstruct
+                key={question.id}
+                question={question}
+                cssProperties={{marginBottom: '20px'}}
+            />
         );
     }
 
-    const deleteButtonClickHandler = (option: IOption) => {
-        let updatedOptions = options
-            .filter(item => item.id !== option.id)
-            .map((item, index) => {
-                return {
-                    id: index + 1,
-                    label: item.label,
-                    score: item.score
-                }
-            })
+    const addNewQuestionButtonClickHandler = () => {
+        const lastId = questions.length;
+        const newQuestion = {
+            id: lastId + 1,
+            topic: "",
+            type: QuestionType.OneChoice,
+            required: false,
+            options: [{ id: 1, label: "", score: 0 }]
+        };
 
-        setOptions(updatedOptions);
+        const updatedQuestions = [...questions];
+        updatedQuestions.push(newQuestion);
+        updateQuestions(updatedQuestions);
     }
 
-    const buttonClickHandler = () => {
-        const lastId = options.length;
-
-        const updatedOptions = [...options];
-
-        updatedOptions.push({
-            id: lastId + 1,
-            label: '',
-            score: 0
-        });
-
-        setOptions(updatedOptions);
+    const finishCreatingButtonClickHandler = () => {
+        alert('You have finished creating the quiz');
+        console.log(questions);
     }
 
     return (
         <div className={style.SurveyConstruct}>
-            <div className={style.SingleChoiceConstruct}>
-                <p> Текст вопроса: </p>
-                <Textarea
-                    value={question}
-                    onChangeHandler={questionChangeHandler}
+            <h1 className={style.Title}> Survey Construct </h1>
+            <div className={style.Questions}>
+                {renderQuestions()}
+            </div>
+            <div className={style.Footer}>
+                <Button
+                    label="Add a new question"
+                    clickHandler={addNewQuestionButtonClickHandler}
+                    cssProperties={{
+                        marginRight: '100px',
+                        padding: '10px',
+                        width: '220px'
+                    }}
                 />
-                <div>
-                    <div>
-                        <span> Варианты ответов </span>
-                    </div>
-                    {renderOptions()}
-                    <Button
-                        label={"Добавить новый вариант ответа"}
-                        clickHandler={buttonClickHandler}
-                    />
-                </div>
+                <Button
+                    label='Create the survey'
+                    clickHandler={finishCreatingButtonClickHandler}
+                    cssProperties={{
+                        width: '220px',
+                        padding: '10px'
+                    }}
+                />
             </div>
         </div>
     );

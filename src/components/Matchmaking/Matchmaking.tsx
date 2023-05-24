@@ -31,8 +31,6 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
     const [matches, setMatches] = useState<IMatch[]>([]);
     const { updateAnswersToQuestions } = useActions();
 
-    console.log(selectedMatches);
-
     useEffect(() => {
         if (selectedMatches) {
             const matches: IMatch[] = [];

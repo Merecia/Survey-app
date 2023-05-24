@@ -2,8 +2,8 @@ import {FC} from 'react';
 import style from './Checkbox.module.scss';
 
 interface CheckboxProps {
-    value: string;
     label: string;
+    value?: string;
     checked?: boolean;
     disabled?: boolean;
     onChangeHandler: (event: React.ChangeEvent<HTMLInputElement>) => void;
@@ -24,7 +24,7 @@ const Checkbox: FC<CheckboxProps> = ({
                 type="checkbox" 
                 name={label} 
                 checked={checked}
-                value={value}
+                value={value ? value : label}
                 disabled = {disabled}
                 onChange={onChangeHandler}
             />

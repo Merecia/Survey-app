@@ -1,0 +1,16 @@
+.MatchmakingQuestionConstruct {
+    width: 100%;
+
+    .Matches {
+        display: flex;
+        justify-content: space-between;
+
+        .Option {
+            margin-bottom: 10px;
+        }
+    }
+
+    .Footer {
+        margin-top: 10px;
+    }
+}
