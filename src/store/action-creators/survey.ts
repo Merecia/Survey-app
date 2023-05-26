@@ -91,6 +91,34 @@ export const updateSurveyInfo = (surveyInfo: ISurveyInfo) => {
     }
 }
 
+export const addNewQuestion = () => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        // const updatedQuestions = [...getState().survey.questions];
+        // updatedQuestions[question.id - 1] = question;
+
+        // dispatch({
+        //     type: SurveyActionTypes.UPDATE_QUESTIONS,
+        //     payload: updatedQuestions
+        // })
+        const questions = getState().survey.questions;
+        const lastId = questions.length;
+        const newQuestion = {
+            id: lastId + 1,
+            topic: "",
+            type: QuestionType.OneChoice,
+            required: false,
+            options: [{ id: 1, label: "", score: 0 }]
+        };
+
+        questions.push(newQuestion);
+        //updateQuestions(updatedQuestions);
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: questions
+        });
+    }
+}
+
 export const updateQuestionType = (question: IQuestion, type: QuestionType) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         question.type = type;

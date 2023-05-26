@@ -1,28 +1,9 @@
 .SurveyConstructForm {
+    background-color: white;
     border: 1px solid black;
     width: 550px;
     margin: 40px auto;
     border-radius: 10px;
     padding: 40px;
-
-    p {
-        margin: 0;
-    }
-
-    input,
-    textarea,
-    select {
-        width: 100%;
-        margin: 0px 0px 20px 0px;
-    }
-
-    input[type="checkbox"] {
-        display: inline-block;
-        width: auto;
-    }
-
-    textarea {
-        resize: none;
-        height: 80px;
-    }
+    box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
 }

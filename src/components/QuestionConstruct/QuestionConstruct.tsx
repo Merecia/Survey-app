@@ -11,6 +11,9 @@ import TextQuestionConstruct from './TextQuestionConstruct/TextQuestionConstruct
 import MatchmakingQuestionConstruct from './MatchmakingQuestionConstruct/MatchmakingQuestionConstruct';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
+// import Button from '@material-ui/core/Button';
+// import IconButton from '@material-ui/core/IconButton';
+// import DeleteIcon from '@material-ui/icons/Delete';
 
 interface IQuestionConstructProps {
     question: IQuestion;
@@ -86,7 +89,7 @@ const QuestionConstruct: FC<IQuestionConstructProps> = ({
                     key={question.id}
                     question={question}
                 />
-            )
+            );
         }
     }
 

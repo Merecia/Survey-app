@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 import style from './SurveyConstruct.module.scss';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
@@ -8,7 +8,7 @@ import Button from '../../UI/Button/Button';
 import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
 
 const SurveyConstruct: FC = () => {
-    const { updateQuestions } = useActions();
+    const { updateQuestions, addNewQuestion } = useActions();
     const { questions } = useTypedSelector(state => state.survey);
 
     const [showForm, setShowForm] = useState<boolean>(true);
@@ -43,21 +43,6 @@ const SurveyConstruct: FC = () => {
         );
     }
 
-    const addNewQuestionButtonClickHandler = () => {
-        const lastId = questions.length;
-        const newQuestion = {
-            id: lastId + 1,
-            topic: "",
-            type: QuestionType.OneChoice,
-            required: false,
-            options: [{ id: 1, label: "", score: 0 }]
-        };
-
-        const updatedQuestions = [...questions];
-        updatedQuestions.push(newQuestion);
-        updateQuestions(updatedQuestions);
-    }
-
     const finishCreatingButtonClickHandler = () => {
         alert('You have finished creating the quiz');
         console.log(questions);
@@ -71,7 +56,7 @@ const SurveyConstruct: FC = () => {
         );
     }
 
-    const renderQuestionConstruct = () => {
+    const renderQuestionsConstruct = () => {
         return (
             <div className={style.QuestionsConstruct}>
                 <h1 className={style.Title}> Survey Construct </h1>
@@ -81,7 +66,7 @@ const SurveyConstruct: FC = () => {
                 <div className={style.Footer}>
                     <Button
                         label="Add a new question"
-                        clickHandler={addNewQuestionButtonClickHandler}
+                        clickHandler={addNewQuestion}
                         cssProperties={{
                             marginRight: '100px',
                             padding: '10px',
@@ -103,7 +88,7 @@ const SurveyConstruct: FC = () => {
 
     return (
         <div className={style.SurveyConstruct}>
-            {showForm ? renderForm() : renderQuestionConstruct()}
+            {showForm ? renderForm() : renderQuestionsConstruct()}
         </div>
     );
 }

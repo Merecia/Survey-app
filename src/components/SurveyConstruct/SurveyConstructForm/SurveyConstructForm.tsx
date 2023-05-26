@@ -3,6 +3,7 @@ import style from './SurveyConstructForm.module.scss';
 import { useForm } from 'react-hook-form';
 import { updateSurveyInfo } from '../../../store/action-creators/survey';
 import { Category, ISurveyInfo } from '../../../types/survey';
+import { TextField, Button, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 
 interface ISurveyConstructFormProps {
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,7 +18,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
     } = useForm({
         defaultValues: {
             title: '',
-            category: 'Study',
+            category: '',
             description: '',
             imageUrl: '',
             timeLimit: false,
@@ -31,6 +32,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
     const MIN_IMAGE_URL_LENGTH = 6;
 
     const timeLimit = watch('timeLimit');
+    const category = watch('category');
 
     const onSubmit = handleSubmit(async (data) => {
         const surveys = localStorage.getItem('surveys');
@@ -62,8 +64,10 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
             className={style.SurveyConstructForm}
             onSubmit={onSubmit}
         >
-            <p> Enter the title of the survey: </p>
-            <input
+            <TextField 
+                label = "Enter the title of the survey"
+                size = 'small'
+                fullWidth
                 {
                     ...register(
                         'title', {
@@ -75,11 +79,15 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                         }
                     )
                 }
+                sx = {{ marginBottom: '20px' }}
+                error = {errors.title?.message !== undefined}
+                helperText = {errors.title?.message}
             />
-            <p> {errors.title?.message} </p>
 
-            <p> Enter the description of the survey: </p>
-            <textarea
+            <TextField 
+                label = "Enter the description of the survey"
+                size = 'small'
+                fullWidth
                 {
                     ...register(
                         'description', {
@@ -91,18 +99,30 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                         }
                     )
                 }
+                sx = {{ marginBottom: '20px' }}
+                error = {errors.description?.message !== undefined}
+                helperText = {errors.description?.message}
             />
-            <p> {errors.description?.message} </p>
 
-            <p> Select category of survey from the list: </p>
-            <select
-                { ...register('category', { required: 'Choose category' } ) }
+            <TextField
+                { ...register('category', { required: 'Choose category' } ) } 
+                label = 'Category'
+                fullWidth
+                select
+                value = {category}
+                sx = {{ marginBottom: '20px' }}
+                error = {errors.category?.message !== undefined}
+                helperText = {errors.category?.message}
             >
-                <option value="Study"> Study </option>
-                <option value="Psychological"> Psychological </option>
-                <option value="Sociological"> Sociological </option>
-            </select>
-            <input
+                <MenuItem value = 'Study'> Study </MenuItem>
+                <MenuItem value = 'Psychological'> Psychological </MenuItem>
+                <MenuItem value = 'Sociological'> Sociological </MenuItem>
+            </TextField>
+
+            <TextField 
+                label = "Enter the image URL to the survey"
+                size = 'small'
+                fullWidth
                 {
                     ...register(
                         'imageUrl', {
@@ -114,49 +134,56 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                         }
                     )
                 }
-                placeholder="Enter the image URL to the survey"
+                sx = {{ marginBottom: '20px' }}
+                error = {errors.imageUrl?.message !== undefined}
+                helperText = {errors.imageUrl?.message}
             />
-            <p> {errors.imageUrl?.message} </p>
 
-            <div className = {style.TimeLimit}>
-                <input 
-                    type = 'checkbox'
-                    id = 'timeLimit'
-                    { ...register('timeLimit') }
-                />
-                <label htmlFor="timeLimit"> Is there a time limit for taking the survey? </label>
-                { 
-                    timeLimit 
-                    ? <>
-                        <p> Enter the maximum time of passing the survey in seconds </p>
-                        <input 
-                            { 
-                                ...register('maximumPassingTimeSeconds', { 
-                                    required: 'You indicated that a time limit must be present, but you did not specify how much',
-                                    pattern: {
-                                        value: /^[0-9]+$/,
-                                        message: 'Please enter a positive integer number',
-                                    }
-                                }) 
-                            }
-                        />
-                        <p> {errors.maximumPassingTimeSeconds?.message} </p>
-                    </> 
-                    : null
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        { ...register('timeLimit') }
+                    />
                 }
-            </div>
-            
-            <input 
-                type = 'checkbox'
-                id = 'isEvaluated'
-                { ...register('isEvaluated') }
+                label="Is there a time limit for taking the survey?"
+                sx = {{ marginBottom: '20px' }}
             />
-            <label htmlFor="isEvaluated"> Will the questions be graded? </label>
 
-            <input 
-                type="submit" 
-                value = "Go to create questions"
+            {
+                timeLimit 
+                ? <TextField 
+                    label = "Enter the maximum time of passing the survey in seconds"
+                    size = 'small'
+                    fullWidth
+                    {
+                        ...register('maximumPassingTimeSeconds', { 
+                            required: 'You indicated that a time limit must be, but you did not specify how much',
+                            pattern: {
+                                value: /^[0-9]+$/,
+                                message: 'Please enter a positive integer number',
+                            }
+                        }) 
+                    }
+                    sx = {{ marginBottom: '20px', padding: '0px' }}
+                    error = {errors.maximumPassingTimeSeconds?.message !== undefined}
+                    helperText = {errors.maximumPassingTimeSeconds?.message}
+                />
+                : null
+            }
+
+            <FormControlLabel
+                control={
+                    <Checkbox
+                        { ...register('isEvaluated') }
+                    />
+                }
+                label="Will the questions be graded?"
+                sx = {{ marginBottom: '20px' }}
             />
+
+            <Button variant = 'contained' type = 'submit' fullWidth> 
+                Go to create questions 
+            </Button>
         </form>
     )
 }
