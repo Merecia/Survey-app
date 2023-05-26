@@ -3,6 +3,7 @@ import { store } from './../index';
 import {
     IAnswerToQuestion,
     IQuestion,
+    ISurveyInfo,
     QuestionType,
     SurveyAction,
     SurveyActionTypes
@@ -77,6 +78,15 @@ export const updateQuestion = (question: IQuestion) => {
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
             payload: updatedQuestions
+        })
+    }
+}
+
+export const updateSurveyInfo = (surveyInfo: ISurveyInfo) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SURVEY_INFO,
+            payload: surveyInfo
         })
     }
 }

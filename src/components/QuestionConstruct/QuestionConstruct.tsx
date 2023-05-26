@@ -30,7 +30,6 @@ const QuestionConstruct: FC<IQuestionConstructProps> = ({
     };
     const initialQuestionType: string = "Single Choice Question";
 
-
     const getNameOfType = (questionType: QuestionType) => {
         return Object.keys(questionTypes).find(
             (typeName) => questionTypes[typeName as keyof typeof questionTypes] === questionType
@@ -81,9 +80,7 @@ const QuestionConstruct: FC<IQuestionConstructProps> = ({
                     question={question}
                 />
             );
-        } else if (
-            question.type === QuestionType.Matchmaking
-        ) {
+        } else if (question.type === QuestionType.Matchmaking) {
             return (
                 <MatchmakingQuestionConstruct
                     key={question.id}

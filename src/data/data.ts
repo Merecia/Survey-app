@@ -4,6 +4,7 @@ import {
     IOption, 
     IQuestion, 
     ISurvey, 
+    ISurveyInfo, 
     QuestionType 
 } from "../types/survey";
 
@@ -61,11 +62,18 @@ export const surveyQuestions: IQuestion[] = [
     surveyQuestion4
 ];
 
-export const survey: ISurvey = {
+const surveyInfo: ISurveyInfo = {
     id: 1,
     title: 'Опрос',
-    questions: surveyQuestions,
-    isEvaluated: false
+    category: 'Study',
+    imageUrl: '',
+    isEvaluated: false,
+    description: 'description'
+}
+
+export const survey: ISurvey = {
+    surveyInfo: surveyInfo,
+    questions: surveyQuestions
 }
 
 // ----------------------------------------------------------------
@@ -132,11 +140,18 @@ export const testQuestions: IQuestion[] = [
     testQuestion4
 ];
 
+const testInfo: ISurveyInfo = {
+    id: 1,
+    title: 'Опрос',
+    category: 'Study',
+    imageUrl: '',
+    isEvaluated: false,
+    description: 'description'
+}
+
 export const quiz: ISurvey = {
-    id: 2,
-    title: 'Quiz',
-    questions: testQuestions,
-    isEvaluated: true
+    surveyInfo: testInfo,
+    questions: testQuestions
 }
 
 export const answers: IAnswerToQuestion[] = [

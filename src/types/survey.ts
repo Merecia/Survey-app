@@ -24,10 +24,15 @@ export interface ITextAnswer {
 }
 
 export interface ISurvey {
-    id: number;
-    title: string;
+    surveyInfo: ISurveyInfo;
     questions: IQuestion[];
-    isEvaluated: boolean;
+}
+
+export interface ISurveyResults {
+    id: number;
+    surveyInfo: ISurveyInfo;
+    passingTimeSeconds: number;
+    answersToQuestions: IAnswerToQuestion[];
 }
 
 export interface IQuestion {
@@ -54,6 +59,23 @@ export interface IAnswerToQuestion {
 export interface SurveyState {
     questions: IQuestion[];
     answersToQuestions: IAnswerToQuestion[];
+    surveyInfo: ISurveyInfo;
+    // title: string;
+    // description: string;
+    // category: Category;
+    // imageUrl: string;
+    // maximumPassingTimeSeconds: undefined | number;
+    // isEvaluated: boolean;
+}
+
+export interface ISurveyInfo {
+    id: number;
+    title: string;
+    description: string;
+    category: Category;
+    imageUrl: string;
+    maximumPassingTimeSeconds?: number;
+    isEvaluated: boolean;
 }
 
 export interface UpdateAnswersQuestionsAction {
@@ -65,6 +87,46 @@ export interface UpdateQuestionsAction {
     type: SurveyActionTypes.UPDATE_QUESTIONS;
     payload: IQuestion[];
 }
+
+export interface UpdateSurveyInfo {
+    type: SurveyActionTypes.UPDATE_SURVEY_INFO;
+    payload: ISurveyInfo;
+}
+
+// export interface UpdateTitleAction {
+//     type: SurveyActionTypes.UPDATE_TITLE;
+//     payload: string;
+// }
+
+// export interface UpdateTypeAction {
+//     type: SurveyActionTypes.UPDATE_TITLE;
+//     payload: string;
+// }
+
+// export interface UpdateCategoryAction {
+//     type: SurveyActionTypes.UPDATE_CATEGORY;
+//     payload: Category;
+// }
+
+// export interface UpdateDescriptionAction {
+//     type: SurveyActionTypes.UPDATE_DESCRIPTION;
+//     payload: string;
+// }
+
+// export interface UpdateImageUrlAction {
+//     type: SurveyActionTypes.UPDATE_IMAGE_URL;
+//     payload: string;
+// }
+
+// export interface UpdateMaximumPassingTimeSecondsAction {
+//     type: SurveyActionTypes.UPDATE_MAXIMUM_PASSING_TIME_SECONDS;
+//     payload: number;
+// }
+
+// export interface UpdateIsEvaluated {
+//     type: SurveyActionTypes.UPDATE_IS_EVALUATED;
+//     payload: boolean;
+// }
 
 // Enum
 
@@ -80,11 +142,23 @@ export enum TextFieldType { Short, Detailed }
 
 export enum SurveyActionTypes {
     UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_TO_QUESTIONS',
-    UPDATE_QUESTIONS = 'UPDATE_QUESTIONS'
+    UPDATE_QUESTIONS = 'UPDATE_QUESTIONS',
+    UPDATE_SURVEY_INFO = 'UPDATE_SURVEY_INFO',
+    // UPDATE_TITLE = 'UPDATE_TITLE',
+    // UPDATE_CATEGORY = 'UPDATE_CATEGORY',
+    // UPDATE_DESCRIPTION = 'UPDATE_DESCRIPTION',
+    // UPDATE_IMAGE_URL = 'UPDATE_IMAGE_URL',
+    // UPDATE_MAXIMUM_PASSING_TIME_SECONDS = 'UPDATE_MAXIMUM_PASSING_TIME_SECONDS',
+    // UPDATE_IS_EVALUATED = 'UPDATE_IS_EVALUATED'
 }
 
 // Types
 
 export type IAnswer = IOption | IOption[] | ITextAnswer | IMatches;
 
-export type SurveyAction = UpdateAnswersQuestionsAction | UpdateQuestionsAction
+export type SurveyAction = UpdateAnswersQuestionsAction | UpdateQuestionsAction | UpdateSurveyInfo
+// | UpdateCategoryAction | UpdateTitleAction | UpdateImageUrlAction 
+// | UpdateDescriptionAction | UpdateIsEvaluated | UpdateTypeAction 
+// | UpdateMaximumPassingTimeSecondsAction
+
+export type Category = 'Study' | 'Psychological' | 'Sociological';

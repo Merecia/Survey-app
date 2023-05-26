@@ -71,7 +71,7 @@ const Survey: FC<ISurveyProps> = ({ survey }) => {
 
     const finishButtonClickHandler = () => {
         if (areAllRequiredQuestionsAnswered()) {
-            finishSurvey(survey.id);
+            finishSurvey(survey.surveyInfo.id);
         } else {
             console.log('You need to answer all required questions');
         }
@@ -83,7 +83,7 @@ const Survey: FC<ISurveyProps> = ({ survey }) => {
     return (
         <div className={style.Survey}>
             <div className={style.Wrapper}>
-                <h1 style={{ textAlign: 'center' }}> {survey.title} </h1>
+                <h1 style={{ textAlign: 'center' }}> {survey.surveyInfo.title} </h1>
                 {renderQuestions()}
                 <Button
                     label='Save Results'

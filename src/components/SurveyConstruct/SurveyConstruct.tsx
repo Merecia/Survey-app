@@ -5,10 +5,13 @@ import { useTypedSelector } from '../../hooks/useTypedSelector';
 import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
 import { IQuestion, QuestionType } from '../../types/survey';
 import Button from '../../UI/Button/Button';
+import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
 
 const SurveyConstruct: FC = () => {
     const { updateQuestions } = useActions();
     const { questions } = useTypedSelector(state => state.survey);
+
+    const [showForm, setShowForm] = useState<boolean>(true);
 
     useEffect(() => {
         const initialQuestion = {
@@ -35,7 +38,7 @@ const SurveyConstruct: FC = () => {
             <QuestionConstruct
                 key={question.id}
                 question={question}
-                cssProperties={{marginBottom: '20px'}}
+                cssProperties={{ marginBottom: '20px' }}
             />
         );
     }
@@ -60,31 +63,47 @@ const SurveyConstruct: FC = () => {
         console.log(questions);
     }
 
+    const renderForm = () => {
+        return (
+            <div className = {style.SurveyConstructForm}>
+                <SurveyConstructForm setShowForm={setShowForm} />
+            </div>
+        );
+    }
+
+    const renderQuestionConstruct = () => {
+        return (
+            <div className={style.QuestionsConstruct}>
+                <h1 className={style.Title}> Survey Construct </h1>
+                <div className={style.Questions}>
+                    {renderQuestions()}
+                </div>
+                <div className={style.Footer}>
+                    <Button
+                        label="Add a new question"
+                        clickHandler={addNewQuestionButtonClickHandler}
+                        cssProperties={{
+                            marginRight: '100px',
+                            padding: '10px',
+                            width: '220px'
+                        }}
+                    />
+                    <Button
+                        label='Create the survey'
+                        clickHandler={finishCreatingButtonClickHandler}
+                        cssProperties={{
+                            width: '220px',
+                            padding: '10px'
+                        }}
+                    />
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className={style.SurveyConstruct}>
-            <h1 className={style.Title}> Survey Construct </h1>
-            <div className={style.Questions}>
-                {renderQuestions()}
-            </div>
-            <div className={style.Footer}>
-                <Button
-                    label="Add a new question"
-                    clickHandler={addNewQuestionButtonClickHandler}
-                    cssProperties={{
-                        marginRight: '100px',
-                        padding: '10px',
-                        width: '220px'
-                    }}
-                />
-                <Button
-                    label='Create the survey'
-                    clickHandler={finishCreatingButtonClickHandler}
-                    cssProperties={{
-                        width: '220px',
-                        padding: '10px'
-                    }}
-                />
-            </div>
+            {showForm ? renderForm() : renderQuestionConstruct()}
         </div>
     );
 }
