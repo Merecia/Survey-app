@@ -1,7 +1,13 @@
 .TextQuestionConstruct {
-    width: 480px;
+    width: 100%;
 
     p {
         margin: 0px 0px 10px 0px;
+    }
+
+    .Footer {
+        display: flex;
+        justify-content: right;
+        margin-top: 20px;
     }
 }

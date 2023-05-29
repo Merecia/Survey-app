@@ -2,9 +2,33 @@
     width: 800px;
     margin: 30px auto;
 
-    .Title {
-        text-align: center;
-        margin-bottom: 30px;
+    .Header {
+        .SurveyImage {
+            display: flex;
+            justify-content: center;
+            margin: 20px auto;
+            width: 80%;
+            height: 200px;
+            border: 1px solid black;
+            border-radius: 10px;
+        }
+    
+        .SurveyDetails {
+            width: 80%;
+            margin: 20px auto;
+            border: 1px solid black;
+            border-radius: 10px;
+            background-color: white;
+
+            .Title {
+                text-align: center;
+                margin: 10px 0px;
+            }
+
+            .Description {
+                padding: 5px 20px;
+            }
+        }
     }
 
     .Questions {

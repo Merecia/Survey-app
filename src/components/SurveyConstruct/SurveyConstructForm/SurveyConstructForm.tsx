@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import style from './SurveyConstructForm.module.scss';
 import { useForm } from 'react-hook-form';
-import { updateSurveyInfo } from '../../../store/action-creators/survey';
 import { Category, ISurveyInfo } from '../../../types/survey';
 import { TextField, Button, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
+import { useActions } from '../../../hooks/useActions';
 
 interface ISurveyConstructFormProps {
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,7 +23,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
             imageUrl: '',
             timeLimit: false,
             maximumPassingTimeSeconds: 600,
-            isEvaluated: true
+            isEvaluated: false
         }
     });
 
@@ -33,6 +33,8 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
 
     const timeLimit = watch('timeLimit');
     const category = watch('category');
+
+    const { updateSurveyInfo } = useActions();
 
     const onSubmit = handleSubmit(async (data) => {
         const surveys = localStorage.getItem('surveys');
@@ -47,7 +49,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
             category: data.category as Category,
             description: data.description,
             imageUrl: data.imageUrl,
-            isEvaluated: true
+            isEvaluated: data.isEvaluated
         };
 
         if (timeLimit) {
@@ -109,6 +111,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                 label = 'Category'
                 fullWidth
                 select
+                size = 'small'
                 value = {category}
                 sx = {{ marginBottom: '20px' }}
                 error = {errors.category?.message !== undefined}

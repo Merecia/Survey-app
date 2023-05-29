@@ -3,8 +3,9 @@ import { IQuestion } from '../../../types/survey';
 import style from './TextQuestionConstruct.module.scss';
 import Input from '../../../UI/Input/Input';
 import { isTextAnswer } from '../../../helper';
-import Checkbox from '../../../UI/Checkbox/Checkbox';
+// import Checkbox from '../../../UI/Checkbox/Checkbox';
 import { useActions } from '../../../hooks/useActions';
+import { TextField, FormControlLabel, Checkbox } from '@mui/material';
 
 interface ITextQuestionConstructProps {
     question: IQuestion;
@@ -38,26 +39,28 @@ const TextQuestionConstruct: FC<ITextQuestionConstructProps> = ({
 
     return (
         <div className={style.TextQuestionConstruct} style={cssProperties}>
-            <p> Enter a correct answer: </p>
-            <Input
+            <TextField 
+                label = "Enter a correct answer"
+                size = 'small'
+                fullWidth
+                sx = {{ marginBottom: '30px' }}
                 value={
                     isTextAnswer(question.correctAnswer)
                         ? question.correctAnswer.text : ''
                 }
-                onChangeHandler={correctAnswerChangeHandler}
-                cssProperties={{ width: '100%', marginBottom: '10px' }}
+                onChange={correctAnswerChangeHandler}
             />
-            <p> Enter score for a correct answer: </p>
-            <Input
-                value={
+            <TextField 
+                label = "Enter score for a correct answer"
+                size = 'small'
+                fullWidth
+                value = {
                     isTextAnswer(question.correctAnswer) && question.correctAnswer.score
-                        ? question.correctAnswer.score : 0
+                       ? question.correctAnswer.score : 0
                 }
-                type={"number"}
-                onChangeHandler={scoreChangeHandler}
-                cssProperties={{ width: '100%' }}
+                onChange={scoreChangeHandler}
             />
-            <Checkbox
+            {/* <Checkbox
                 label={"Ignore register"}
                 checked={
                     isTextAnswer(question.correctAnswer)
@@ -69,7 +72,21 @@ const TextQuestionConstruct: FC<ITextQuestionConstructProps> = ({
                     justifyContent: 'right',
                     marginTop: '20px'
                 }}
-            />
+            /> */}
+            <div className = {style.Footer}>
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={
+                                isTextAnswer(question.correctAnswer)
+                                    ? question.correctAnswer.ignoreRegister : false
+                            }
+                            onChange = {ignoreRegisterChangeHandler}
+                        />
+                    }
+                    label="Ignore register?"
+                />
+            </div>
         </div>
     );
 }

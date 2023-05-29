@@ -4,8 +4,10 @@ import style from './MatchmakingQuestionConstruct.module.scss';
 import Input from '../../../UI/Input/Input';
 import { isMatches } from '../../../helper';
 import { useActions } from '../../../hooks/useActions';
-import Select from '../../../UI/Select/Select';
-import Button from '../../../UI/Button/Button';
+// import Select from '../../../UI/Select/Select';
+// import Button from '../../../UI/Button/Button';
+import { IconButton, TextField, Button, MenuItem } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 interface IMatchmakingQuestionConstructProps {
     question: IQuestion;
@@ -111,6 +113,20 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
         }
     }
 
+    const renderPossibleRelatedOptions = () => {
+        if (isMatches(question.options)) {
+            return question.options.rightList.map(option => {
+                return <MenuItem value = {option.id}> {option.id} </MenuItem>
+            });
+        }
+    }
+
+    // const renderQuestionTypes = () => {
+    //     return Object.keys(questionTypes).map(typeName => {
+    //         return <MenuItem value = {typeName}> {typeName} </MenuItem>
+    //     });
+    // }
+
     const removeRightListOption = (option: IOption) => {
         if (isMatches(question.options)) {
             const rightList = question.options.rightList
@@ -130,14 +146,22 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
         return (
             <div className={style.Option} key={option.id}>
                 <span> {option.id} </span>
-                <Input
+                {/* <Input
                     value={option.label || ''}
                     onChangeHandler={
                         (event: React.ChangeEvent<HTMLInputElement>) => leftListOptionChangeHandler(option, event)
                     }
                     cssProperties={{ marginLeft: '5px', marginRight: '10px' }}
+                /> */}
+                <TextField 
+                    size = 'small'
+                    sx = {{ marginLeft: '5px', marginRight: '10px' }}
+                    value={option.label || ''}
+                    onChange={
+                        (event: React.ChangeEvent<HTMLInputElement>) => leftListOptionChangeHandler(option, event)
+                    }
                 />
-                <Select
+                {/* <Select
                     id={option.id}
                     value={String(option.relatedOptionId) || '1'}
                     options={
@@ -147,11 +171,28 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                     }
                     onChangeHandler={(event) => relatedOptionChangeHandler(option, event)}
                     cssProperties={{ marginRight: '10px' }}
-                />
-                <Button
+                /> */}
+                <TextField
+                    size = 'small'
+                    value={String(option.relatedOptionId) || '1'}
+                    onChange = {
+                        (event: React.ChangeEvent<HTMLInputElement>) => 
+                        relatedOptionChangeHandler(option, event)
+                    }
+                    select
+                >
+                    { renderPossibleRelatedOptions() }
+                </TextField>
+                <IconButton 
+                    aria-label="delete" 
+                    onClick={() => removeLeftListOption(option)}
+                >
+                    <DeleteIcon />
+                </IconButton>
+                {/* <Button
                     label='x'
                     clickHandler={() => removeLeftListOption(option)}
-                />
+                /> */}
             </div>
         );
     }
@@ -167,10 +208,12 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                     }
                     cssProperties={{ marginRight: '10px' }}
                 />
-                <Button
-                    label='x'
-                    clickHandler={() => removeRightListOption(option)}
-                />
+                <IconButton 
+                    aria-label="delete" 
+                    onClick={() => removeRightListOption(option)}
+                >
+                    <DeleteIcon />
+                </IconButton>
             </div>
         )
     }
@@ -217,11 +260,18 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                             ? renderLeftList(question.options.leftList)
                             : null
                     }
-                    <Button
+                    {/* <Button
                         label={'Add new option'}
                         clickHandler={addNewLeftListOption}
                         cssProperties={{ marginTop: '10px', width: '100%' }}
-                    />
+                    /> */}
+                    <Button 
+                        variant = 'contained' 
+                        onClick = {addNewLeftListOption}
+                        sx = {{ marginTop: '10px', width: '100%' }}
+                    > 
+                        Add a new option
+                    </Button>
                 </div>
                 <div className={style.RightList}>
                     {
@@ -229,11 +279,13 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                             ? renderRightList(question.options.rightList)
                             : null
                     }
-                    <Button
-                        label={'Add new option'}
-                        clickHandler={addNewRightListOption}
-                        cssProperties={{ marginTop: '10px', width: '100%' }}
-                    />
+                    <Button 
+                        variant = 'contained' 
+                        onClick = {addNewRightListOption}
+                        sx = {{ marginTop: '10px', width: '100%' }}
+                    > 
+                        Add a new option
+                    </Button>
                 </div>
             </div>
             <div className = {style.Footer}>

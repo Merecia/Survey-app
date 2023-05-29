@@ -70,20 +70,34 @@ export const updateQuestions = (questions: IQuestion[]) => {
     }
 }
 
-export const updateQuestion = (question: IQuestion) => {
+export const updateQuestionRequired = (question: IQuestion, required: boolean) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-        const updatedQuestions = [...getState().survey.questions];
-        updatedQuestions[question.id - 1] = question;
+        question.required = required;
+        const questions = getState().survey.questions;
+        questions[question.id - 1] = question;
 
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
-            payload: updatedQuestions
+            payload: questions
+        })
+    }
+}
+
+export const updateQuestion = (question: IQuestion) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        const questions = getState().survey.questions;
+        questions[question.id - 1] = question;
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: questions
         })
     }
 }
 
 export const updateSurveyInfo = (surveyInfo: ISurveyInfo) => {
     return async (dispatch: Dispatch<SurveyAction>) => {
+        console.log('x');
         dispatch({
             type: SurveyActionTypes.UPDATE_SURVEY_INFO,
             payload: surveyInfo
@@ -93,13 +107,6 @@ export const updateSurveyInfo = (surveyInfo: ISurveyInfo) => {
 
 export const addNewQuestion = () => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-        // const updatedQuestions = [...getState().survey.questions];
-        // updatedQuestions[question.id - 1] = question;
-
-        // dispatch({
-        //     type: SurveyActionTypes.UPDATE_QUESTIONS,
-        //     payload: updatedQuestions
-        // })
         const questions = getState().survey.questions;
         const lastId = questions.length;
         const newQuestion = {
@@ -111,11 +118,59 @@ export const addNewQuestion = () => {
         };
 
         questions.push(newQuestion);
-        //updateQuestions(updatedQuestions);
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
             payload: questions
         });
+    }
+}
+
+export const deleteQuestion = (question: IQuestion) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        const questions = getState().survey.questions
+            .filter(item => item.id !== question.id)
+            .map((item, index) => {
+                if (
+                    item.type === QuestionType.OneChoice ||
+                    item.type === QuestionType.MultipleChoice ||
+                    item.type === QuestionType.Matchmaking
+                ) {
+                    return {
+                        id: index + 1,
+                        topic: item.topic,
+                        type: item.type,
+                        required: item.required,
+                        options: item.options
+                    }
+                } else {
+                    return {
+                        id: index + 1,
+                        topic: item.topic,
+                        type: item.type,
+                        required: item.required,
+                        correctAnswer: item.correctAnswer
+                    }
+                }
+
+            });
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: questions
+        });
+    }
+}
+
+export const updateQuestionTopic = (question: IQuestion, topic: string) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        question.topic = topic;
+        const questions = getState().survey.questions;
+        questions[question.id - 1] = question;
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: questions
+        })
     }
 }
 
@@ -152,9 +207,9 @@ export const updateQuestionType = (question: IQuestion, type: QuestionType) => {
 
             const initialLeftList = [{ id: 1, label: '', relatedOptionId: 1, score: 1 }]
             const initialRightList = [{ id: 1, label: '' }];
-            
+
             question.options = {
-                leftList: initialLeftList, 
+                leftList: initialLeftList,
                 rightList: initialRightList
             };
         }

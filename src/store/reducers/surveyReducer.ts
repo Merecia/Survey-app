@@ -16,12 +16,6 @@ const initialState: SurveyState = {
         maximumPassingTimeSeconds: undefined,
         isEvaluated: true
     }
-    // title: '',
-    // description: '',
-    // category: 'Study',
-    // imageUrl: '',
-    // maximumPassingTimeSeconds: undefined,
-    // isEvaluated: true
 }
 
 export const surveyReducer = (state = initialState, action: SurveyAction): SurveyState => {
@@ -41,36 +35,6 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
                 ...state,
                 surveyInfo: action.payload
             }
-        // case SurveyActionTypes.UPDATE_TITLE:
-        //     return {
-        //         ...state,
-        //         title: action.payload
-        //     }
-        // case SurveyActionTypes.UPDATE_CATEGORY:
-        //     return {
-        //         ...state,
-        //         category: action.payload
-        //     }
-        // case SurveyActionTypes.UPDATE_DESCRIPTION:
-        //     return {
-        //         ...state,
-        //         description: action.payload
-        //     }
-        // case SurveyActionTypes.UPDATE_IMAGE_URL:
-        //     return {
-        //         ...state,
-        //         imageUrl: action.payload
-        //     }
-        // case SurveyActionTypes.UPDATE_IS_EVALUATED:
-        //     return {
-        //         ...state,
-        //         isEvaluated: action.payload
-        //     }
-        // case SurveyActionTypes.UPDATE_MAXIMUM_PASSING_TIME_SECONDS:
-        //     return {
-        //         ...state,
-        //         maximumPassingTimeSeconds: action.payload
-        //     }
         default:
             return state
     }
