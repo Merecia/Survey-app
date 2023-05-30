@@ -6,8 +6,15 @@ import ChoiceQuestionConstruct from './ChoiceQuestionConstruct/ChoiceQuestionCon
 import TextQuestionConstruct from './TextQuestionConstruct/TextQuestionConstruct';
 import MatchmakingQuestionConstruct from './MatchmakingQuestionConstruct/MatchmakingQuestionConstruct';
 import { useActions } from '../../hooks/useActions';
-import { FormControlLabel, MenuItem, TextField, Checkbox, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
+import { 
+    FormControlLabel, 
+    MenuItem, 
+    TextField, 
+    Checkbox, 
+    Button 
+} from '@mui/material';
 
 interface IQuestionConstructProps {
     question: IQuestion;
@@ -40,14 +47,16 @@ const QuestionConstruct: FC<IQuestionConstructProps> = ({
         deleteQuestion
     } = useActions();
 
+    const { surveyInfo } = useTypedSelector(state => state.survey);
+
     const questionTypeChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         const typeName = questionTypes.hasOwnProperty(event.target.value)
-            ? event.target.value
+            ? event.target.value 
             : initialQuestionType;
 
         const type = questionTypes[typeName as keyof typeof questionTypes];
 
-        updateQuestionType(question, type);
+        updateQuestionType(question, type, surveyInfo.isEvaluated);
     }
 
     const renderAnswerFields = () => {
@@ -65,12 +74,14 @@ const QuestionConstruct: FC<IQuestionConstructProps> = ({
             question.type === QuestionType.ShortTextField ||
             question.type === QuestionType.DetailedTextField
         ) {
-            return (
-                <TextQuestionConstruct
-                    key={question.id}
-                    question={question}
-                />
-            );
+            if (surveyInfo.isEvaluated) {
+                return (
+                    <TextQuestionConstruct
+                        key={question.id}
+                        question={question}
+                    />
+                );
+            }
         } else if (question.type === QuestionType.Matchmaking) {
             return (
                 <MatchmakingQuestionConstruct
@@ -82,8 +93,8 @@ const QuestionConstruct: FC<IQuestionConstructProps> = ({
     }
 
     const renderQuestionTypes = () => {
-        return Object.keys(questionTypes).map(typeName => {
-            return <MenuItem value = {typeName}> {typeName} </MenuItem>
+        return Object.keys(questionTypes).map((typeName, index) => {
+            return <MenuItem value = {typeName} key = {index}> {typeName} </MenuItem>
         });
     }
 

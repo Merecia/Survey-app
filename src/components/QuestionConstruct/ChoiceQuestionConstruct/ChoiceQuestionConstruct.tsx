@@ -2,8 +2,6 @@ import React, { FC } from 'react';
 import { IOption, IQuestion } from '../../../types/survey';
 import { isSetOfOptions } from '../../../helper';
 import style from './ChoiceQuestionConstruct.module.scss';
-import Input from '../../../UI/Input/Input';
-// import Button from '../../../UI/Button/Button';
 import { useActions } from '../../../hooks/useActions';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
 import { TextField, Button, IconButton } from '@mui/material';
@@ -19,6 +17,7 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
     cssProperties
 }) => {
     const { updateQuestion } = useActions();
+    const { surveyInfo } = useTypedSelector(state => state.survey);
 
     const optionChangeHandler = (
         option: IOption,
@@ -70,12 +69,11 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
         if (isSetOfOptions(question.options)) {
             const lastId = question.options.length;
             const updatedOptions = [...question.options];
-            updatedOptions.push({
-                id: lastId + 1,
-                label: '',
-                score: 0
-            });
+            const newOption: IOption = { id: lastId + 1, label: '' };
 
+            if (surveyInfo.isEvaluated) newOption.score = 0;
+
+            updatedOptions.push(newOption);
             updateOptions(updatedOptions);
         }
     }
@@ -84,49 +82,31 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
         return (
             <div className={style.Option} key={option.id}>
                 <span> {option.id} </span>
-                {/* <Input
-                    value={option.label || ''}
-                    onChangeHandler={
-                        (event: React.ChangeEvent<HTMLInputElement>) => optionChangeHandler(option, event)
-                    }
-                    cssProperties={{ marginLeft: '5px', marginRight: '10px' }}
-                /> */}
                 <TextField 
                     size = 'small'
-                    sx = {{ marginLeft: '12px', marginRight: '10px', width: '75%' }}
+                    sx = {{ 
+                        marginLeft: '12px', 
+                        marginRight: '10px', 
+                        width: surveyInfo.isEvaluated ? '75%' : '88%'
+                    }}
                     value={option.label || ''}
                     onChange={
                         (event: React.ChangeEvent<HTMLInputElement>) => optionChangeHandler(option, event)
                     }
                 />
-                <TextField 
-                    size = 'small'
-                    value = {option.score || 0}
-                    onChange={
-                        (event: React.ChangeEvent<HTMLInputElement>) => scoreChangeHandler(option, event)
-                    }
-                    sx = {{ marginLeft: '3px', marginRight: '5px', width: '10%' }}
-                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                />
-                {/* <Input
-                    value={option.score || 0}
-                    onChangeHandler={
-                        (event: React.ChangeEvent<HTMLInputElement>) => scoreChangeHandler(option, event)
-                    }
-                    type='number'
-                    cssProperties={{ marginRight: '10px' }}
-                /> */}
-                {/* <Button
-                    label='Delete'
-                    clickHandler={() => deleteOption(option)}
-                /> */}
-                {/* <Button 
-                    variant="outlined" 
-                    startIcon={<DeleteIcon />}
-                    onClick={() => deleteOption(option)}
-                >
-                    Delete
-                </Button> */}
+                {
+                    surveyInfo.isEvaluated
+                    ? <TextField 
+                        size = 'small'
+                        value = {option.score || 0}
+                        onChange={
+                            (event: React.ChangeEvent<HTMLInputElement>) => scoreChangeHandler(option, event)
+                        }
+                        sx = {{ marginLeft: '3px', marginRight: '5px', width: '10%' }}
+                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                    />
+                    : null
+                }
                 <IconButton 
                     aria-label="delete" 
                     onClick={() => deleteOption(option)}
@@ -148,19 +128,13 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
             <div className = {style.Header}>
                 <p className = {style.NumberLabel}> # </p>
                 <p className = {style.OptionLabel}> Option </p>
-                <p className = {style.ScoreLabel}> Score </p>
+                {
+                    surveyInfo.isEvaluated 
+                    ? <p className = {style.ScoreLabel}> Score </p> 
+                    : null
+                }
             </div>
             {renderOptions()}
-            {/* <Button
-                label={"Add a new option"}
-                clickHandler={addEmptyOption}
-                cssProperties={{
-                    width: '100%', 
-                    marginTop: '10px', 
-                    padding: '5px'
-                }}
-            /> */}
-
             <Button 
                 variant = 'contained' 
                 onClick = {addEmptyOption}

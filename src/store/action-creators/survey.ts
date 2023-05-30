@@ -97,7 +97,6 @@ export const updateQuestion = (question: IQuestion) => {
 
 export const updateSurveyInfo = (surveyInfo: ISurveyInfo) => {
     return async (dispatch: Dispatch<SurveyAction>) => {
-        console.log('x');
         dispatch({
             type: SurveyActionTypes.UPDATE_SURVEY_INFO,
             payload: surveyInfo
@@ -118,6 +117,7 @@ export const addNewQuestion = () => {
         };
 
         questions.push(newQuestion);
+
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
             payload: questions
@@ -174,7 +174,11 @@ export const updateQuestionTopic = (question: IQuestion, topic: string) => {
     }
 }
 
-export const updateQuestionType = (question: IQuestion, type: QuestionType) => {
+export const updateQuestionType = (
+    question: IQuestion, 
+    type: QuestionType,
+    isEvaluated: boolean
+) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         question.type = type;
 
@@ -186,7 +190,10 @@ export const updateQuestionType = (question: IQuestion, type: QuestionType) => {
                 delete question.correctAnswer;
             }
 
-            const initialOptions = [{ id: 1, label: "", score: 0 }]
+            const initialOptions = isEvaluated 
+                ? [{ id: 1, label: "", score: 0 }]
+                : [{ id: 1, label: ""}];
+
             question.options = initialOptions;
         } else if (
             question.type === QuestionType.ShortTextField ||
@@ -196,8 +203,11 @@ export const updateQuestionType = (question: IQuestion, type: QuestionType) => {
                 delete question.options;
             }
 
-            const initialCorrectAnswer = { text: '', score: 0 }
-            question.correctAnswer = initialCorrectAnswer;
+            const initialCorrectAnswer = { text: '', score: 0 };
+
+            if (isEvaluated) {
+                question.correctAnswer = initialCorrectAnswer;
+            }
         } else if (
             question.type === QuestionType.Matchmaking
         ) {
@@ -205,7 +215,10 @@ export const updateQuestionType = (question: IQuestion, type: QuestionType) => {
                 delete question.correctAnswer;
             }
 
-            const initialLeftList = [{ id: 1, label: '', relatedOptionId: 1, score: 1 }]
+            const initialLeftList = isEvaluated 
+                ? [{ id: 1, label: '', relatedOptionId: 1, score: 1 }]
+                : [{ id: 1, label: '' }];
+
             const initialRightList = [{ id: 1, label: '' }];
 
             question.options = {

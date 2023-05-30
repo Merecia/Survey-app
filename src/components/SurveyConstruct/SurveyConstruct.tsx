@@ -3,34 +3,30 @@ import style from './SurveyConstruct.module.scss';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
-import { IQuestion, QuestionType } from '../../types/survey';
-// import Button from '../../UI/Button/Button';
+import { IOption, IQuestion, ISurvey, QuestionType } from '../../types/survey';
 import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
 import { Button } from '@mui/material';
 
 const SurveyConstruct: FC = () => {
-    const { updateQuestions, addNewQuestion } = useActions();
     const { questions, surveyInfo } = useTypedSelector(state => state.survey);
-
     const [showForm, setShowForm] = useState<boolean>(true);
-
-    console.log(surveyInfo);
+    const { updateQuestions, addNewQuestion } = useActions();
 
     useEffect(() => {
-        const initialQuestion = {
+        const initialOption: IOption = { id: 1, label: '' };
+
+        if (surveyInfo.isEvaluated) initialOption.score = 0;
+
+        const initialQuestions = [{
             id: 1,
             topic: "",
             type: QuestionType.OneChoice,
             required: false,
-            options: [{ id: 1, label: "", score: 0 }]
-        }
-
-        const initialQuestions = [initialQuestion];
+            options: [initialOption]
+        }];
 
         updateQuestions(initialQuestions);
     }, [])
-
-    console.log(questions);
 
     const renderQuestions = () => {
         return questions.map(question => renderQuestion(question));
@@ -47,8 +43,16 @@ const SurveyConstruct: FC = () => {
     }
 
     const finishCreatingButtonClickHandler = () => {
-        alert('You have finished creating the quiz');
-        console.log(questions);
+        alert('You have finished creating the survey');
+
+        const survey: ISurvey = { surveyInfo, questions };
+        const surveysData = localStorage.getItem('surveys');
+
+        let surveys;
+        if (surveysData) surveys = JSON.parse(surveysData).push(survey)
+        else surveys = [survey];
+
+        localStorage.setItem('surveys', JSON.stringify(surveys));
     }
 
     const renderForm = () => {
@@ -78,19 +82,9 @@ const SurveyConstruct: FC = () => {
                     {renderQuestions()}
                 </div>
                 <div className={style.Footer}>
-                    {/* <Button
-                        label="Add a new question"
-                        clickHandler={addNewQuestion}
-                        cssProperties={{
-                            marginRight: '100px',
-                            padding: '10px',
-                            width: '220px'
-                        }}
-                    /> */}
                     <Button 
                         variant = 'contained' 
                         onClick = {addNewQuestion} 
-                        // color = 'primary'
                         color = 'info'
                         sx = {{
                             marginRight: '100px',
@@ -112,14 +106,6 @@ const SurveyConstruct: FC = () => {
                     > 
                         Create the survey
                     </Button>
-                    {/* <Button
-                        label='Create the survey'
-                        clickHandler={finishCreatingButtonClickHandler}
-                        cssProperties={{
-                            width: '220px',
-                            padding: '10px'
-                        }}
-                    /> */}
                 </div>
             </div>
         )

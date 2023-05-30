@@ -38,6 +38,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
 
     const onSubmit = handleSubmit(async (data) => {
         const surveys = localStorage.getItem('surveys');
+        console.log(surveys);
 
         let id;
         if (surveys) id = JSON.parse(surveys).pop().surveyInfo.id + 1;  

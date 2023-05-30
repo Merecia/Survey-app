@@ -14,7 +14,7 @@ const initialState: SurveyState = {
         category: 'Study', 
         imageUrl: '',
         maximumPassingTimeSeconds: undefined,
-        isEvaluated: true
+        isEvaluated: false
     }
 }
 

@@ -1,13 +1,11 @@
 import React, { FC } from 'react';
 import { IOption, IQuestion } from '../../../types/survey';
 import style from './MatchmakingQuestionConstruct.module.scss';
-import Input from '../../../UI/Input/Input';
 import { isMatches } from '../../../helper';
 import { useActions } from '../../../hooks/useActions';
-// import Select from '../../../UI/Select/Select';
-// import Button from '../../../UI/Button/Button';
 import { IconButton, TextField, Button, MenuItem } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { useTypedSelector } from '../../../hooks/useTypedSelector';
 
 interface IMatchmakingQuestionConstructProps {
     question: IQuestion;
@@ -19,6 +17,7 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
     cssProperties
 }) => {
     const { updateQuestion } = useActions();
+    const { surveyInfo } = useTypedSelector(state => state.survey);
 
     const renderLeftList = (leftList: IOption[]) => {
         return leftList.map(option => renderLeftListOption(option));
@@ -121,12 +120,6 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
         }
     }
 
-    // const renderQuestionTypes = () => {
-    //     return Object.keys(questionTypes).map(typeName => {
-    //         return <MenuItem value = {typeName}> {typeName} </MenuItem>
-    //     });
-    // }
-
     const removeRightListOption = (option: IOption) => {
         if (isMatches(question.options)) {
             const rightList = question.options.rightList
@@ -146,53 +139,40 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
         return (
             <div className={style.Option} key={option.id}>
                 <span> {option.id} </span>
-                {/* <Input
-                    value={option.label || ''}
-                    onChangeHandler={
-                        (event: React.ChangeEvent<HTMLInputElement>) => leftListOptionChangeHandler(option, event)
-                    }
-                    cssProperties={{ marginLeft: '5px', marginRight: '10px' }}
-                /> */}
                 <TextField 
                     size = 'small'
-                    sx = {{ marginLeft: '5px', marginRight: '10px' }}
+                    sx = {{ 
+                        marginLeft: '5px', 
+                        marginRight: '10px', 
+                        width: surveyInfo.isEvaluated ? '64%' : '80%' 
+                    }}
                     value={option.label || ''}
                     onChange={
                         (event: React.ChangeEvent<HTMLInputElement>) => leftListOptionChangeHandler(option, event)
                     }
                 />
-                {/* <Select
-                    id={option.id}
-                    value={String(option.relatedOptionId) || '1'}
-                    options={
-                        isMatches(question.options)
-                            ? question.options.rightList.map(option => String(option.id))
-                            : ['1']
-                    }
-                    onChangeHandler={(event) => relatedOptionChangeHandler(option, event)}
-                    cssProperties={{ marginRight: '10px' }}
-                /> */}
-                <TextField
-                    size = 'small'
-                    value={String(option.relatedOptionId) || '1'}
-                    onChange = {
-                        (event: React.ChangeEvent<HTMLInputElement>) => 
-                        relatedOptionChangeHandler(option, event)
-                    }
-                    select
-                >
-                    { renderPossibleRelatedOptions() }
-                </TextField>
+                { 
+                    surveyInfo.isEvaluated
+                    ? <TextField
+                        size = 'small'
+                        value={String(option.relatedOptionId) || '1'}
+                        onChange = {
+                            (event: React.ChangeEvent<HTMLInputElement>) => 
+                            relatedOptionChangeHandler(option, event)
+                        }
+                        select
+                    >
+                        { renderPossibleRelatedOptions() }
+                    </TextField> 
+                    : null
+                }
+                
                 <IconButton 
                     aria-label="delete" 
                     onClick={() => removeLeftListOption(option)}
                 >
                     <DeleteIcon />
                 </IconButton>
-                {/* <Button
-                    label='x'
-                    clickHandler={() => removeLeftListOption(option)}
-                /> */}
             </div>
         );
     }
@@ -201,12 +181,13 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
         return (
             <div className={style.Option} key={option.id}>
                 <span> {option.id} </span>
-                <Input
+                <TextField 
+                    size = 'small'
+                    sx = {{ marginLeft: '5px', marginRight: '10px', width: '73%' }}
                     value={option.label || ''}
-                    onChangeHandler={
+                    onChange={
                         (event: React.ChangeEvent<HTMLInputElement>) => rightListOptionChangeHandler(option, event)
                     }
-                    cssProperties={{ marginRight: '10px' }}
                 />
                 <IconButton 
                     aria-label="delete" 
@@ -215,18 +196,18 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                     <DeleteIcon />
                 </IconButton>
             </div>
-        )
+        );
     }
 
     const addNewLeftListOption = () => {
         if (isMatches(question.options)) {
             const lastId = question.options.leftList.length;
-            const newOption = {
-                id: lastId + 1,
-                label: '',
-                score: question.options.leftList[0].score,
-                relatedOptionId: 1
-            };
+            const newOption: IOption = { id: lastId + 1, label: '' };
+
+            if (surveyInfo.isEvaluated) {
+                newOption.relatedOptionId = 1;
+                newOption.score = question.options.leftList[0].score;
+            }
 
             const updatedLeftList = [...question.options.leftList];
             updatedLeftList.push(newOption);
@@ -238,10 +219,7 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
         if (isMatches(question.options)) {
             const lastId = question.options.rightList.length;
             const updatedRightList = [...question.options.rightList];
-            const newOption = {
-                id: lastId + 1,
-                label: ''
-            };
+            const newOption = { id: lastId + 1, label: '' };
 
             updatedRightList.push(newOption);
             updateRightList(updatedRightList);
@@ -260,11 +238,6 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                             ? renderLeftList(question.options.leftList)
                             : null
                     }
-                    {/* <Button
-                        label={'Add new option'}
-                        clickHandler={addNewLeftListOption}
-                        cssProperties={{ marginTop: '10px', width: '100%' }}
-                    /> */}
                     <Button 
                         variant = 'contained' 
                         onClick = {addNewLeftListOption}
@@ -289,16 +262,21 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                 </div>
             </div>
             <div className = {style.Footer}>
-                <p> Enter the score for the correct answer: </p>
-                <Input 
-                    value = {
-                        isMatches(question.options) && question.options.leftList[0].score 
-                            ? question.options.leftList[0].score : 1
-                    }
-                    onChangeHandler={matchesScoreChangeHandler}
-                    type = {'number'}
-                />
-
+                {
+                    surveyInfo.isEvaluated
+                    ? <TextField 
+                        label = "Enter score for a correct answer"
+                        size = 'small'
+                        fullWidth
+                        value = {
+                            isMatches(question.options) && question.options.leftList[0].score 
+                                ? question.options.leftList[0].score : 0
+                        }
+                        onChange={matchesScoreChangeHandler}
+                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                    />
+                    : null
+                }
             </div>
         </div>
     );
