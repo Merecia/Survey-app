@@ -19,6 +19,7 @@ import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
 import TextField from '../TextField/TextField';
 import Feedback from '../Feedback/Feedback';
+import { Typography } from '@mui/material';
 
 interface IAnswerProps {
     answerToQuestion: IAnswerToQuestion;
@@ -178,22 +179,19 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
         return { totalScore, maximumScore, correctAnswers } as IFeedback;
     }
 
-    const renderFeedback = (feedback: IFeedback) => {
-        return (
-            <Feedback
-                feedback={feedback}
-                cssProperties={{ margin: '20px 0px 0px 0px' }}
-            />
-        );
-    }
-
     const feedback = getFeedback(answerToQuestion);
 
     return (
         <div className={style.Answer} style={cssProperties}>
-            <p> {answerToQuestion.question.topic} </p>
-            {renderResponseField(answerToQuestion.question, answerToQuestion.answer)}
-            {feedback ? renderFeedback(feedback) : null}
+            <Typography 
+                variant={"h6"} 
+                component={"h6"} 
+                sx = {{ marginBottom: '20px' }} 
+            >
+                { answerToQuestion.question.topic }
+            </Typography>
+            { renderResponseField(answerToQuestion.question, answerToQuestion.answer) }
+            { feedback && <Feedback feedback={feedback} /> }
         </div>
     );
 }

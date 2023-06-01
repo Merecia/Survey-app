@@ -4,6 +4,7 @@ import {
     IAnswerToQuestion,
     IQuestion,
     ISurveyInfo,
+    ISurveyResults,
     QuestionType,
     SurveyAction,
     SurveyActionTypes
@@ -53,11 +54,35 @@ export const updateAnswersToQuestions = (answerToQuestion: IAnswerToQuestion) =>
     }
 }
 
-export const finishSurvey = (surveyId: number) => {
+export const finishSurvey = (
+    surveyInfo: ISurveyInfo, 
+    passingTimeSeconds: number,
+    answersToQuestions: IAnswerToQuestion[]
+) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-        console.log(getState().survey.answersToQuestions);
-        console.log(`User has finished survey ${surveyId}`);
-        console.log('Score: ' + scoreTest());
+        alert('You have finished passing the survey');
+
+        const allSurveyResultsData = localStorage.getItem('allSurveyResults');
+        let allSurveyResults, id;
+
+        if (allSurveyResultsData) {
+            allSurveyResults = JSON.parse(allSurveyResultsData);
+            const lastSurvey = allSurveyResults[allSurveyResults.length - 1];
+            id = lastSurvey.id + 1;
+        } else {
+            allSurveyResults = [];
+            id = 1;
+        }
+
+        const surveyResults: ISurveyResults = {
+            id,
+            surveyInfo,
+            passingTimeSeconds,
+            answersToQuestions
+        };
+
+        allSurveyResults.push(surveyResults);
+        localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
     }
 }
 

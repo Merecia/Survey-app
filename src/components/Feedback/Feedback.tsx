@@ -1,6 +1,7 @@
 import { FC } from 'react';
 import { IFeedback } from '../../types/survey';
 import style from './Feedback.module.scss';
+import { Alert, AlertTitle } from "@mui/material";
 
 interface IFeedbackProps {
     feedback: IFeedback;
@@ -8,50 +9,52 @@ interface IFeedbackProps {
 }
 
 const Feedback: FC<IFeedbackProps> = ({ feedback, cssProperties }) => {
-    const renderNote = () => {
+    const renderFeedback = () => {
         if (feedback.totalScore <= 0) {
-            return 'You answered the question wrong.'
+            return (
+                <Alert severity="error" sx={{ marginTop: '10px' }}>
+                    <AlertTitle> Your answer is incorrect </AlertTitle>
+                    { renderScore(feedback.totalScore, feedback.maximumScore) }
+                    { renderCorrectAnswers() }
+                </Alert>
+            );
         } else if (feedback.totalScore > 0 && feedback.totalScore < feedback.maximumScore) {
-            return 'You answered the questions partially correctly.'
+            return (
+                <Alert severity="warning" sx={{ marginTop: '10px' }}>
+                    <AlertTitle> Your answer is partially correct </AlertTitle>
+                    { renderScore(feedback.totalScore, feedback.maximumScore) }
+                    { renderCorrectAnswers() }
+                </Alert>
+            )
         } else if (feedback.totalScore === feedback.maximumScore) {
-            return 'You have answered the question correctly.'
+            return (
+                <Alert severity="success" sx={{ marginTop: '10px' }}>
+                    <AlertTitle> Your answer is correct </AlertTitle>
+                    { renderScore(feedback.totalScore, feedback.maximumScore) }
+                </Alert>
+            );
         }
     }
 
-    const renderFootnote = () => {
+    const renderCorrectAnswers = () => {
         return (
-            <div className={style.Footnote}>
-                <p> 
-                    {
-                        feedback.correctAnswers.length > 1 
-                        ? 'Correct answers: ' 
-                        : 'Correct answer: '
-                    } 
-                </p>
-                {renderCorrectAnswers()}
+            <div className = {style.Footnote}>
+                { feedback.correctAnswers.length > 1 ? 'Correct answers are: ' : 'Correct answer is: ' }
+                { feedback.correctAnswers.map((correctAnswer, index) => renderCorrectAnswer(correctAnswer, index)) }
             </div>
         );
     }
 
-    const renderCorrectAnswers = () => feedback.correctAnswers.map(
-        (correctAnswer, index) => renderCorrectAnswer(correctAnswer, index)
-    );
-
-    const renderCorrectAnswer = (correctAnswer: string, index: number) => {
-        return <p key={index}> {correctAnswer} </p>
+    const renderScore = (totalScore: number, maximumScore: number): JSX.Element => {
+        return <p> `Your score is — <strong> {totalScore} / {maximumScore} </strong>` </p>
     }
+
+    const renderCorrectAnswer = (correctAnswer: string, index: number) => <strong key={index}> {correctAnswer} </strong>
 
     return (
         <div className={style.Feedback} style={cssProperties}>
-            <div className={style.Header}>
-                {renderNote()}
-                <div className={style.Score}>
-                    {feedback.totalScore} / {feedback.maximumScore}
-                </div>
-            </div>
-
-            {feedback.totalScore !== feedback.maximumScore ? renderFootnote() : null}
-        </div >
+            {renderFeedback()}
+        </div>
     );
 }
 

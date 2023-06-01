@@ -5,6 +5,7 @@ import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
 import TextField from '../TextField/TextField';
 import style from './Question.module.scss';
+import { Typography } from '@mui/material';
 
 interface IQuestionProps {
     question: IQuestion;
@@ -15,45 +16,34 @@ const Question: FC<IQuestionProps> = ({ question, cssProperties }) => {
 
     const renderResponseField = () => {
         if (question.type === QuestionType.Matchmaking) {
-            return (
-                <Matchmaking
-                    question={question}
-                />
-            );
+            return <Matchmaking question={question} />
         }
+
         else if (question.type === QuestionType.OneChoice) {
-            return (
-                <SingleChoice
-                    question={question}
-                />
-            );
+            return <SingleChoice question={question} />
         }
+
         else if (question.type === QuestionType.MultipleChoice) {
-            return (
-                <MultipleChoice
-                    question={question}
-                />
-            );
+            return <MultipleChoice question={question} />
         }
-        else if (question.type === QuestionType.ShortTextField) {
-            return (
-                <TextField
-                    question={question}
-                />
-            );
-        }
-        else if (question.type === QuestionType.DetailedTextField) {
-            return (
-                <TextField
-                    question={question}
-                />
-            );
+
+        else if (
+            question.type === QuestionType.ShortTextField || 
+            question.type === QuestionType.DetailedTextField
+        ) {
+            return <TextField question={question} />
         }
     }
 
     return (
         <div className={style.Question} style={cssProperties}>
-            <p> {question.topic} </p>
+            <Typography 
+                variant={"h6"} 
+                component={"h6"} 
+                sx = {{ marginBottom: '20px' }} 
+            >
+                { question.topic }
+            </Typography>
             {renderResponseField()}
         </div>
     );

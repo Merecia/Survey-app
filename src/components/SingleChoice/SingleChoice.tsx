@@ -2,8 +2,10 @@ import { FC, useState, useEffect } from 'react';
 import { isOption, isSetOfOptions } from '../../helper';
 import { useActions } from '../../hooks/useActions';
 import { IAnswer, IOption, IQuestion } from '../../types/survey';
-import Radio from '../../UI/Radio/Radio';
+import { Radio, FormControlLabel } from '@mui/material';
 import style from './SingleChoice.module.scss';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface ISingleChoiceProps {
     question: IQuestion;
@@ -13,6 +15,8 @@ interface ISingleChoiceProps {
 const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
     const { updateAnswersToQuestions } = useActions();
     const [selectedOptionId, setSelectedOptionId] = useState<Number>();
+
+    console.log(selectedOption);
 
     useEffect(() => {
         if (selectedOption) {
@@ -51,26 +55,31 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
         return isCorrectOption(selectedOption) ? renderCheckmark() : renderCrossmark();
     }
 
-    const renderCheckmark = () => {
-        return <span className={style.Checkmark}> &#10003; </span>
-    }
-
-    const renderCrossmark = () => {
-        return <span className={style.Crossmark}> &#10060; </span>
-    }
+    const renderCheckmark = () => <span className={style.Checkmark}> <CheckCircleIcon /> </span>
+    
+    const renderCrossmark = () => <span className={style.Crossmark}> <CloseIcon /> </span>
 
     const renderOption = (option: IOption) => {
         return (
             <li className={style.Option} key={option.id}>
-                <Radio
-                    value={String(option.id)}
+                <FormControlLabel 
+                    value={String(option.id)} 
+                    control={
+                        <Radio
+                            checked={selectedOptionId === option.id}
+                            onChange={radioHandler}
+                            name="radio-buttons"
+                            inputProps={{ 'aria-label': option.label }}
+                            disabled = {selectedOption !== undefined}
+                        />
+                    } 
                     label={option.label}
-                    onChangeHandler={radioHandler}
-                    checked={selectedOptionId === option.id}
-                    disabled={false}
                 />
 
-                {selectedOption ? renderMark(selectedOption) : null} 
+                {
+                    selectedOption && selectedOption.id === option.id 
+                    ? renderMark(selectedOption) : null
+                } 
             </li>
         );
     }

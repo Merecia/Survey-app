@@ -13,7 +13,7 @@ import {
     IOption,
     IQuestion
 } from '../../types/survey';
-import Select from '../../UI/Select/Select';
+import { TextField, MenuItem } from '@mui/material';
 import style from './Matchmaking.module.scss';
 
 interface IMatchmakingProps {
@@ -75,7 +75,7 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
 
     const onChangeHandler = (
         selectedOptionIdFromLeftList: number,
-        event: React.ChangeEvent<HTMLSelectElement>
+        event: React.ChangeEvent<HTMLInputElement>
     ) => {
         const matchIndex = matches.findIndex(selectedOption =>
             selectedOption.leftListOptionId === selectedOptionIdFromLeftList
@@ -113,6 +113,18 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
         <div className={style.Option} key={id}> {id}. {label} </div>
     )
 
+    const renderPossibleRelatedOptions = (rightList: IOption[]) => {
+        if (isMatches(question.options)) {
+            return rightList.map(option => {
+                return (
+                    <MenuItem value = { makeOptionIdLetter(option.id) }> 
+                        { makeOptionIdLetter(option.id) } 
+                    </MenuItem>
+                );
+            });
+        }
+    }
+
     /*
         This function will find the match for the leftListOptionId from the selectedOptions.
         If we can't find a match (for example, in cases when the user doesn't 
@@ -128,9 +140,7 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
         if (isOption(option)) {
             const match = findMatch(option.id);
 
-            if (option.relatedOptionId === match) {
-                return true;
-            }
+            if (option.relatedOptionId === match) return true;
 
             return false;
         }
@@ -144,42 +154,41 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
     const renderCrossmark = () => <span className={style.Crossmark}> &#10060; </span>
 
     const renderLeftList = () => {
-        if (!isMatches(question.options)) return;
+        if (isMatches(question.options)) {
+            const { leftList, rightList } = question.options;
 
-        const {leftList, rightList} = question.options;
+            return leftList.map(option => {
+                const match = findMatch(option.id);
 
-        return leftList.map(option => {
-            const match = findMatch(option.id);
+                return (
+                    <div className={style.ListItem} key={option.id}>
+                        {renderOption(option.id, option.label)}
+                        <div className={style.Select}>
+                            <TextField
+                                size = 'small'
+                                value={match ? makeOptionIdLetter(match) : ''}
+                                onChange = { (event: React.ChangeEvent<HTMLInputElement>) => onChangeHandler(option.id, event) }
+                                select
+                            >
+                                { renderPossibleRelatedOptions(rightList) }
+                            </TextField> 
 
-            return (
-                <div className={style.ListItem} key={option.id}>
-                    {renderOption(option.id, option.label)}
-                    <div className={style.Select}>
-                        <Select
-                            id={option.id}
-                            value={match ? makeOptionIdLetter(match) : ''}
-                            options={rightList.map(option => makeOptionIdLetter(option.id))}
-                            disabled={false}
-                            onChangeHandler={
-                                (event: React.ChangeEvent<HTMLSelectElement>) =>
-                                    onChangeHandler(option.id, event)
-                            }
-                        />
-                        {selectedMatches ? renderMark(option) : null}
+                            {selectedMatches ? renderMark(option) : null}
+                        </div>
                     </div>
-                </div>
-            );
-        });
+                );
+            });
+        }
     }
 
     const renderRightList = () => {
-        if (!isMatches(question.options)) return;
-
-        return question.options.rightList.map(option => (
-            <div className={style.ListItem} key={option.id}>
-                {renderOption(makeOptionIdLetter(option.id), option.label)}
-            </div>
-        ));
+        if (isMatches(question.options)) {
+            return question.options.rightList.map(option => (
+                <div className={style.ListItem} key={option.id}>
+                    {renderOption(makeOptionIdLetter(option.id), option.label)}
+                </div>
+            ));
+        }
     }
 
     return (

@@ -7,8 +7,7 @@ import {
     ITextAnswer,
     QuestionType
 } from '../../types/survey';
-import Input from '../../UI/Input/Input';
-import Textarea from '../../UI/Textarea/Textarea';
+import { TextField as TextInput } from '@mui/material';
 
 interface ITextFieldProps {
     question: IQuestion;
@@ -46,46 +45,50 @@ const TextField: FC<ITextFieldProps> = ({ question, givedAnswer }) => {
         updateAnswersToQuestions({ question, answer });
     }
 
-    const inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-        updateTextAnswer(event.target.value);
-    }
-
-
-    const textareaChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const textInputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         updateTextAnswer(event.target.value);
     }
 
     const getBorder = () => {
+        const red = 'rgb(247, 84, 81)';
+        const green = 'rgb(92,182,96)';
+
         if (givedAnswer && givedAnswer.score !== undefined) {
             if (givedAnswer.score > 0) {
-                return `2px solid green`;
+                return `2px solid ${green}`;
             } else if (givedAnswer.score <= 0) {
-                return `2px solid red`;
+                return `2px solid ${red}`;
             }
-        } else {
-            return '1px solid black';
-        }
+        } 
     }
 
     const renderTextField = () => {
         if (question.type === QuestionType.ShortTextField) {
             return (
-                <Input
+                <TextInput
+                    size='small'
+                    fullWidth
                     value={text}
-                    onChangeHandler={inputChangeHandler}
-                    disabled={false}
-                    cssProperties={{ 'width': '100%', 'border': getBorder() }}
+                    onChange={textInputChangeHandler}
+                    disabled = {givedAnswer !== undefined}
+                    sx = {{ 
+                        border: getBorder(),
+                        borderRadius: '6px'
+                    }}  
                 />
             );
         }
 
         else if (question.type === QuestionType.DetailedTextField) {
             return (
-                <Textarea
+                <TextInput
+                    size='small'
+                    fullWidth
                     value={text}
-                    onChangeHandler={textareaChangeHandler}
-                    disabled={false}
-                    cssProperties={{ 'width': '100%', 'height': '100px' }}
+                    onChange={textInputChangeHandler}
+                    multiline
+                    rows={5}
+                    disabled = {givedAnswer !== undefined}
                 />
             );
         }

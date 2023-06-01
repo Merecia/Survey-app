@@ -1,3 +1,6 @@
+$green: rgb(92,182,96);
+$red: rgb(247, 84, 81);
+
 .Options {
     list-style-type: none;
     margin: 0;
@@ -7,10 +10,14 @@
         .Checkmark, .Crossmark {
             margin-left: 10%;
         }
+        
         .Checkmark {
-            font-weight: bold;
-            color: green;
-            font-size: 20px;   
+            color: $green;
+
+        }
+
+        .Crossmark {
+            color: $red;
         }
     }
 }

@@ -2,8 +2,52 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
 
-.Wrapper {
-    width: 60%;
+    .Wrapper {
+        width: 900px;
+
+        .Header {
+            .SurveyImage {
+                display: flex;
+                justify-content: center;
+                margin: 20px auto;
+                width: 80%;
+                height: 250px;
+                border: 1px solid black;
+                border-radius: 10px;
+                background-color: white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
+            }
+
+            .SurveyDetails {
+                width: 80%;
+                margin: 20px auto;
+                border: 1px solid black;
+                border-radius: 10px;
+                background-color: white;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
+
+                .Title {
+                    text-align: center;
+                    margin: 10px 0px;
+                }
+
+                .Description {
+                    padding: 5px 20px;
+                    font-size: 20px;
+                }
+            }
+        }
+
+        .AnswersToQuestions {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+
+            .AnswerToQuestion {
+                display: flex;
+                justify-content: center;
+            }
+        }
+    }
 }

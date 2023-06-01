@@ -9,8 +9,8 @@ import { Button } from '@mui/material';
 
 const SurveyConstruct: FC = () => {
     const { questions, surveyInfo } = useTypedSelector(state => state.survey);
-    const [showForm, setShowForm] = useState<boolean>(true);
     const { updateQuestions, addNewQuestion } = useActions();
+    const [showForm, setShowForm] = useState<boolean>(true);
 
     useEffect(() => {
         const initialOption: IOption = { id: 1, label: '' };
@@ -49,8 +49,13 @@ const SurveyConstruct: FC = () => {
         const surveysData = localStorage.getItem('surveys');
 
         let surveys;
-        if (surveysData) surveys = JSON.parse(surveysData).push(survey)
-        else surveys = [survey];
+        if (surveysData) {
+            surveys = JSON.parse(surveysData);
+            surveys.push(survey);
+        }
+        else {
+            surveys = [survey];
+        }
 
         localStorage.setItem('surveys', JSON.stringify(surveys));
     }
@@ -113,7 +118,7 @@ const SurveyConstruct: FC = () => {
 
     return (
         <div className={style.SurveyConstruct}>
-            {showForm ? renderForm() : renderQuestionsConstruct()}
+            { showForm ? renderForm() : renderQuestionsConstruct() }
         </div>
     );
 }
