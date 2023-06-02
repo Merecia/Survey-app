@@ -44,7 +44,7 @@ const Question: FC<IQuestionProps> = ({ question, cssProperties }) => {
             >
                 { question.topic }
             </Typography>
-            {renderResponseField()}
+            { renderResponseField() }
         </div>
     );
 }

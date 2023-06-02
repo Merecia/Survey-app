@@ -1,28 +1,60 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import { IQuestion, ISurvey, ISurveyResults } from '../../types/survey';
+import { IQuestion, ISurvey, ISurveyResults, ISurveyInfo } from '../../types/survey';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
-import { Button, Typography } from '@mui/material';
+import { Button, Typography, CircularProgress } from '@mui/material';
+import useInterval from '../../hooks/useInterval';
 
 interface ISurveyProps {
-    survey: ISurvey;
+    id: number;
 }
 
-const Survey: FC<ISurveyProps> = ({ survey }) => {
-    const { finishSurvey, updateQuestions } = useActions();
-    const { answersToQuestions, questions } = useTypedSelector(state => state.survey);
+const Survey: FC<ISurveyProps> = ({ id }) => {
+    const { updateQuestions, updateSurveyInfo } = useActions();
+    const { answersToQuestions, questions, surveyInfo } = useTypedSelector(state => state.survey);
+    const [timeStart, setTimeStart] = useState(new Date());
+    const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
+    const [loading, setLoading] = useState(true);
+
+    const loadSurvey = (id: number) => {
+        const surveys = localStorage.getItem('surveys');
+        const survey = surveys 
+            ? JSON.parse(surveys).find((survey: ISurvey) => survey.surveyInfo.id === id) 
+            : null;
+
+        updateQuestions(survey.questions);
+        updateSurveyInfo(survey.surveyInfo);
+    }
 
     useEffect(() => {
-        updateQuestions(survey.questions);
+        loadSurvey(id);
+        setTimeStart(new Date());
+        setLoading(false);
         // eslint-disable-next-line
     }, [])
 
-    const renderQuestions = () => {
+    useInterval(() => {
+        const maximumPassingTimeSeconds = surveyInfo.maximumPassingTimeSeconds;
+
+        if (maximumPassingTimeSeconds) {
+            const now = new Date();
+            const dt = (now.getTime() - timeStart.getTime()) / 1000;
+
+            if (Math.floor(dt) === Number(maximumPassingTimeSeconds)) {
+                alert('Time is over. Finishing survey...');
+                finishSurvey(maximumPassingTimeSeconds);
+            } else {
+                setPassingTimeSeconds(Math.floor(dt));
+            }
+        }
+    }, 1000)
+
+    const renderQuestions = (questions: IQuestion[]) => {
         return (
             <ul className={style.Questions}>
-                { survey.questions.map(question => renderQuestion(question)) }
+                {questions.map(question => renderQuestion(question))}
             </ul>
         );
     }
@@ -32,9 +64,9 @@ const Survey: FC<ISurveyProps> = ({ survey }) => {
             <li className={style.Question} key={question.id}>
                 <Question
                     question={question}
-                    cssProperties={{ 
-                        margin: '20px 0px', 
-                        width: '80%' 
+                    cssProperties={{
+                        margin: '20px 0px',
+                        width: '80%'
                     }}
                 />
             </li>
@@ -65,81 +97,88 @@ const Survey: FC<ISurveyProps> = ({ survey }) => {
         return allRequiredQuestionsAreAnswered;
     }
 
+    const finishSurvey = (passingTimeSeconds: number) => {
+        alert('You have finished passing the survey');
+
+        const allSurveyResultsData = localStorage.getItem('allSurveyResults');
+        let allSurveyResults, id;
+
+        if (allSurveyResultsData) {
+            allSurveyResults = JSON.parse(allSurveyResultsData);
+            const lastSurvey = allSurveyResults[allSurveyResults.length - 1];
+            id = lastSurvey.id + 1;
+        } else {
+            allSurveyResults = [];
+            id = 1;
+        }
+
+        const surveyResults: ISurveyResults = { id, surveyInfo, passingTimeSeconds, answersToQuestions };
+
+        allSurveyResults.push(surveyResults);
+        localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
+    }
+
     const finishButtonClickHandler = () => {
         if (areAllRequiredQuestionsAnswered()) {
-            alert('You have finished passing the survey');
-
-            const allSurveyResultsData = localStorage.getItem('allSurveyResults');
-            let allSurveyResults, id;
-
-            if (allSurveyResultsData) {
-                allSurveyResults = JSON.parse(allSurveyResultsData);
-                const lastSurvey = allSurveyResults[allSurveyResults.length - 1];
-                id = lastSurvey.id + 1;
-            } else {
-                allSurveyResults = [];
-                id = 1;
-            }
-
-            const surveyResults: ISurveyResults = {
-                id,
-                surveyInfo: survey.surveyInfo,
-                passingTimeSeconds: 100,
-                answersToQuestions: answersToQuestions
-            };
-
-            allSurveyResults.push(surveyResults);
-            localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
+            finishSurvey(passingTimeSeconds);
         } else {
-            console.log('You need to answer all required questions');
+            alert('You need to answer all required questions');
         }
     }
 
-    console.log(questions);
-    console.log(answersToQuestions);
-
-    return (
-        <div className={style.Survey}>
-            <div className={style.Wrapper}>
-                <div className={style.Header}>
-                    <div className={style.SurveyDetails} style = {{ width: '80%' }}>
-                        <Typography
-                            variant={"h4"}
-                            component={"h4"}
-                            sx={{
-                                textAlign: 'center',
-                                margin: '10px auto'
-                            }}
-                        >
-                            {survey.surveyInfo.title}
-                        </Typography>
-                        <hr />
-                        <p className={style.Description}> {survey.surveyInfo.description} </p>
-                    </div>
-                    <img
-                        className={style.SurveyImage}
-                        src={survey.surveyInfo.imageUrl}
-                        alt={"SurveyImage"}
-                        style = {{ width: '80%' }}
-                    />
+    const renderSurvey = (surveyInfo: ISurveyInfo, questions: IQuestion[]) => {
+        return (
+            <div className={style.Survey}>
+                <div className={style.Wrapper}>
+                    {renderSurveyInfo(surveyInfo)}
+                    {renderQuestions(questions)}
+                    <Button
+                        variant='contained'
+                        onClick={finishButtonClickHandler}
+                        sx={{
+                            padding: '15px',
+                            width: '80%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            margin: '20px auto'
+                        }}
+                    >
+                        Finish the survey
+                    </Button>
                 </div>
-                {renderQuestions()}
-                <Button
-                    variant='contained'
-                    onClick={finishButtonClickHandler}
-                    sx={{
-                        padding: '15px',
-                        width: '80%',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        margin: '20px auto'
-                    }}
-                >
-                    Finish the survey
-                </Button>
             </div>
-        </div>
-    );
+        );
+    }
+
+    const renderSurveyInfo = (surveyInfo: ISurveyInfo) => {
+        return (
+            <div className={style.Header}>
+                <div className={style.SurveyDetails} style={{ width: '80%' }}>
+                    <Typography
+                        variant={"h4"}
+                        component={"h4"}
+                        sx={{
+                            textAlign: 'center',
+                            margin: '10px auto'
+                        }}
+                    >
+                        {surveyInfo.title}
+                    </Typography>
+                    <hr />
+                    <p className={style.Description}> {surveyInfo.description} </p>
+                </div>
+                <img
+                    className={style.SurveyImage}
+                    src={surveyInfo.imageUrl}
+                    alt={"SurveyImage"}
+                    style={{ width: '80%' }}
+                />
+            </div>
+        );
+    }
+
+    return loading ? <CircularProgress sx = {{ marginTop: '200px' }} /> 
+                   : renderSurvey(surveyInfo, questions);
 }
 
 export default Survey;

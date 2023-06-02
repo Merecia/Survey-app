@@ -16,8 +16,6 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
     const { updateAnswersToQuestions } = useActions();
     const [selectedOptionId, setSelectedOptionId] = useState<Number>();
 
-    console.log(selectedOption);
-
     useEffect(() => {
         if (selectedOption) {
             setSelectedOptionId(selectedOption.id);
