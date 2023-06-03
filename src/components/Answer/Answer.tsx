@@ -1,17 +1,6 @@
 import { FC } from 'react';
-import {
-    isMatches,
-    isTextAnswer,
-    isOption,
-    isSetOfOptions,
-    makeOptionIdLetter
-} from '../../helper';
-import {
-    IAnswer,
-    IAnswerToQuestion,
-    IFeedback,
-    IOption
-} from '../../types/survey';
+import { isMatches, isTextAnswer, isOption, isSetOfOptions, makeOptionIdLetter } from '../../helper';
+import { IAnswer, IAnswerToQuestion, IFeedback } from '../../types/survey';
 import { IQuestion, QuestionType } from '../../types/survey';
 import style from './Answer.module.scss';
 import Matchmaking from '../Matchmaking/Matchmaking';
@@ -27,7 +16,6 @@ interface IAnswerProps {
 }
 
 const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
-
     const renderResponseField = (question: IQuestion, answer: IAnswer) => {
         if (question.type === QuestionType.Matchmaking) {
             return (
@@ -53,15 +41,10 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
                 />
             );
         }
-        else if (question.type === QuestionType.ShortTextField) {
-            return (
-                <TextField
-                    question={question}
-                    givedAnswer={isTextAnswer(answer) ? answer : undefined}
-                />
-            );
-        }
-        else if (question.type === QuestionType.DetailedTextField) {
+        else if (
+            question.type === QuestionType.ShortTextField ||
+            question.type === QuestionType.DetailedTextField
+        ) {
             return (
                 <TextField
                     question={question}
@@ -75,7 +58,6 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
         let maximumScore: number = 0;
 
         if (question.options) {
-
             if (isMatches(question.options)) {
                 question.options.leftList.forEach(option => {
                     if (option.score && option.score > 0) {
@@ -95,17 +77,16 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
                 })
             }
 
-        } else if (question.type === QuestionType.ShortTextField) {
+        } else if (
+            question.type === QuestionType.ShortTextField || 
+            question.type === QuestionType.DetailedTextField
+        ) {
             if (isTextAnswer(question.correctAnswer) && question.correctAnswer?.score) {
                 maximumScore += question.correctAnswer.score;
             }
         }
 
         return maximumScore;
-    }
-
-    const getOptionById = (list: IOption[], optionId: number) => {
-        return list.find(option => option.id === optionId);
     }
 
     const getCorrectAnswers = (question: IQuestion) => {
@@ -119,18 +100,9 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
                     }
                 })
             } else if (isMatches(question.options)) {
-                const leftList = question.options.leftList;
-                const rightList = question.options.rightList;
-
-                leftList.forEach(option => {
-                    const correctMatch = getOptionById(
-                        rightList,
-                        option.relatedOptionId as number
-                    )?.label;
-
+                question.options.leftList.forEach(option => {
                     correctAnswers.push(
-                        `${option.id}) ${option.label} => ` +
-                        `${makeOptionIdLetter(option.relatedOptionId as number)}) ${correctMatch}`
+                        `${option.id}) => ${makeOptionIdLetter(option.relatedOptionId as number)})`
                     );
                 })
             }

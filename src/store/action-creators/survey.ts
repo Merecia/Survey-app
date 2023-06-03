@@ -14,9 +14,19 @@ import { RootState } from '../reducers';
 import { isMatches, isOption, isTextAnswer } from '../../helper';
 import { answers, quiz } from '../../data/data';
 
-export const updateAnswersToQuestions = (answerToQuestion: IAnswerToQuestion) => {
+export const updateAnswersToQuestions = (answersToQuestions: IAnswerToQuestion[]) => {
+    return async(dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
+            payload: answersToQuestions
+        })
+    }
+}
+
+export const updateAnswerToQuestion = (answerToQuestion: IAnswerToQuestion) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         const answersToQuestions = getState().survey.answersToQuestions;
+        console.log(answersToQuestions);
         const answeredQuestions = answersToQuestions.map(answerToQuestion => answerToQuestion.question);
         const currentQuestion = answerToQuestion.question;
 
@@ -33,6 +43,8 @@ export const updateAnswersToQuestions = (answerToQuestion: IAnswerToQuestion) =>
         const index = answeredQuestions.findIndex(answeredQuestion =>
             JSON.stringify(answeredQuestion) === JSON.stringify(currentQuestion)
         );
+
+        console.log(index);
 
         if (index === -1) {
             dispatch({

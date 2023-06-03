@@ -7,19 +7,19 @@ export const remove = <T>(array: T[], index: number): T[] => {
 }
 
 export const isOption = (entity: any): entity is IOption => (
-    'id' in entity && 'label' in entity
+    entity && 'id' in entity && 'label' in entity
 )
 
 export const isTextAnswer = (entity: any): entity is ITextAnswer => (
-    'text' in entity
+    entity && 'text' in entity
 )
 
 export const isMatches = (entity: any): entity is IMatches => (
-    'leftList' in entity && 'rightList' in entity
+    entity && 'leftList' in entity && 'rightList' in entity
 )
 
 export const isQuestion = (entity: any): entity is IQuestion => (
-    'id' in entity && 'topic' in entity && 'type' in entity && 'required' in entity
+    entity && 'id' in entity && 'topic' in entity && 'type' in entity && 'required' in entity
 )
 
 export const isSetOfOptions = (entity: any): entity is IOption[] => (

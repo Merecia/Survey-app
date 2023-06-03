@@ -6,11 +6,15 @@ import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
 import { IOption, IQuestion, ISurvey, QuestionType } from '../../types/survey';
 import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
 import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const SurveyConstruct: FC = () => {
     const { questions, surveyInfo } = useTypedSelector(state => state.survey);
     const { updateQuestions, addNewQuestion } = useActions();
     const [showForm, setShowForm] = useState<boolean>(true);
+    const navigate = useNavigate();
+
+    console.log(questions);
 
     useEffect(() => {
         const initialOption: IOption = { id: 1, label: '' };
@@ -58,6 +62,7 @@ const SurveyConstruct: FC = () => {
         }
 
         localStorage.setItem('surveys', JSON.stringify(surveys));
+        navigate(`/survey/${surveyInfo.id}`);
     }
 
     const renderForm = () => {
@@ -113,7 +118,7 @@ const SurveyConstruct: FC = () => {
                     </Button>
                 </div>
             </div>
-        )
+        );
     }
 
     return (

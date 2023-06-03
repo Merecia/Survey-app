@@ -1,6 +1,6 @@
 .SurveyAnswers {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
 
     .Wrapper {
@@ -43,7 +43,7 @@
             list-style-type: none;
             margin: 0;
             padding: 0;
-
+        
             .AnswerToQuestion {
                 display: flex;
                 justify-content: center;

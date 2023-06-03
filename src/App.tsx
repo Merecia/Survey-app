@@ -1,20 +1,20 @@
 import { FC } from 'react';
 import style from './App.module.scss';
 import Survey from './components/Survey/Survey';
-import { quiz } from './data/data';
+import {Route, Routes} from 'react-router-dom';
 import SurveyConstruct from './components/SurveyConstruct/SurveyConstruct';
-import { Button } from '@mui/material';
-import { ISurvey, ISurveyResults } from './types/survey';
 import SurveyAnswers from './components/SurveyAnswers/SurveyAnswers';
+import MainPage from './components/MainPage/MainPage';
 
 const App: FC = () => {
   return (
     <div className={style.App}>
-      { <Survey id = {1} /> }
-      {/* <Survey survey = {quiz} /> */}
-      {/* <SurveyAnswers surveyResults = {surveyResults}/> */}
-      {/* <SurveyConstruct /> */}
-      {/* <Button variant = 'contained'> Hello from MUI v5 </Button> */}
+      <Routes>
+        <Route path = '' element = {<MainPage />} />
+        <Route path = '/survey/:id' element = {<Survey />} />
+        <Route path = '/survey-results/:id' element = {<SurveyAnswers />} />
+        <Route path = '/survey-constructor' element = {<SurveyConstruct />} />
+      </Routes>
     </div>
   );
 }

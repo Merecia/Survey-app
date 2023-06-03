@@ -15,6 +15,8 @@ import {
 } from '../../types/survey';
 import { TextField, MenuItem } from '@mui/material';
 import style from './Matchmaking.module.scss';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface IMatchmakingProps {
     question: IQuestion;
@@ -29,7 +31,7 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
         amount of pairs (amount of matches) will be 5.
     */
     const [matches, setMatches] = useState<IMatch[]>([]);
-    const { updateAnswersToQuestions } = useActions();
+    const { updateAnswerToQuestion } = useActions();
 
     useEffect(() => {
         if (selectedMatches) {
@@ -47,11 +49,13 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
         // eslint-disable-next-line
     }, [])
 
-    const getCorrectAnswers = (options: IMatches): IMatch[] => {
-        return options.leftList.map(option => ({
-            leftListOptionId: option.id,
-            rightListOptionId: option.relatedOptionId || 0
-        }));
+    const getCorrectAnswers = (options: IMatches): IMatch[] | null => {
+        if (options.leftList[0].relatedOptionId) {
+            return options.leftList.map(option => ({
+                leftListOptionId: option.id,
+                rightListOptionId: option.relatedOptionId || 0
+            }));
+        } else return null;
     }
 
     const updateLeftList = (updatedMatches: IMatch[]): IOption[] | undefined => {
@@ -60,15 +64,20 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
 
             return question.options.leftList.map(option => {
                 const match = updatedMatches.find(match => match.leftListOptionId === option.id);
-                const correctAnswer = correctAnswers.find(answer => answer.leftListOptionId === option.id);
-                const score = JSON.stringify(match) === JSON.stringify(correctAnswer) ? option.score : 0;
 
-                return {
+                const updatedOption: IOption = {
                     id: option.id,
                     label: option.label,
-                    score: score,
                     relatedOptionId: match?.rightListOptionId
-                };
+                }
+
+                if (correctAnswers) {
+                    const correctAnswer = correctAnswers.find(answer => answer.leftListOptionId === option.id);
+                    const score = JSON.stringify(match) === JSON.stringify(correctAnswer) ? option.score : 0;
+                    updatedOption.score = score;
+                }
+
+                return updatedOption;
             });
         }
     }
@@ -105,7 +114,7 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
                 rightList: question.options.rightList
             };
 
-            updateAnswersToQuestions({ answer, question });
+            updateAnswerToQuestion({ answer, question });
         }
     }
 
@@ -147,11 +156,13 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
         return undefined;
     }
 
-    const renderMark = (option: IAnswer) => isCorrectOption(option) ? renderCheckmark() : renderCrossmark();
+    const renderMark = (option: IAnswer) => {
+        return isCorrectOption(option) ? renderCheckmark() : renderCrossmark();
+    }
 
-    const renderCheckmark = () => <span className={style.Checkmark}> &#10003; </span>
-
-    const renderCrossmark = () => <span className={style.Crossmark}> &#10060; </span>
+    const renderCheckmark = () => <span className={style.Checkmark}> <CheckCircleIcon /> </span>
+    
+    const renderCrossmark = () => <span className={style.Crossmark}> <CloseIcon /> </span>
 
     const renderLeftList = () => {
         if (isMatches(question.options)) {
@@ -169,6 +180,7 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
                                 value={match ? makeOptionIdLetter(match) : ''}
                                 onChange = { (event: React.ChangeEvent<HTMLInputElement>) => onChangeHandler(option.id, event) }
                                 select
+                                disabled = {selectedMatches !== undefined}
                             >
                                 { renderPossibleRelatedOptions(rightList) }
                             </TextField> 

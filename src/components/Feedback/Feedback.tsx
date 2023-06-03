@@ -49,7 +49,12 @@ const Feedback: FC<IFeedbackProps> = ({ feedback, cssProperties }) => {
         return <p> `Your score is — <strong> {totalScore} / {maximumScore} </strong>` </p>
     }
 
-    const renderCorrectAnswer = (correctAnswer: string, index: number) => <strong key={index}> {correctAnswer} </strong>
+    const renderCorrectAnswer = (correctAnswer: string, index: number) => {
+        if (index !== feedback.correctAnswers.length - 1) 
+            return <strong key={index}> {correctAnswer}, </strong>
+
+        return <strong key={index}> {correctAnswer} </strong>
+    }
 
     return (
         <div className={style.Feedback} style={cssProperties}>

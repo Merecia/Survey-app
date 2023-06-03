@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom'
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { IQuestion, ISurvey, ISurveyResults, ISurveyInfo } from '../../types/survey';
@@ -6,17 +7,17 @@ import Question from '../Question/Question';
 import style from './Survey.module.scss';
 import { Button, Typography, CircularProgress } from '@mui/material';
 import useInterval from '../../hooks/useInterval';
+import { useNavigate } from 'react-router-dom';
 
-interface ISurveyProps {
-    id: number;
-}
-
-const Survey: FC<ISurveyProps> = ({ id }) => {
+const Survey: FC = () => {
     const { updateQuestions, updateSurveyInfo } = useActions();
     const { answersToQuestions, questions, surveyInfo } = useTypedSelector(state => state.survey);
     const [timeStart, setTimeStart] = useState(new Date());
     const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+
+    const id = useParams().id;
 
     const loadSurvey = (id: number) => {
         const surveys = localStorage.getItem('surveys');
@@ -29,11 +30,17 @@ const Survey: FC<ISurveyProps> = ({ id }) => {
     }
 
     useEffect(() => {
-        loadSurvey(id);
-        setTimeStart(new Date());
-        setLoading(false);
+        if (id) {
+            loadSurvey(parseInt(id));
+            setTimeStart(new Date());
+            setLoading(false);
+        }
         // eslint-disable-next-line
     }, [])
+
+    console.log(questions);
+    console.log(surveyInfo);
+    console.log(answersToQuestions);
 
     useInterval(() => {
         const maximumPassingTimeSeconds = surveyInfo.maximumPassingTimeSeconds;
@@ -116,6 +123,7 @@ const Survey: FC<ISurveyProps> = ({ id }) => {
 
         allSurveyResults.push(surveyResults);
         localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
+        navigate(`/survey-results/${id}`);
     }
 
     const finishButtonClickHandler = () => {

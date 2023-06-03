@@ -14,7 +14,7 @@ interface IMultipleChoiceProps {
 
 const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions }) => {
     const [selectedOptionsId, setSelectedOptionsId] = useState<number[]>([]);
-    const { updateAnswersToQuestions } = useActions();
+    const { updateAnswerToQuestion } = useActions();
 
     useEffect(() => {
         if (selectedOptions) {
@@ -45,14 +45,19 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
                 ? question.options.find(option => option.id === selectedOptionId)
                 : null;
 
-            return {
+            const answer: IOption = {
                 id: selectedOptionId,
-                label: selectedOption?.label || '',
-                score: selectedOption?.score || 0
+                label: selectedOption?.label || ''
             };
+    
+            if (selectedOption && selectedOption.score) {
+                answer.score = selectedOption.score;
+            } 
+
+            return answer;
         })
 
-        updateAnswersToQuestions({ question, answer });
+        updateAnswerToQuestion({ question, answer });
     }
 
     const isCorrectOption = (option: IAnswer) => {
@@ -70,29 +75,29 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
     }
 
     const renderCheckmark = () => <span className={style.Checkmark}> <CheckCircleIcon /> </span>
-    
+
     const renderCrossmark = () => <span className={style.Crossmark}> <CloseIcon /> </span>
 
     const renderOption = (option: IOption) => {
         return (
-            <div className={style.Option} key = {option.id}>
-                <FormControlLabel 
-                    value={String(option.id)} 
+            <div className={style.Option} key={option.id}>
+                <FormControlLabel
+                    value={String(option.id)}
                     control={
                         <Checkbox
                             checked={selectedOptionsId.includes(option.id)}
                             onChange={checkboxHandler}
                             name="checkbox-button"
                             inputProps={{ 'aria-label': option.label }}
-                            disabled = {selectedOptions !== undefined}
+                            disabled={selectedOptions !== undefined}
                         />
-                    } 
+                    }
                     label={option.label}
                 />
 
                 {
-                    selectedOptions?.map(selectedOption => selectedOption.id).includes(option.id) 
-                        ? renderMark(option) 
+                    selectedOptions?.map(selectedOption => selectedOption.id).includes(option.id)
+                        ? renderMark(option)
                         : null
                 }
             </div>
@@ -101,11 +106,11 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
 
     const renderOptions = () => {
         return (
-            <ul className = {style.Options}>
+            <ul className={style.Options}>
                 {
                     isSetOfOptions(question.options)
-                    ? question.options.map(option => renderOption(option)) 
-                    : null
+                        ? question.options.map(option => renderOption(option))
+                        : null
                 }
             </ul>
         );

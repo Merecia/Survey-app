@@ -13,7 +13,7 @@ interface ISingleChoiceProps {
 }
 
 const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
-    const { updateAnswersToQuestions } = useActions();
+    const { updateAnswerToQuestion } = useActions();
     const [selectedOptionId, setSelectedOptionId] = useState<Number>();
 
     useEffect(() => {
@@ -32,11 +32,14 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
 
         const answer: IOption = {
             id: selectedOptionId,
-            label: selectedOption?.label || '',
-            score: selectedOption?.score || 0
+            label: selectedOption?.label || ''
         };
 
-        updateAnswersToQuestions({ question, answer });
+        if (selectedOption && selectedOption.score) {
+            answer.score = selectedOption.score;
+        }
+
+        updateAnswerToQuestion({ question, answer });
     }
 
     const isCorrectOption = (option: IAnswer) => {
@@ -50,7 +53,15 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
     }
 
     const renderMark = (selectedOption: IAnswer) => {
-        return isCorrectOption(selectedOption) ? renderCheckmark() : renderCrossmark();
+        if (isOption(selectedOption) && selectedOption.score) {
+            if (isCorrectOption(selectedOption)) {
+                return renderCheckmark();
+            } else {
+                return renderCrossmark();
+            }
+        } else {
+            return null;
+        }
     }
 
     const renderCheckmark = () => <span className={style.Checkmark}> <CheckCircleIcon /> </span>
@@ -75,7 +86,7 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
                 />
 
                 {
-                    selectedOption && selectedOption.id === option.id 
+                    selectedOption && selectedOption.score && selectedOption.id === option.id 
                     ? renderMark(selectedOption) : null
                 } 
             </li>

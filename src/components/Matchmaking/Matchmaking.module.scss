@@ -1,3 +1,6 @@
+$green: rgb(92,182,96);
+$red: rgb(247, 84, 81);
+
 .Matchmaking {
     display: flex;
 
@@ -7,9 +10,12 @@
     }
 
     .Checkmark {
-        font-weight: bold;
-        color: green;
-        font-size: 20px;
+        color: $green;
+
+    }
+
+    .Crossmark {
+        color: $red;
     }
 
     .LeftList {

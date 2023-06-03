@@ -16,7 +16,7 @@ interface ITextFieldProps {
 
 const TextField: FC<ITextFieldProps> = ({ question, givedAnswer }) => {
     const [text, setText] = useState<string>('');
-    const { updateAnswersToQuestions } = useActions();
+    const { updateAnswerToQuestion } = useActions();
 
     useEffect(() => {
         if (givedAnswer) {
@@ -42,7 +42,7 @@ const TextField: FC<ITextFieldProps> = ({ question, givedAnswer }) => {
             
         } else answer = { text: value };
 
-        updateAnswersToQuestions({ question, answer });
+        updateAnswerToQuestion({ question, answer });
     }
 
     const textInputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,9 +86,13 @@ const TextField: FC<ITextFieldProps> = ({ question, givedAnswer }) => {
                     fullWidth
                     value={text}
                     onChange={textInputChangeHandler}
+                    disabled = {givedAnswer !== undefined}
+                    sx = {{ 
+                        border: getBorder(),
+                        borderRadius: '6px'
+                    }} 
                     multiline
                     rows={5}
-                    disabled = {givedAnswer !== undefined}
                 />
             );
         }

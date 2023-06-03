@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { useActions } from '../../hooks/useActions';
+import { useParams } from 'react-router-dom';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { IAnswerToQuestion, ISurveyInfo, ISurveyResults } from '../../types/survey';
 import Answer from '../Answer/Answer';
@@ -7,14 +8,12 @@ import style from './SurveyAnswers.module.scss';
 import { Typography } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 
-interface ISurveyAnswersProps {
-    id: number;
-}
-
-const SurveyAnswers: FC<ISurveyAnswersProps> = ({ id }) => {
+const SurveyAnswers: FC = () => {
     const { answersToQuestions, surveyInfo } = useTypedSelector(state => state.survey);
     const { updateAnswersToQuestions, updateSurveyInfo } = useActions();
     const [loading, setLoading] = useState(true);
+
+    const id = useParams().id;
 
     const loadSurveyAnswers = (id: number) => {
         const allSurveyResults = localStorage.getItem('allSurveyResults');
@@ -27,8 +26,10 @@ const SurveyAnswers: FC<ISurveyAnswersProps> = ({ id }) => {
     }
 
     useEffect(() => {
-        loadSurveyAnswers(id);
-        setLoading(false);
+        if (id) {
+            loadSurveyAnswers(parseInt(id));
+            setLoading(false);
+        }
         // eslint-disable-next-line
     }, [])
 
@@ -59,48 +60,54 @@ const SurveyAnswers: FC<ISurveyAnswersProps> = ({ id }) => {
 
     const renderSurveyInfo = (surveyInfo: ISurveyInfo) => {
         return (
-            <div className={style.Wrapper}>
-                <div className={style.Header}>
-                    <div className={style.SurveyDetails}>
-                        <Typography
-                            variant={"h4"}
-                            component={"h4"}
-                            sx={{
-                                textAlign: 'center',
-                                margin: '10px auto'
-                            }}
-                        >
-                            {surveyInfo.title}
-                        </Typography>
-                        <hr />
-                        <p className={style.Description}>
-                            {surveyInfo.description}
-                        </p>
-                    </div>
-                    <img
-                        className={style.SurveyImage}
-                        src={surveyInfo.imageUrl}
-                        alt={"SurveyImage"}
-                    />
+            <div className={style.Header}>
+                <div className={style.SurveyDetails}>
+                    <Typography
+                        variant={"h4"}
+                        component={"h4"}
+                        sx={{
+                            textAlign: 'center',
+                            margin: '10px auto'
+                        }}
+                    >
+                        {surveyInfo.title}
+                    </Typography>
+                    <hr />
+                    <p className={style.Description}>
+                        {surveyInfo.description}
+                    </p>
                 </div>
+                <img
+                    className={style.SurveyImage}
+                    src={surveyInfo.imageUrl}
+                    alt={"SurveyImage"}
+                />
             </div>
         );
     }
 
     const renderSurveyAnswers = (
-        surveyInfo: ISurveyInfo, 
+        surveyInfo: ISurveyInfo,
         answersToQuestions: IAnswerToQuestion[]
     ) => {
         return (
-            <div className = {style.SurveyAnswers}>
-                { renderSurveyInfo(surveyInfo) }
-                { renderAnswersToQuestions(answersToQuestions) }
+            <div className={style.SurveyAnswers}>
+                <div className={style.Wrapper}>
+                    {renderSurveyInfo(surveyInfo)}
+                    {renderAnswersToQuestions(answersToQuestions)}
+                </div>
             </div>
         );
     }
 
-    return loading ? <CircularProgress sx = {{ margin: '100px auto' }} /> 
-                   : renderSurveyAnswers(surveyInfo, answersToQuestions);
+    return (
+        <div className={style.SurveyAnswers}>
+            {
+                loading ? <CircularProgress sx={{ margin: '100px auto' }} />
+                        : renderSurveyAnswers(surveyInfo, answersToQuestions)
+            }
+        </div>
+    );
 }
 
 export default SurveyAnswers;
