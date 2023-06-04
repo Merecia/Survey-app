@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import React, { FC, useMemo } from 'react';
 import { IQuestion, QuestionType } from '../../types/survey';
 import Matchmaking from '../Matchmaking/Matchmaking';
 import MultipleChoice from '../MultipleChoice/MultipleChoice';
@@ -35,18 +35,24 @@ const Question: FC<IQuestionProps> = ({ question, cssProperties }) => {
         }
     }
 
-    return (
-        <div className={style.Question} style={cssProperties}>
+    const renderTopic = (topic: string) => {
+        return (
             <Typography 
                 variant={"h6"} 
                 component={"h6"} 
                 sx = {{ marginBottom: '20px' }} 
-            >
-                { question.topic }
+                >
+                    { topic }
             </Typography>
+        );
+    }
+
+    return (
+        <div className={style.Question} style={cssProperties}>
+            { useMemo(() => renderTopic(question.topic), [question.topic]) }
             { renderResponseField() }
         </div>
     );
 }
 
-export default Question;
+export default React.memo(Question);

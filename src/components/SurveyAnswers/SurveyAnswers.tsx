@@ -13,6 +13,8 @@ const SurveyAnswers: FC = () => {
     const { updateAnswersToQuestions, updateSurveyInfo } = useActions();
     const [loading, setLoading] = useState(true);
 
+    console.log(answersToQuestions);
+
     const id = useParams().id;
 
     const loadSurveyAnswers = (id: number) => {

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { isOption, isSetOfOptions } from '../../helper';
 import { useActions } from '../../hooks/useActions';
 import { IAnswer, IOption, IQuestion } from '../../types/survey';
@@ -108,4 +108,4 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
     return renderOptions();
 }
 
-export default SingleChoice;
+export default React.memo(SingleChoice);

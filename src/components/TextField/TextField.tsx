@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { isTextAnswer } from '../../helper';
 import { useActions } from '../../hooks/useActions';
 import {
@@ -34,10 +34,16 @@ const TextField: FC<ITextFieldProps> = ({ question, givedAnswer }) => {
         if (isTextAnswer(correctAnswer)) {
             let earnedScore: number = 0;
 
-            if (correctAnswer.text.toLowerCase() === value.toLowerCase()) {
-                earnedScore = correctAnswer.score || 0;
+            if (correctAnswer.ignoreRegister) {
+                if (correctAnswer.text.toLowerCase() === value.toLowerCase()) {
+                    earnedScore = correctAnswer.score || 0;
+                }
+            } else {
+                if (correctAnswer.text === value) {
+                    earnedScore = correctAnswer.score || 0;
+                }
             }
-
+            
             answer = { text: value, score: earnedScore };
             
         } else answer = { text: value };
@@ -103,4 +109,4 @@ const TextField: FC<ITextFieldProps> = ({ question, givedAnswer }) => {
     return renderTextField();
 }
 
-export default TextField;
+export default React.memo(TextField);

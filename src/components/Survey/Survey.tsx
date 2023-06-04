@@ -21,8 +21,8 @@ const Survey: FC = () => {
 
     const loadSurvey = (id: number) => {
         const surveys = localStorage.getItem('surveys');
-        const survey = surveys 
-            ? JSON.parse(surveys).find((survey: ISurvey) => survey.surveyInfo.id === id) 
+        const survey = surveys
+            ? JSON.parse(surveys).find((survey: ISurvey) => survey.surveyInfo.id === id)
             : null;
 
         updateQuestions(survey.questions);
@@ -37,10 +37,6 @@ const Survey: FC = () => {
         }
         // eslint-disable-next-line
     }, [])
-
-    console.log(questions);
-    console.log(surveyInfo);
-    console.log(answersToQuestions);
 
     useInterval(() => {
         const maximumPassingTimeSeconds = surveyInfo.maximumPassingTimeSeconds;
@@ -136,24 +132,22 @@ const Survey: FC = () => {
 
     const renderSurvey = (surveyInfo: ISurveyInfo, questions: IQuestion[]) => {
         return (
-            <div className={style.Survey}>
-                <div className={style.Wrapper}>
-                    {renderSurveyInfo(surveyInfo)}
-                    {renderQuestions(questions)}
-                    <Button
-                        variant='contained'
-                        onClick={finishButtonClickHandler}
-                        sx={{
-                            padding: '15px',
-                            width: '80%',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            margin: '20px auto'
-                        }}
-                    >
-                        Finish the survey
-                    </Button>
-                </div>
+            <div className={style.Wrapper}>
+                {renderSurveyInfo(surveyInfo)}
+                {renderQuestions(questions)}
+                <Button
+                    variant='contained'
+                    onClick={finishButtonClickHandler}
+                    sx={{
+                        padding: '15px',
+                        width: '80%',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        margin: '20px auto'
+                    }}
+                >
+                    Finish the survey
+                </Button>
             </div>
         );
     }
@@ -185,8 +179,14 @@ const Survey: FC = () => {
         );
     }
 
-    return loading ? <CircularProgress sx = {{ marginTop: '200px' }} /> 
-                   : renderSurvey(surveyInfo, questions);
+    return (
+        <div className={style.Survey}>
+            {
+                loading ? <CircularProgress sx={{ margin: '200px auto' }} />
+                        : renderSurvey(surveyInfo, questions)
+            }
+        </div>
+    );
 }
 
 export default Survey;

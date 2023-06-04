@@ -4,8 +4,8 @@ import { isSetOfOptions } from '../../../helper';
 import style from './ChoiceQuestionConstruct.module.scss';
 import { useActions } from '../../../hooks/useActions';
 import { useTypedSelector } from '../../../hooks/useTypedSelector';
-import { TextField, Button, IconButton } from '@mui/material';
-import DeleteIcon from '@mui/icons-material/Delete';
+import { Button } from '@mui/material';
+import OptionConstruct from './OptionConstruct/OptionConstruct';
 
 interface IChoiceQuestionConstructProps {
     question: IQuestion;
@@ -18,52 +18,6 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
 }) => {
     const { updateQuestion } = useActions();
     const { surveyInfo } = useTypedSelector(state => state.survey);
-
-    const optionChangeHandler = (
-        option: IOption,
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        option.label = event.target.value;
-        updateOption(option);
-    }
-
-    const scoreChangeHandler = (
-        option: IOption,
-        event: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        option.score = Number(event.target.value);
-        updateOption(option);
-    }
-
-    const updateOption = (updatedOption: IOption) => {
-        if (isSetOfOptions(question.options)) {
-            question.options[updatedOption.id - 1] = updatedOption;
-            updateQuestion(question);
-        }
-    }
-
-    const updateOptions = (updatedOptions: IOption[]) => {
-        if (isSetOfOptions(question.options)) {
-            question.options = updatedOptions;
-            updateQuestion(question);
-        }
-    }
-
-    const deleteOption = (option: IOption) => {
-        if (isSetOfOptions(question.options)) {
-            const updatedOptions = question.options
-                .filter(item => item.id !== option.id)
-                .map((item, index) => {
-                    return {
-                        id: index + 1,
-                        label: item.label,
-                        score: item.score
-                    }
-                })
-            
-            updateOptions(updatedOptions);
-        }
-    }
 
     const addEmptyOption = () => {
         if (isSetOfOptions(question.options)) {
@@ -78,48 +32,27 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
         }
     }
 
-    const renderOption = (option: IOption) => {
-        return (
-            <div className={style.Option} key={option.id}>
-                <span> {option.id} </span>
-                <TextField 
-                    size = 'small'
-                    sx = {{ 
-                        marginLeft: '12px', 
-                        marginRight: '10px', 
-                        width: surveyInfo.isEvaluated ? '75%' : '88%'
-                    }}
-                    value={option.label || ''}
-                    onChange={
-                        (event: React.ChangeEvent<HTMLInputElement>) => optionChangeHandler(option, event)
-                    }
-                />
-                {
-                    surveyInfo.isEvaluated
-                    ? <TextField 
-                        size = 'small'
-                        value = {option.score || 0}
-                        onChange={
-                            (event: React.ChangeEvent<HTMLInputElement>) => scoreChangeHandler(option, event)
-                        }
-                        sx = {{ marginLeft: '3px', marginRight: '5px', width: '10%' }}
-                        inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-                    />
-                    : null
-                }
-                <IconButton 
-                    aria-label="delete" 
-                    onClick={() => deleteOption(option)}
-                >
-                    <DeleteIcon />
-                </IconButton>
-            </div>
-        );
+    const updateOptions = (updatedOptions: IOption[]) => {
+        if (isSetOfOptions(question.options)) {
+            question.options = updatedOptions;
+            updateQuestion(question);
+        }
     }
 
-    const renderOptions = () => {
-        if (isSetOfOptions(question.options)) {
-            return question.options.map(option => renderOption(option));
+    const renderOption = (option: IOption) => (
+        <OptionConstruct 
+            question = {question}
+            option = {option}
+            cssProperties={{
+                width: '100%',
+                marginBottom: '10px'
+            }}
+        />
+    )
+
+    const renderOptions = (options: any) => {
+        if (isSetOfOptions(options)) {
+            return options.map(option => renderOption(option));
         }
     }
 
@@ -128,13 +61,9 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
             <div className = {style.Header}>
                 <p className = {style.NumberLabel}> # </p>
                 <p className = {style.OptionLabel}> Option </p>
-                {
-                    surveyInfo.isEvaluated 
-                    ? <p className = {style.ScoreLabel}> Score </p> 
-                    : null
-                }
+                { surveyInfo.isEvaluated && <p className = {style.ScoreLabel}> Score </p> }
             </div>
-            {renderOptions()}
+            { renderOptions(question.options) }
             <Button 
                 variant = 'contained' 
                 onClick = {addEmptyOption}
@@ -150,4 +79,4 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
     );
 }
 
-export default ChoiceQuestionConstruct;
+export default React.memo(ChoiceQuestionConstruct);

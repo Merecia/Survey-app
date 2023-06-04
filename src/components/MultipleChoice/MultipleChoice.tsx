@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { isOption, isSetOfOptions, remove } from '../../helper';
 import { useActions } from '../../hooks/useActions';
 import { IAnswer, IOption, IQuestion } from '../../types/survey';
@@ -119,4 +119,4 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
     return renderOptions();
 }
 
-export default MultipleChoice;
+export default React.memo(MultipleChoice);

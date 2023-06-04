@@ -1,5 +1,5 @@
-import React, { FC } from 'react';
-import { IQuestion } from '../../../types/survey';
+import React, { FC, useMemo } from 'react';
+import { IQuestion, ITextAnswer } from '../../../types/survey';
 import style from './TextQuestionConstruct.module.scss';
 import { isTextAnswer } from '../../../helper';
 import { useActions } from '../../../hooks/useActions';
@@ -35,43 +35,65 @@ const TextQuestionConstruct: FC<ITextQuestionConstructProps> = ({
         }
     }
 
-    return (
-        <div className={style.TextQuestionConstruct} style={cssProperties}>
-            <TextField
-                label="Enter a correct answer"
-                size='small'
-                fullWidth
-                value={
-                    isTextAnswer(question.correctAnswer)
-                        ? question.correctAnswer.text : ''
-                }
-                onChange={correctAnswerChangeHandler}
-            />
-            <TextField
-                label="Enter score for a correct answer"
-                size='small'
-                fullWidth
-                sx={{ marginTop: '30px' }}
-                value={
-                    isTextAnswer(question.correctAnswer) && question.correctAnswer.score
-                        ? question.correctAnswer.score : 0
-                }
-                onChange={scoreChangeHandler}
-            />
+    const renderCorrectAnswerTextField = (correctAnswer: any) => (
+        <TextField
+            label="Enter a correct answer"
+            size='small'
+            fullWidth
+            value={isTextAnswer(correctAnswer) ? correctAnswer.text : ''}
+            onChange={correctAnswerChangeHandler}
+        />
+    )
+
+    const renderScoreField = (correctAnswer: ITextAnswer | undefined) => (
+        <TextField
+            label="Enter score for a correct answer"
+            size='small'
+            fullWidth
+            sx={{ marginTop: '30px' }}
+            value={ isTextAnswer(correctAnswer) && correctAnswer.score ? correctAnswer.score : 0 }
+            onChange={scoreChangeHandler}
+        />
+    )
+
+    const renderFooter = (correctAnswer: ITextAnswer | undefined) => {
+        return (
             <div className={style.Footer}>
                 <FormControlLabel
                     control={
                         <Checkbox
-                            checked={
-                                isTextAnswer(question.correctAnswer)
-                                    ? question.correctAnswer.ignoreRegister : false
-                            }
+                            checked={ isTextAnswer(correctAnswer) ? correctAnswer.ignoreRegister : false }
                             onChange={ignoreRegisterChangeHandler}
                         />
                     }
                     label="Ignore register?"
                 />
             </div>
+        );
+    }
+
+    return (
+        <div className={style.TextQuestionConstruct} style={cssProperties}>
+            { 
+                useMemo(
+                    () => renderCorrectAnswerTextField(question.correctAnswer), 
+                    [question?.correctAnswer?.text]
+                ) 
+            } 
+
+            { 
+                useMemo(
+                    () => renderScoreField(question.correctAnswer), 
+                    [question?.correctAnswer?.score]
+                ) 
+            }
+
+            { 
+                useMemo(
+                    () => renderFooter(question.correctAnswer), 
+                    [question?.correctAnswer?.ignoreRegister]
+                )
+            }
         </div>
     );
 }

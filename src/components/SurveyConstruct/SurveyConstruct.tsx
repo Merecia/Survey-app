@@ -14,8 +14,6 @@ const SurveyConstruct: FC = () => {
     const [showForm, setShowForm] = useState<boolean>(true);
     const navigate = useNavigate();
 
-    console.log(questions);
-
     useEffect(() => {
         const initialOption: IOption = { id: 1, label: '' };
 
@@ -30,7 +28,7 @@ const SurveyConstruct: FC = () => {
         }];
 
         updateQuestions(initialQuestions);
-    }, [])
+    }, [showForm])
 
     const renderQuestions = () => {
         return questions.map(question => renderQuestion(question));

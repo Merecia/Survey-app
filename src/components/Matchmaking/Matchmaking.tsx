@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import React, { FC, useState, useEffect } from 'react';
 import { useActions } from '../../hooks/useActions';
 import {
     isMatches,
@@ -215,4 +215,4 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
     );
 }
 
-export default Matchmaking;
+export default React.memo(Matchmaking);
