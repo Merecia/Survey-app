@@ -155,9 +155,17 @@ const Matchmaking: FC<IMatchmakingProps> = ({ question, selectedMatches }) => {
         }
         return undefined;
     }
-
-    const renderMark = (option: IAnswer) => {
-        return isCorrectOption(option) ? renderCheckmark() : renderCrossmark();
+    
+    const renderMark = (selectedOption: IAnswer) => {
+        if (isOption(selectedOption) && selectedOption.score !== undefined) {
+            if (isCorrectOption(selectedOption)) {
+                return renderCheckmark();
+            } else {
+                return renderCrossmark();
+            }
+        } else {
+            return null;
+        }
     }
 
     const renderCheckmark = () => <span className={style.Checkmark}> <CheckCircleIcon /> </span>

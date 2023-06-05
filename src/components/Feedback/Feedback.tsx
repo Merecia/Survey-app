@@ -46,7 +46,7 @@ const Feedback: FC<IFeedbackProps> = ({ feedback, cssProperties }) => {
     }
 
     const renderScore = (totalScore: number, maximumScore: number): JSX.Element => {
-        return <p> `Your score is — <strong> {totalScore} / {maximumScore} </strong>` </p>
+        return <p> Your score is — <strong> {totalScore} / {maximumScore} </strong> </p>
     }
 
     const renderCorrectAnswer = (correctAnswer: string, index: number) => {

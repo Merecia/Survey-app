@@ -26,7 +26,6 @@ export const updateAnswersToQuestions = (answersToQuestions: IAnswerToQuestion[]
 export const updateAnswerToQuestion = (answerToQuestion: IAnswerToQuestion) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         const answersToQuestions = getState().survey.answersToQuestions;
-        console.log(answersToQuestions);
         const answeredQuestions = answersToQuestions.map(answerToQuestion => answerToQuestion.question);
         const currentQuestion = answerToQuestion.question;
 

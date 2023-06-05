@@ -46,9 +46,10 @@ export const replaceNumberWithLetter = (number: number): string => {
     }
 }
 
-export const makeOptionIdLetter = (id: number): string => (
-    replaceNumberWithLetter(id).toUpperCase()
-)
+export const makeOptionIdLetter = (id: number): string => {
+    console.log(id);
+    return replaceNumberWithLetter(id).toUpperCase()
+}
 
 export const replaceLetterWithNumber = (letter: string): number => {
     const alphabet = 'abcdefghijklmnopqrstuvwxyz'.split('');

@@ -12,10 +12,15 @@ import { Typography } from '@mui/material';
 
 interface IAnswerProps {
     answerToQuestion: IAnswerToQuestion;
+    isEvaluated: boolean;
     cssProperties?: React.CSSProperties;
 }
 
-const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
+const Answer: FC<IAnswerProps> = ({ 
+    answerToQuestion, 
+    isEvaluated, 
+    cssProperties 
+}) => {
     const renderResponseField = (question: IQuestion, answer: IAnswer) => {
         if (question.type === QuestionType.Matchmaking) {
             return (
@@ -123,26 +128,12 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
         const correctAnswers = getCorrectAnswers(question);
 
         if ((isOption(answer) || isTextAnswer(answer))) {
-            if (answer?.score === undefined) {
-                return undefined;
-            }
-
-            totalScore = answer.score;
-
+            totalScore = answer.score as number;
         } else if (isMatches(answer)) {
-            if (answer?.leftList[0].score === undefined) {
-                return undefined;
-            }
-
             answer.leftList.forEach(option => {
                 totalScore += option.score as number;
             })
-
         } else if (isSetOfOptions(answer)) {
-            if (answer[0]?.score === undefined && answer.length !== 0) {
-                return undefined;
-            };
-
             answer.forEach(option => {
                 totalScore += option.score as number;
             })
@@ -151,7 +142,7 @@ const Answer: FC<IAnswerProps> = ({ answerToQuestion, cssProperties }) => {
         return { totalScore, maximumScore, correctAnswers } as IFeedback;
     }
 
-    const feedback = getFeedback(answerToQuestion);
+    const feedback = isEvaluated ? getFeedback(answerToQuestion) : undefined;
 
     return (
         <div className={style.Answer} style={cssProperties}>

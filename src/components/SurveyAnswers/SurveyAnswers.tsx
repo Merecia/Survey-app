@@ -50,6 +50,7 @@ const SurveyAnswers: FC = () => {
                 key={answerToQuestion.question.id}
             >
                 <Answer
+                    isEvaluated = {surveyInfo.isEvaluated}
                     answerToQuestion={answerToQuestion}
                     cssProperties={{
                         margin: '20px 0px',

@@ -35,7 +35,7 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
             label: selectedOption?.label || ''
         };
 
-        if (selectedOption && selectedOption.score) {
+        if (selectedOption && selectedOption.score !== undefined) {
             answer.score = selectedOption.score;
         }
 
@@ -53,7 +53,7 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
     }
 
     const renderMark = (selectedOption: IAnswer) => {
-        if (isOption(selectedOption) && selectedOption.score) {
+        if (isOption(selectedOption) && selectedOption.score !== undefined) {
             if (isCorrectOption(selectedOption)) {
                 return renderCheckmark();
             } else {
@@ -86,8 +86,10 @@ const SingleChoice: FC<ISingleChoiceProps> = ({ question, selectedOption }) => {
                 />
 
                 {
-                    selectedOption && selectedOption.score && selectedOption.id === option.id 
-                    ? renderMark(selectedOption) : null
+                    selectedOption && 
+                    selectedOption.score !== undefined &&
+                    selectedOption.id === option.id ? 
+                    renderMark(selectedOption) : null
                 } 
             </li>
         );

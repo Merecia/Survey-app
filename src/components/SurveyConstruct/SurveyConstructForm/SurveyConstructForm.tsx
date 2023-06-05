@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import style from './SurveyConstructForm.module.scss';
 import { useForm } from 'react-hook-form';
-import { Category, ISurveyInfo } from '../../../types/survey';
+import { Category, IOption, ISurveyInfo, QuestionType } from '../../../types/survey';
 import { TextField, Button, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import { useActions } from '../../../hooks/useActions';
 
@@ -34,11 +34,10 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
     const timeLimit = watch('timeLimit');
     const category = watch('category');
 
-    const { updateSurveyInfo } = useActions();
+    const { updateSurveyInfo, updateQuestions } = useActions();
 
     const onSubmit = handleSubmit(async (data) => {
         const surveys = localStorage.getItem('surveys');
-        console.log(surveys);
 
         let id;
         if (surveys) id = JSON.parse(surveys).pop().surveyInfo.id + 1;  
@@ -56,9 +55,21 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
         if (timeLimit) {
             surveyInfo.maximumPassingTimeSeconds = data.maximumPassingTimeSeconds;
         }
-
-        console.log(surveyInfo);
         updateSurveyInfo(surveyInfo);
+
+        const initialOption: IOption = { id: 1, label: '' };
+
+        if (surveyInfo.isEvaluated) initialOption.score = 0;
+
+        const initialQuestions = [{
+            id: 1,
+            topic: "",
+            type: QuestionType.OneChoice,
+            required: false,
+            options: [initialOption]
+        }];
+
+        updateQuestions(initialQuestions);
         setShowForm(false);
     })
 

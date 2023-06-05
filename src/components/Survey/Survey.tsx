@@ -38,6 +38,8 @@ const Survey: FC = () => {
         // eslint-disable-next-line
     }, [])
 
+    console.log(answersToQuestions);
+
     useInterval(() => {
         const maximumPassingTimeSeconds = surveyInfo.maximumPassingTimeSeconds;
 

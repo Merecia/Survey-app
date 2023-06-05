@@ -50,7 +50,7 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
                 label: selectedOption?.label || ''
             };
     
-            if (selectedOption && selectedOption.score) {
+            if (selectedOption && selectedOption.score !== undefined) {
                 answer.score = selectedOption.score;
             } 
 
@@ -62,16 +62,24 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
 
     const isCorrectOption = (option: IAnswer) => {
         if (isOption(option)) {
-            if (option.score && option.score > 0) {
+            if (option.score !== undefined && option.score > 0) {
                 return true;
             }
             return false;
         }
         return undefined;
     }
-
+    
     const renderMark = (selectedOption: IAnswer) => {
-        return isCorrectOption(selectedOption) ? renderCheckmark() : renderCrossmark();
+        if (isOption(selectedOption) && selectedOption.score !== undefined) {
+            if (isCorrectOption(selectedOption)) {
+                return renderCheckmark();
+            } else {
+                return renderCrossmark();
+            }
+        } else {
+            return null;
+        }
     }
 
     const renderCheckmark = () => <span className={style.Checkmark}> <CheckCircleIcon /> </span>
@@ -96,9 +104,8 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
                 />
 
                 {
-                    selectedOptions?.map(selectedOption => selectedOption.id).includes(option.id)
-                        ? renderMark(option)
-                        : null
+                    selectedOptions?.map(selectedOption => selectedOption.id)
+                                    .includes(option.id) && renderMark(option)
                 }
             </div>
         );
@@ -108,9 +115,8 @@ const MultipleChoice: FC<IMultipleChoiceProps> = ({ question, selectedOptions })
         return (
             <ul className={style.Options}>
                 {
-                    isSetOfOptions(question.options)
-                        ? question.options.map(option => renderOption(option))
-                        : null
+                    isSetOfOptions(question.options) && 
+                    question.options.map(option => renderOption(option))
                 }
             </ul>
         );

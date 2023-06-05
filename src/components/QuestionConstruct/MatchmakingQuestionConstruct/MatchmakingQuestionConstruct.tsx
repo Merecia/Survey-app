@@ -115,7 +115,7 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                 onChange={matchesScoreChangeHandler}
                 inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
-        } else return <div> Empty </div>
+        } else return null;
     }
 
     return (
@@ -146,9 +146,7 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
                 </div>
             </div>
             <div className={style.Footer}>
-                {
-                    useMemo(() => renderScore(), [question?.options]) 
-                }
+                { useMemo(() => renderScore(), [question?.options]) }
             </div>
         </div>
     );
