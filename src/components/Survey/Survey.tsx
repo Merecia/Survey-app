@@ -10,15 +10,13 @@ import useInterval from '../../hooks/useInterval';
 import { useNavigate } from 'react-router-dom';
 
 const Survey: FC = () => {
-    const { updateQuestions, updateSurveyInfo } = useActions();
+    const { updateQuestions, updateSurveyInfo, clearQuestions } = useActions();
     const { answersToQuestions, questions, surveyInfo } = useTypedSelector(state => state.survey);
     const [timeStart, setTimeStart] = useState(new Date());
     const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const id = useParams().id;
-
-    const DEFAULT_SURVEY_IMAGE_URL = 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
 
     const loadSurvey = (id: number) => {
         const surveys = localStorage.getItem('surveys');
@@ -118,10 +116,16 @@ const Survey: FC = () => {
             id = 1;
         }
 
-        const surveyResults: ISurveyResults = { id, surveyInfo, passingTimeSeconds, answersToQuestions };
+        const surveyResults: ISurveyResults = { 
+            id, 
+            surveyInfo, 
+            passingTimeSeconds, 
+            answersToQuestions 
+        };
 
         allSurveyResults.push(surveyResults);
         localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
+        clearQuestions();
         navigate(`/survey-results/${id}`);
     }
 
@@ -176,10 +180,12 @@ const Survey: FC = () => {
                     src={surveyInfo.imageUrl}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null;
-                        currentTarget.src = DEFAULT_SURVEY_IMAGE_URL;
+                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL 
+                        || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                     }}
                     style={{ width: '80%' }}
                     className={style.SurveyImage}
+                    alt={"SurveyImage"}
                 />
             </div>
         );

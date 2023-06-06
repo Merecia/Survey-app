@@ -8,7 +8,6 @@ import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
 import TextField from '../TextField/TextField';
 import Feedback from '../Feedback/Feedback';
-import { Typography } from '@mui/material';
 
 interface IAnswerProps {
     answerToQuestion: IAnswerToQuestion;

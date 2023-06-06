@@ -1,9 +1,9 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState } from 'react';
 import style from './SurveyConstruct.module.scss';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
-import { IOption, IQuestion, ISurvey, QuestionType } from '../../types/survey';
+import { IQuestion, ISurvey } from '../../types/survey';
 import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
@@ -13,8 +13,6 @@ const SurveyConstruct: FC = () => {
     const { addNewQuestion } = useActions();
     const [showForm, setShowForm] = useState<boolean>(true);
     const navigate = useNavigate();
-
-    const DEFAULT_SURVEY_IMAGE_URL = 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
 
     const renderQuestions = () => {
         return questions.map(question => renderQuestion(question));
@@ -67,8 +65,10 @@ const SurveyConstruct: FC = () => {
                         src={surveyInfo.imageUrl}
                         onError={({ currentTarget }) => {
                             currentTarget.onerror = null;
-                            currentTarget.src = DEFAULT_SURVEY_IMAGE_URL;
+                            currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL 
+                            || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                         }}
+                        alt={"SurveyImage"}
                         className={style.SurveyImage}
                     />
                 </div>

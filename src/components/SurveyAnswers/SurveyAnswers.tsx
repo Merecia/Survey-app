@@ -11,12 +11,10 @@ import { useNavigate } from 'react-router-dom';
 
 const SurveyAnswers: FC = () => {
     const { answersToQuestions, surveyInfo } = useTypedSelector(state => state.survey);
-    const { updateAnswersToQuestions, updateSurveyInfo } = useActions();
+    const { updateAnswersToQuestions, updateSurveyInfo, clearAnswersToQuestions } = useActions();
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
     const id = useParams().id;
-
-    const DEFAULT_SURVEY_IMAGE_URL = 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
 
     console.log(answersToQuestions);
 
@@ -64,6 +62,11 @@ const SurveyAnswers: FC = () => {
         );
     }
 
+    const finishViewAnswers = () => {
+        clearAnswersToQuestions();
+        navigate('/');
+    }
+
     const renderSurveyInfo = (surveyInfo: ISurveyInfo) => {
         return (
             <div className={style.Header}>
@@ -87,10 +90,12 @@ const SurveyAnswers: FC = () => {
                     src={surveyInfo.imageUrl}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null;
-                        currentTarget.src = DEFAULT_SURVEY_IMAGE_URL;
+                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL 
+                        || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                     }}
                     style={{ width: '80%' }}
                     className={style.SurveyImage}
+                    alt = {"SurveyImage"}
                 />
             </div>
         );
@@ -107,7 +112,7 @@ const SurveyAnswers: FC = () => {
                     {renderAnswersToQuestions(answersToQuestions)}
                     <Button
                         variant='contained'
-                        onClick={() => navigate('/')}
+                        onClick={finishViewAnswers}
                         sx={{
                             padding: '15px',
                             width: '80%',
@@ -127,7 +132,7 @@ const SurveyAnswers: FC = () => {
         <div className={style.SurveyAnswers}>
             {
                 loading ? <CircularProgress sx={{ margin: '100px auto' }} />
-                    : renderSurveyAnswers(surveyInfo, answersToQuestions)
+                        : renderSurveyAnswers(surveyInfo, answersToQuestions)
             }
         </div>
     );

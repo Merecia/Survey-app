@@ -1,8 +1,9 @@
 .Header {
     display: flex;
+    justify-content: center;
     background-color: white;
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.2);
 
     .AppName {
         margin-right: 70px;
@@ -16,24 +17,38 @@
         display: flex;
         justify-content: space-between;
         width: 200px;
-        margin-right: 100px;
+        margin-right: 250px;
 
-        .Surveys {
-            margin-right: 30px;
-        }
-
-        .Surveys, .Quizes {
+        .Surveys,
+        .Quizes {
             display: flex;
             align-items: center;
             padding: 0px 10px;
 
             &:hover {
                 cursor: pointer;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.2);
                 border-radius: 10px;
             }
         }
     }
+
+    .Avatar_DropdownMenu {
+        .Avatar {
+            &:hover {
+                cursor: pointer;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.2);
+            }
+        }
+    }
+}
+
+.Categories {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 40px 0px;
 }
 
 .SurveyCards {
@@ -42,4 +57,11 @@
     justify-content: space-between;
     margin: 40px auto;
     flex-wrap: wrap;
+}
+
+.Message {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
 }

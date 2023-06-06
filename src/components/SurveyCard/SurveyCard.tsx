@@ -15,7 +15,6 @@ interface ISurveyCardProps {
 
 const SurveyCard: FC<ISurveyCardProps> = ({ surveyInfo, cssProperties }) => {
     const navigate = useNavigate();
-    const DEFAULT_SURVEY_IMAGE_URL = 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
 
     return (
         <div className={style.SurveyCard} style={cssProperties}>
@@ -23,8 +22,10 @@ const SurveyCard: FC<ISurveyCardProps> = ({ surveyInfo, cssProperties }) => {
                 src={surveyInfo.imageUrl}
                 onError={({ currentTarget }) => {
                     currentTarget.onerror = null;
-                    currentTarget.src = DEFAULT_SURVEY_IMAGE_URL;
+                    currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL 
+                    || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                 }}
+                alt={"SurveyCard"}
                 className={style.Image}
             />
             <div className={style.TitleDescription}>

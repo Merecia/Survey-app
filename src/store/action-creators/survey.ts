@@ -12,7 +12,6 @@ import {
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
 import { isMatches, isOption, isTextAnswer } from '../../helper';
-import { answers, quiz } from '../../data/data';
 
 export const updateAnswersToQuestions = (answersToQuestions: IAnswerToQuestion[]) => {
     return async(dispatch: Dispatch<SurveyAction>) => {
@@ -106,6 +105,24 @@ export const updateQuestions = (questions: IQuestion[]) => {
     }
 }
 
+export const clearQuestions = () => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: []
+        })
+    }
+}
+
+export const clearAnswersToQuestions = () => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
+            payload: []
+        })
+    }
+}
+
 export const updateQuestionRequired = (question: IQuestion, required: boolean) => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         question.required = required;
@@ -143,13 +160,19 @@ export const updateSurveyInfo = (surveyInfo: ISurveyInfo) => {
 export const addNewQuestion = () => {
     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         const questions = getState().survey.questions;
+        const isEvaluated = getState().survey.surveyInfo.isEvaluated;
+
         const lastId = questions.length;
+        const initialOptions = isEvaluated 
+            ? [{ id: 1, label: "", score: 0 }]
+            : [{ id: 1, label: ""}];
+
         const newQuestion = {
             id: lastId + 1,
             topic: "",
             type: QuestionType.OneChoice,
             required: false,
-            options: [{ id: 1, label: "", score: 0 }]
+            options: initialOptions
         };
 
         questions.push(newQuestion);
@@ -273,16 +296,16 @@ export const updateQuestionType = (
     }
 }
 
-export const loadAnswersToQuestions = (surveyId: number) => {
-    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-        console.log(`Answers to Questions from Survey ${surveyId} have been loaded`);
+// export const loadAnswersToQuestions = (surveyId: number) => {
+//     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+//         console.log(`Answers to Questions from Survey ${surveyId} have been loaded`);
 
-        dispatch({
-            type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
-            payload: answers
-        })
-    }
-}
+//         dispatch({
+//             type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
+//             payload: answers
+//         })
+//     }
+// }
 
 export const scoreTest = (): number => {
     const answersToQuestions = store.getState().survey.answersToQuestions;

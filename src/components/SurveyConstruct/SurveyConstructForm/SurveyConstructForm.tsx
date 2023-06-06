@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import style from './SurveyConstructForm.module.scss';
 import { useForm } from 'react-hook-form';
-import { Category, IOption, ISurveyInfo, QuestionType } from '../../../types/survey';
+import { IOption, ISurveyInfo, QuestionType, SurveyCategory } from '../../../types/survey';
 import { TextField, Button, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import { useActions } from '../../../hooks/useActions';
 
@@ -27,14 +27,14 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
         }
     });
 
-    const MIN_TITLE_LENGTH = 4;
-    const MIN_DESCRIPTION_LENGTH = 4;
-    const MIN_IMAGE_URL_LENGTH = 6;
-
     const timeLimit = watch('timeLimit');
     const category = watch('category');
 
     const { updateSurveyInfo, updateQuestions } = useActions();
+
+    const renderCategoriesOptions = (categories: string[]) => (
+        categories.map(category => <MenuItem value = {category}> {category} </MenuItem>)
+    )
 
     const onSubmit = handleSubmit(async (data) => {
         const surveys = localStorage.getItem('surveys');
@@ -46,7 +46,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
         const surveyInfo: ISurveyInfo = {
             id: id,
             title: data.title,
-            category: data.category as Category,
+            category: data.category as SurveyCategory,
             description: data.description,
             imageUrl: data.imageUrl,
             isEvaluated: data.isEvaluated
@@ -87,8 +87,9 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                         'title', {
                             required: 'Title is required',
                             minLength: {
-                                value: MIN_TITLE_LENGTH,
-                                message: `The length of title must be more than ${MIN_TITLE_LENGTH} symbols`
+                                value: parseInt(process.env.REACT_APP_MIN_TITLE_LENGTH || '4'),
+                                message: `The length of title must be more than 
+                                ${process.env.REACT_APP_MIN_TITLE_LENGTH} symbols`
                             }
                         }
                     )
@@ -107,8 +108,9 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                         'description', {
                             required: 'Description is required',
                             minLength: {
-                                value: MIN_DESCRIPTION_LENGTH,
-                                message: `The length of title must be more than ${MIN_DESCRIPTION_LENGTH} symbols`
+                                value: parseInt(process.env.REACT_APP_MIN_DESCRIPTION_LENGTH || '4'),
+                                message: `The length of description must be more than 
+                                ${process.env.REACT_APP_MIN_DESCRIPTION_LENGTH} symbols`
                             }
                         }
                     )
@@ -129,9 +131,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                 error = {errors.category?.message !== undefined}
                 helperText = {errors.category?.message}
             >
-                <MenuItem value = 'Study'> Study </MenuItem>
-                <MenuItem value = 'Psychological'> Psychological </MenuItem>
-                <MenuItem value = 'Sociological'> Sociological </MenuItem>
+                { renderCategoriesOptions(Object.keys(SurveyCategory)) }
             </TextField>
 
             <TextField 
@@ -143,8 +143,9 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                         'imageUrl', {
                             required: 'Image URL is required',
                             minLength: {
-                                value: MIN_IMAGE_URL_LENGTH,
-                                message: `The length of URL must be more than ${MIN_IMAGE_URL_LENGTH} symbols`
+                                value: parseInt(process.env.REACT_APP_MIN_IMAGE_URL_LENGTH || '6'),
+                                message: `The length of URL must be more than 
+                                ${process.env.REACT_APP_MIN_IMAGE_URL_LENGTH} symbols`
                             }
                         }
                     )

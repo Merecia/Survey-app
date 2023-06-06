@@ -5,7 +5,6 @@ import MultipleChoice from '../MultipleChoice/MultipleChoice';
 import SingleChoice from '../SingleChoice/SingleChoice';
 import TextField from '../TextField/TextField';
 import style from './Question.module.scss';
-import { Typography } from '@mui/material';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';

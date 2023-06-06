@@ -1,7 +1,8 @@
 import { 
     SurveyState, 
     SurveyAction, 
-    SurveyActionTypes 
+    SurveyActionTypes, 
+    SurveyCategory
 } from './../../types/survey';
 
 const initialState: SurveyState = {
@@ -11,7 +12,7 @@ const initialState: SurveyState = {
         id: 1, 
         title: '', 
         description: '',
-        category: 'Study', 
+        category: SurveyCategory.Study, 
         imageUrl: '',
         maximumPassingTimeSeconds: undefined,
         isEvaluated: false

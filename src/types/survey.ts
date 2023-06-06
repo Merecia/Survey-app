@@ -66,7 +66,7 @@ export interface ISurveyInfo {
     id: number;
     title: string;
     description: string;
-    category: Category;
+    category: SurveyCategory;
     imageUrl: string;
     maximumPassingTimeSeconds?: number;
     isEvaluated: boolean;
@@ -99,6 +99,18 @@ export enum QuestionType {
 
 export enum TextFieldType { Short, Detailed }
 
+export enum SurveyCategory {
+    Study = 'Study',
+    Psychological = 'Psychological',
+    Sociological = 'Sociological',
+    Entertainment = 'Entertainment'
+}
+
+export enum SurveyType { 
+    Evaluated = 'Evaluated', 
+    Unevaluated = 'Unevaluated' 
+}
+
 export enum SurveyActionTypes {
     UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_TO_QUESTIONS',
     UPDATE_QUESTIONS = 'UPDATE_QUESTIONS',
@@ -108,7 +120,7 @@ export enum SurveyActionTypes {
 // Types
 
 export type IAnswer = IOption | IOption[] | ITextAnswer | IMatches;
-
 export type SurveyAction = UpdateAnswersQuestionsAction | UpdateQuestionsAction | UpdateSurveyInfo
-export type Category = 'Study' | 'Psychological' | 'Sociological';
-export type SurveyType = 'Surveys' | 'Quizes';
+
+// export type SurveyCategory = 'Study' | 'Psychological' | 'Sociological';
+// export type SurveyType = 'Surveys' | 'Quizes';
