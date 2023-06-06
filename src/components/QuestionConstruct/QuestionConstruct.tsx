@@ -147,13 +147,7 @@ const QuestionConstruct: FC<IQuestionConstructProps> = ({
                 ) 
             }
             <div className={style.AnswersField}>
-            { 
-                renderAnswerFields(question)
-                // useMemo(
-                //     () => renderAnswerFields(question),
-                //     [question] 
-                // )
-            }
+            { renderAnswerFields(question) }
             </div>
             {
                 useMemo(

@@ -16,8 +16,9 @@ const Survey: FC = () => {
     const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
-
     const id = useParams().id;
+
+    const DEFAULT_SURVEY_IMAGE_URL = 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
 
     const loadSurvey = (id: number) => {
         const surveys = localStorage.getItem('surveys');
@@ -172,10 +173,13 @@ const Survey: FC = () => {
                     <p className={style.Description}> {surveyInfo.description} </p>
                 </div>
                 <img
-                    className={style.SurveyImage}
                     src={surveyInfo.imageUrl}
-                    alt={"SurveyImage"}
+                    onError={({ currentTarget }) => {
+                        currentTarget.onerror = null;
+                        currentTarget.src = DEFAULT_SURVEY_IMAGE_URL;
+                    }}
                     style={{ width: '80%' }}
+                    className={style.SurveyImage}
                 />
             </div>
         );

@@ -111,3 +111,4 @@ export type IAnswer = IOption | IOption[] | ITextAnswer | IMatches;
 
 export type SurveyAction = UpdateAnswersQuestionsAction | UpdateQuestionsAction | UpdateSurveyInfo
 export type Category = 'Study' | 'Psychological' | 'Sociological';
+export type SurveyType = 'Surveys' | 'Quizes';

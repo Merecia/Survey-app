@@ -5,17 +5,20 @@ import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { IAnswerToQuestion, ISurveyInfo, ISurveyResults } from '../../types/survey';
 import Answer from '../Answer/Answer';
 import style from './SurveyAnswers.module.scss';
-import { Typography } from '@mui/material';
+import { Typography, Button } from '@mui/material';
 import { CircularProgress } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 const SurveyAnswers: FC = () => {
     const { answersToQuestions, surveyInfo } = useTypedSelector(state => state.survey);
     const { updateAnswersToQuestions, updateSurveyInfo } = useActions();
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
+    const id = useParams().id;
+
+    const DEFAULT_SURVEY_IMAGE_URL = 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
 
     console.log(answersToQuestions);
-
-    const id = useParams().id;
 
     const loadSurveyAnswers = (id: number) => {
         const allSurveyResults = localStorage.getItem('allSurveyResults');
@@ -50,7 +53,7 @@ const SurveyAnswers: FC = () => {
                 key={answerToQuestion.question.id}
             >
                 <Answer
-                    isEvaluated = {surveyInfo.isEvaluated}
+                    isEvaluated={surveyInfo.isEvaluated}
                     answerToQuestion={answerToQuestion}
                     cssProperties={{
                         margin: '20px 0px',
@@ -81,9 +84,13 @@ const SurveyAnswers: FC = () => {
                     </p>
                 </div>
                 <img
-                    className={style.SurveyImage}
                     src={surveyInfo.imageUrl}
-                    alt={"SurveyImage"}
+                    onError={({ currentTarget }) => {
+                        currentTarget.onerror = null;
+                        currentTarget.src = DEFAULT_SURVEY_IMAGE_URL;
+                    }}
+                    style={{ width: '80%' }}
+                    className={style.SurveyImage}
                 />
             </div>
         );
@@ -98,6 +105,19 @@ const SurveyAnswers: FC = () => {
                 <div className={style.Wrapper}>
                     {renderSurveyInfo(surveyInfo)}
                     {renderAnswersToQuestions(answersToQuestions)}
+                    <Button
+                        variant='contained'
+                        onClick={() => navigate('/')}
+                        sx={{
+                            padding: '15px',
+                            width: '80%',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            margin: '20px auto'
+                        }}
+                    >
+                        Back to main page
+                    </Button>
                 </div>
             </div>
         );
@@ -107,7 +127,7 @@ const SurveyAnswers: FC = () => {
         <div className={style.SurveyAnswers}>
             {
                 loading ? <CircularProgress sx={{ margin: '100px auto' }} />
-                        : renderSurveyAnswers(surveyInfo, answersToQuestions)
+                    : renderSurveyAnswers(surveyInfo, answersToQuestions)
             }
         </div>
     );

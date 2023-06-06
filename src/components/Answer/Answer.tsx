@@ -118,6 +118,8 @@ const Answer: FC<IAnswerProps> = ({
         return correctAnswers;
     }
 
+    const renderTopic = (topic: string) => <p className = {style.Topic}> {topic} </p>
+
     const getFeedback = (answerToQuestion: IAnswerToQuestion): IFeedback | undefined => {
         const answer = answerToQuestion.answer;
         const question = answerToQuestion.question;
@@ -146,13 +148,7 @@ const Answer: FC<IAnswerProps> = ({
 
     return (
         <div className={style.Answer} style={cssProperties}>
-            <Typography 
-                variant={"h6"} 
-                component={"h6"} 
-                sx = {{ marginBottom: '20px' }} 
-            >
-                { answerToQuestion.question.topic }
-            </Typography>
+            { renderTopic(answerToQuestion.question.topic) }
             { renderResponseField(answerToQuestion.question, answerToQuestion.answer) }
             { feedback && <Feedback feedback={feedback} /> }
         </div>

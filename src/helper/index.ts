@@ -47,7 +47,6 @@ export const replaceNumberWithLetter = (number: number): string => {
 }
 
 export const makeOptionIdLetter = (id: number): string => {
-    console.log(id);
     return replaceNumberWithLetter(id).toUpperCase()
 }
 

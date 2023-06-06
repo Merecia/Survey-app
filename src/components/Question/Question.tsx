@@ -6,6 +6,10 @@ import SingleChoice from '../SingleChoice/SingleChoice';
 import TextField from '../TextField/TextField';
 import style from './Question.module.scss';
 import { Typography } from '@mui/material';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
 
 interface IQuestionProps {
     question: IQuestion;
@@ -35,17 +39,7 @@ const Question: FC<IQuestionProps> = ({ question, cssProperties }) => {
         }
     }
 
-    const renderTopic = (topic: string) => {
-        return (
-            <Typography 
-                variant={"h6"} 
-                component={"h6"} 
-                sx = {{ marginBottom: '20px' }} 
-                >
-                    { topic }
-            </Typography>
-        );
-    }
+    const renderTopic = (topic: string) => <p className = {style.Topic}> {topic} </p>
 
     return (
         <div className={style.Question} style={cssProperties}>
