@@ -2,20 +2,24 @@ import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import { IQuestion, ISurvey, ISurveyResults, ISurveyInfo } from '../../types/survey';
+import { IQuestion, ISurvey, ISurveyResults, ISurveyInfo, IAnswerToQuestion } from '../../types/survey';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
-import { Button, Typography, CircularProgress } from '@mui/material';
+import { Button, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
 import useInterval from '../../hooks/useInterval';
-import { useNavigate } from 'react-router-dom';
+import SurveyFinishModal from './SurveyFinishModal/SurveyFinishModal';
+import { isMatches, isOption, isSetOfOptions, isTextAnswer } from '../../helper';
 
 const Survey: FC = () => {
-    const { updateQuestions, updateSurveyInfo, clearQuestions } = useActions();
+    const { updateQuestions, updateSurveyInfo } = useActions();
     const { answersToQuestions, questions, surveyInfo } = useTypedSelector(state => state.survey);
     const [timeStart, setTimeStart] = useState(new Date());
     const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
+    const [surveyResults, setSurveyResults] = useState<ISurveyResults | null>(null);
     const [loading, setLoading] = useState(true);
-    const navigate = useNavigate();
+    const [errorAlert, setErrorAlert] = useState<boolean>(false);
+    const [successAlert, setSuccessAlert] = useState<boolean>(false);
+    const [warningAlert, setWarningAlert] = useState<boolean>(false);
     const id = useParams().id;
 
     const loadSurvey = (id: number) => {
@@ -28,6 +32,8 @@ const Survey: FC = () => {
         updateSurveyInfo(survey.surveyInfo);
     }
 
+    console.log(questions);
+
     useEffect(() => {
         if (id) {
             loadSurvey(parseInt(id));
@@ -37,7 +43,44 @@ const Survey: FC = () => {
         // eslint-disable-next-line
     }, [])
 
-    console.log(answersToQuestions);
+    const renderErrorAlert = (message: string) => (
+        <Snackbar
+            open={errorAlert}
+            autoHideDuration={6000}
+            onClose={() => setErrorAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setErrorAlert(false)} severity="error">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
+
+    const renderSuccessAlert = (message: string) => (
+        <Snackbar
+            open={successAlert}
+            autoHideDuration={6000}
+            onClose={() => setSuccessAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setSuccessAlert(false)} severity="success">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
+
+    const renderWarningAlert = (message: string) => (
+        <Snackbar
+            open={warningAlert}
+            autoHideDuration={6000}
+            onClose={() => setWarningAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setWarningAlert(false)} severity="warning">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
 
     useInterval(() => {
         const maximumPassingTimeSeconds = surveyInfo.maximumPassingTimeSeconds;
@@ -47,7 +90,7 @@ const Survey: FC = () => {
             const dt = (now.getTime() - timeStart.getTime()) / 1000;
 
             if (Math.floor(dt) === Number(maximumPassingTimeSeconds)) {
-                alert('Time is over. Finishing survey...');
+                setWarningAlert(true);
                 finishSurvey(maximumPassingTimeSeconds);
             } else {
                 setPassingTimeSeconds(Math.floor(dt));
@@ -101,9 +144,29 @@ const Survey: FC = () => {
         return allRequiredQuestionsAreAnswered;
     }
 
-    const finishSurvey = (passingTimeSeconds: number) => {
-        alert('You have finished passing the survey');
+    const calculateEarnedScore = (answersToQuestions: IAnswerToQuestion[]): number => {
+        let earnedScore: number = 0;
 
+        answersToQuestions.forEach(answerToQuestion => {
+            const answer = answerToQuestion.answer;
+
+            if (isOption(answer) || isTextAnswer(answer)) {
+                earnedScore += answer.score as number;
+            } else if (isMatches(answer)) {
+                answer.leftList.forEach(option => {
+                    earnedScore += option.score as number;
+                })
+            } else if (isSetOfOptions(answer)) {
+                answer.forEach(option => {
+                    earnedScore += option.score as number;
+                })
+            }
+        })
+
+        return earnedScore;
+    }
+
+    const finishSurvey = (passingTimeSeconds: number) => {
         const allSurveyResultsData = localStorage.getItem('allSurveyResults');
         let allSurveyResults, id;
 
@@ -116,32 +179,50 @@ const Survey: FC = () => {
             id = 1;
         }
 
-        const surveyResults: ISurveyResults = { 
-            id, 
-            surveyInfo, 
-            passingTimeSeconds, 
-            answersToQuestions 
+        const surveyResults: ISurveyResults = {
+            id,
+            surveyInfo,
+            passingTimeSeconds,
+            answersToQuestions
         };
+
+        if (surveyInfo.isEvaluated) {
+            surveyResults.earnedScore = calculateEarnedScore(answersToQuestions);
+        }
 
         allSurveyResults.push(surveyResults);
         localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
-        clearQuestions();
-        navigate(`/survey-results/${id}`);
+        setSurveyResults(surveyResults);
     }
 
     const finishButtonClickHandler = () => {
         if (areAllRequiredQuestionsAnswered()) {
+            setSuccessAlert(true);
             finishSurvey(passingTimeSeconds);
         } else {
-            alert('You need to answer all required questions');
+            setErrorAlert(true);
         }
     }
 
     const renderSurvey = (surveyInfo: ISurveyInfo, questions: IQuestion[]) => {
         return (
             <div className={style.Wrapper}>
+                {
+                    surveyResults &&
+                    <SurveyFinishModal
+                        surveyResultsId={surveyResults.id}
+                        earnedScore={surveyResults.earnedScore}
+                        maximumScore={surveyInfo.maximumScore}
+                    />
+                }
+
+                {errorAlert && renderErrorAlert('You need to answer all required questions.')}
+                {successAlert && renderSuccessAlert('Your answers have been successfully saved.')}
+                {warningAlert && renderWarningAlert('The time to pass the survey came out.')}
+
                 {renderSurveyInfo(surveyInfo)}
                 {renderQuestions(questions)}
+
                 <Button
                     variant='contained'
                     onClick={finishButtonClickHandler}
@@ -180,8 +261,8 @@ const Survey: FC = () => {
                     src={surveyInfo.imageUrl}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null;
-                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL 
-                        || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
+                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL
+                            || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                     }}
                     style={{ width: '80%' }}
                     className={style.SurveyImage}
@@ -195,7 +276,7 @@ const Survey: FC = () => {
         <div className={style.Survey}>
             {
                 loading ? <CircularProgress sx={{ margin: '200px auto' }} />
-                        : renderSurvey(surveyInfo, questions)
+                    : renderSurvey(surveyInfo, questions)
             }
         </div>
     );

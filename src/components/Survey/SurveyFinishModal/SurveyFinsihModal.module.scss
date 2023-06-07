@@ -1,0 +1,33 @@
+.SurveyFinishModal {
+    position: fixed;
+    background: #00000050;
+    width: 100%;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 100;
+
+    .Box {
+        position: relative;
+        width: 40%;
+        margin: 0 auto;
+        height: auto;
+        max-height: 70vh;
+        margin-top: calc(100vh - 80vh);
+        background: #fff;
+        border-radius: 4px;
+        padding: 20px;
+        border: 1px solid #999;
+        overflow: auto;
+
+        .Text {
+            text-align: center;
+        }
+
+        .Buttons {
+            margin-top: 50px;
+            display: flex;
+            justify-content: space-around;
+        }
+    }
+}

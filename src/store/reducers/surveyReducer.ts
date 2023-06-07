@@ -15,6 +15,7 @@ const initialState: SurveyState = {
         category: SurveyCategory.Study, 
         imageUrl: '',
         maximumPassingTimeSeconds: undefined,
+        maximumScore: undefined,
         isEvaluated: false
     }
 }

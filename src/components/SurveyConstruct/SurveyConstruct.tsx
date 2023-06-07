@@ -3,15 +3,16 @@ import style from './SurveyConstruct.module.scss';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
-import { IQuestion, ISurvey } from '../../types/survey';
+import { IQuestion, ISurvey, QuestionType } from '../../types/survey';
 import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { isMatches, isSetOfOptions, isTextAnswer } from '../../helper';
 
 const SurveyConstruct: FC = () => {
     const { questions, surveyInfo } = useTypedSelector(state => state.survey);
     const { addNewQuestion } = useActions();
-    const [showForm, setShowForm] = useState<boolean>(true);
+    const [showSurveyConstructForm, setShowSurveyConstructForm] = useState<boolean>(true);
     const navigate = useNavigate();
 
     const renderQuestions = () => {
@@ -28,8 +29,50 @@ const SurveyConstruct: FC = () => {
         );
     }
 
+    const calculateMaximumScore = (questions: IQuestion[]) => {
+        let maximumScore: number = 0;
+
+        questions.forEach(question => {
+            if (
+                question.type === QuestionType.OneChoice ||
+                question.type === QuestionType.MultipleChoice
+            ) {
+                if (isSetOfOptions(question.options)) {
+                    question.options.forEach(option => {
+                        if (option.score && option.score > 0) {
+                            maximumScore += option.score as number;
+                        }
+                    })
+                }
+            } else if (
+                question.type === QuestionType.ShortTextField ||
+                question.type === QuestionType.DetailedTextField
+            ) {
+                if (isTextAnswer(question.correctAnswer)) {
+                    maximumScore += question.correctAnswer.score as number;
+                }
+            } else if (
+                question.type === QuestionType.Matchmaking
+            ) {
+                if (isMatches(question.options)) {
+                    question.options.leftList.forEach(option => {
+                        if (option.score && option.score > 0) {
+                            maximumScore += option.score as number;
+                        }
+                    })
+                }
+            }
+        })
+
+        return maximumScore;
+    }
+
     const finishCreatingButtonClickHandler = () => {
         alert('You have finished creating the survey');
+
+        if (surveyInfo.isEvaluated) {
+            surveyInfo.maximumScore = calculateMaximumScore(questions);
+        }
 
         const survey: ISurvey = { surveyInfo, questions };
         const surveysData = localStorage.getItem('surveys');
@@ -44,10 +87,10 @@ const SurveyConstruct: FC = () => {
         navigate(`/survey/${surveyInfo.id}`);
     }
 
-    const renderForm = () => {
+    const renderSurveyConstructForm = () => {
         return (
             <div className={style.SurveyConstructForm}>
-                <SurveyConstructForm setShowForm={setShowForm} />
+                <SurveyConstructForm setShowForm={setShowSurveyConstructForm} />
             </div>
         );
     }
@@ -107,7 +150,11 @@ const SurveyConstruct: FC = () => {
 
     return (
         <div className={style.SurveyConstruct}>
-            {showForm ? renderForm() : renderQuestionsConstruct()}
+            {
+                showSurveyConstructForm 
+                ? renderSurveyConstructForm() 
+                : renderQuestionsConstruct()
+            }
         </div>
     );
 }

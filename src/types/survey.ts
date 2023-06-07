@@ -33,6 +33,7 @@ export interface ISurveyResults {
     surveyInfo: ISurveyInfo;
     passingTimeSeconds: number;
     answersToQuestions: IAnswerToQuestion[];
+    earnedScore?: number;
 }
 
 export interface IQuestion {
@@ -69,6 +70,7 @@ export interface ISurveyInfo {
     category: SurveyCategory;
     imageUrl: string;
     maximumPassingTimeSeconds?: number;
+    maximumScore?: number;
     isEvaluated: boolean;
 }
 

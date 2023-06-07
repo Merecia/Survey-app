@@ -64,37 +64,37 @@ export const updateAnswerToQuestion = (answerToQuestion: IAnswerToQuestion) => {
     }
 }
 
-export const finishSurvey = (
-    surveyInfo: ISurveyInfo, 
-    passingTimeSeconds: number,
-    answersToQuestions: IAnswerToQuestion[]
-) => {
-    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-        alert('You have finished passing the survey');
+// export const finishSurvey = (
+//     surveyInfo: ISurveyInfo, 
+//     passingTimeSeconds: number,
+//     answersToQuestions: IAnswerToQuestion[]
+// ) => {
+//     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+//         alert('You have finished passing the survey');
 
-        const allSurveyResultsData = localStorage.getItem('allSurveyResults');
-        let allSurveyResults, id;
+//         const allSurveyResultsData = localStorage.getItem('allSurveyResults');
+//         let allSurveyResults, id;
 
-        if (allSurveyResultsData) {
-            allSurveyResults = JSON.parse(allSurveyResultsData);
-            const lastSurvey = allSurveyResults[allSurveyResults.length - 1];
-            id = lastSurvey.id + 1;
-        } else {
-            allSurveyResults = [];
-            id = 1;
-        }
+//         if (allSurveyResultsData) {
+//             allSurveyResults = JSON.parse(allSurveyResultsData);
+//             const lastSurvey = allSurveyResults[allSurveyResults.length - 1];
+//             id = lastSurvey.id + 1;
+//         } else {
+//             allSurveyResults = [];
+//             id = 1;
+//         }
 
-        const surveyResults: ISurveyResults = {
-            id,
-            surveyInfo,
-            passingTimeSeconds,
-            answersToQuestions
-        };
+//         const surveyResults: ISurveyResults = {
+//             id,
+//             surveyInfo,
+//             passingTimeSeconds,
+//             answersToQuestions
+//         };
 
-        allSurveyResults.push(surveyResults);
-        localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
-    }
-}
+//         allSurveyResults.push(surveyResults);
+//         localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
+//     }
+// }
 
 export const updateQuestions = (questions: IQuestion[]) => {
     return async (dispatch: Dispatch<SurveyAction>) => {
@@ -306,29 +306,3 @@ export const updateQuestionType = (
 //         })
 //     }
 // }
-
-export const scoreTest = (): number => {
-    const answersToQuestions = store.getState().survey.answersToQuestions;
-    let totalScore: number = 0;
-
-    answersToQuestions.forEach(answerToQuestion => {
-        const answer = answerToQuestion.answer;
-
-        if (isOption(answer) || isTextAnswer(answer)) {
-            const score = answer.score ?? 0;
-            totalScore += score;
-        } else if (isMatches(answer)) {
-            answer.leftList.forEach(option => {
-                const score = option.score ?? 0;
-                totalScore += score;
-            })
-        } else if (isSetOfOptions(answer)) {
-            answer.forEach(option => {
-                const score = option.score ?? 0;
-                totalScore += score;
-            })
-        }
-    })
-
-    return totalScore;
-}
