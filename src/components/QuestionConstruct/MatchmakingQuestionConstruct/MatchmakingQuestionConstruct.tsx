@@ -104,17 +104,19 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
 
     const renderScore = () => {
         if (surveyInfo.isEvaluated) {
-            <TextField
-                label="Enter score for a correct answer"
-                size='small'
-                fullWidth
-                value={
-                    isMatches(question.options) && question.options.leftList[0].score
-                        ? question.options.leftList[0].score : 0
-                }
-                onChange={matchesScoreChangeHandler}
-                inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-            />
+            return (
+                <TextField
+                    label="Enter score for a correct answer"
+                    size='small'
+                    fullWidth
+                    value={
+                        isMatches(question.options) && question.options.leftList[0].score
+                            ? question.options.leftList[0].score : 0
+                    }
+                    onChange={matchesScoreChangeHandler}
+                    inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+                />
+            );
         } else return null;
     }
 

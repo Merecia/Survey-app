@@ -50,18 +50,10 @@ const MainPage: FC = () => {
         if (filteredSurveys.length === 0) {
             return (
                 <div className = {style.Message}>
-                    <Typography
-                        variant={"h6"}
-                        component={"h6"}
-                        fontWeight={'300'}
-                    >
+                    <Typography variant={"h6"} component={"h6"} fontWeight={'300'} >
                         There are no surveys with the category and search query you specified.
                     </Typography>
-                    <Typography
-                        variant={"h6"}
-                        component={"h6"}
-                        fontWeight={'300'}
-                    >
+                    <Typography variant={"h6"} component={"h6"} fontWeight={'300'}>
                         Try changing the category or changing the search query.
                     </Typography>
                 </div>
