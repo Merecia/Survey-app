@@ -18,7 +18,7 @@ const SurveyFinishModal: FC<ISurveyFinishModalProps> = ({
 }) => {
     const isEvaluated = earnedScore !== undefined && maximumScore !== undefined;
     const navigate = useNavigate();
-    const { clearQuestions } = useActions();
+    const { clearQuestions, clearAnswersToQuestions } = useActions();
 
     const viewResultsButtonClickHandler = () => {
         clearQuestions();
@@ -27,6 +27,7 @@ const SurveyFinishModal: FC<ISurveyFinishModalProps> = ({
 
     const toMainPageButtonClickHandler = () => {
         clearQuestions();
+        clearAnswersToQuestions();
         navigate(`/`);
     }
 

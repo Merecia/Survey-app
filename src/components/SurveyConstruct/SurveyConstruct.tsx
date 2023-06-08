@@ -39,7 +39,7 @@ const SurveyConstruct: FC = () => {
             ) {
                 if (isSetOfOptions(question.options)) {
                     question.options.forEach(option => {
-                        if (option.score && option.score > 0) {
+                        if (option.score && option.score > 0) { 
                             maximumScore += option.score as number;
                         }
                     })
@@ -84,7 +84,8 @@ const SurveyConstruct: FC = () => {
         } else surveys = [survey];
 
         localStorage.setItem('surveys', JSON.stringify(surveys));
-        navigate(`/survey/${surveyInfo.id}`);
+        // navigate(`/survey/${surveyInfo.id}`);
+        navigate('/');
     }
 
     const renderSurveyConstructForm = () => {

@@ -35,7 +35,7 @@ const TextQuestionConstruct: FC<ITextQuestionConstructProps> = ({
         }
     }
 
-    const renderCorrectAnswerTextField = (correctAnswer: any) => (
+    const renderCorrectAnswerTextField = (correctAnswer: ITextAnswer | undefined) => (
         <TextField
             label="Enter a correct answer"
             size='small'
