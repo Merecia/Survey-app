@@ -1,17 +1,13 @@
-import { isSetOfOptions } from './../../helper/index';
-import { store } from './../index';
 import {
     IAnswerToQuestion,
     IQuestion,
     ISurveyInfo,
-    ISurveyResults,
     QuestionType,
     SurveyAction,
     SurveyActionTypes
 } from './../../types/survey';
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
-import { isMatches, isOption, isTextAnswer } from '../../helper';
 
 export const updateAnswersToQuestions = (answersToQuestions: IAnswerToQuestion[]) => {
     return async(dispatch: Dispatch<SurveyAction>) => {
@@ -63,38 +59,6 @@ export const updateAnswerToQuestion = (answerToQuestion: IAnswerToQuestion) => {
         }
     }
 }
-
-// export const finishSurvey = (
-//     surveyInfo: ISurveyInfo, 
-//     passingTimeSeconds: number,
-//     answersToQuestions: IAnswerToQuestion[]
-// ) => {
-//     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-//         alert('You have finished passing the survey');
-
-//         const allSurveyResultsData = localStorage.getItem('allSurveyResults');
-//         let allSurveyResults, id;
-
-//         if (allSurveyResultsData) {
-//             allSurveyResults = JSON.parse(allSurveyResultsData);
-//             const lastSurvey = allSurveyResults[allSurveyResults.length - 1];
-//             id = lastSurvey.id + 1;
-//         } else {
-//             allSurveyResults = [];
-//             id = 1;
-//         }
-
-//         const surveyResults: ISurveyResults = {
-//             id,
-//             surveyInfo,
-//             passingTimeSeconds,
-//             answersToQuestions
-//         };
-
-//         allSurveyResults.push(surveyResults);
-//         localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
-//     }
-// }
 
 export const updateQuestions = (questions: IQuestion[]) => {
     return async (dispatch: Dispatch<SurveyAction>) => {
@@ -295,14 +259,3 @@ export const updateQuestionType = (
         })
     }
 }
-
-// export const loadAnswersToQuestions = (surveyId: number) => {
-//     return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
-//         console.log(`Answers to Questions from Survey ${surveyId} have been loaded`);
-
-//         dispatch({
-//             type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
-//             payload: answers
-//         })
-//     }
-// }

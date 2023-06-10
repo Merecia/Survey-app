@@ -69,18 +69,20 @@ const MainPage: FC = () => {
 
     const renderSurveyCard = (survey: ISurveyInfo) => (
         <SurveyCard
+            key = {survey.id}
             surveyInfo={survey}
             cssProperties={{ marginBottom: '20px' }}
         />
     )
 
     const renderCategoriesButtons = (categories: string[]) => {
-        return categories.map(category => renderCategoryButton(category));
+        return categories.map((category, index) => renderCategoryButton(category, index));
     }
 
-    const renderCategoryButton = (category: string) => {
+    const renderCategoryButton = (category: string, index: number) => {
         return (
             <Button
+                key={index}
                 variant={category === choicedCategory ? 'contained' : 'outlined'}
                 size="medium"
                 sx={{ p: 1.5 }}

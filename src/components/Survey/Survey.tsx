@@ -2,13 +2,13 @@ import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import { IQuestion, ISurvey, ISurveyResults, ISurveyInfo, IAnswerToQuestion } from '../../types/survey';
+import { IQuestion, ISurvey, ISurveyResults, ISurveyInfo } from '../../types/survey';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
 import { Button, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
 import useInterval from '../../hooks/useInterval';
 import SurveyFinishModal from './SurveyFinishModal/SurveyFinishModal';
-import { isMatches, isOption, isSetOfOptions, isTextAnswer } from '../../helper';
+import { areAllRequiredQuestionsAnswered, calculateEarnedScore } from '../../helper';
 
 const Survey: FC = () => {
     const { updateQuestions, updateSurveyInfo } = useActions();
@@ -120,52 +120,6 @@ const Survey: FC = () => {
         );
     }
 
-    const areAllRequiredQuestionsAnswered = (): boolean => {
-        const requiredQuestionsId: number[] = [];
-
-        questions.forEach(question => {
-            if (question.required) {
-                requiredQuestionsId.push(question.id);
-            }
-        })
-
-        const answeredQuestionsId: number[] = answersToQuestions.map(
-            answerToQuestion => answerToQuestion.question.id
-        );
-
-        let allRequiredQuestionsAreAnswered = true;
-
-        requiredQuestionsId.forEach(requiredQuestionId => {
-            if (!answeredQuestionsId.includes(requiredQuestionId)) {
-                allRequiredQuestionsAreAnswered = false;
-            }
-        })
-
-        return allRequiredQuestionsAreAnswered;
-    }
-
-    const calculateEarnedScore = (answersToQuestions: IAnswerToQuestion[]): number => {
-        let earnedScore: number = 0;
-
-        answersToQuestions.forEach(answerToQuestion => {
-            const answer = answerToQuestion.answer;
-
-            if (isOption(answer) || isTextAnswer(answer)) {
-                earnedScore += answer.score as number;
-            } else if (isMatches(answer)) {
-                answer.leftList.forEach(option => {
-                    earnedScore += option.score as number;
-                })
-            } else if (isSetOfOptions(answer)) {
-                answer.forEach(option => {
-                    earnedScore += option.score as number;
-                })
-            }
-        })
-
-        return earnedScore;
-    }
-
     const finishSurvey = (passingTimeSeconds: number) => {
         const allSurveyResultsData = localStorage.getItem('allSurveyResults');
         let allSurveyResults, id;
@@ -196,7 +150,7 @@ const Survey: FC = () => {
     }
 
     const finishButtonClickHandler = () => {
-        if (areAllRequiredQuestionsAnswered()) {
+        if (areAllRequiredQuestionsAnswered(questions, answersToQuestions)) {
             setSuccessAlert(true);
             finishSurvey(passingTimeSeconds);
         } else {
