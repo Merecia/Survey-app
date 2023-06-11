@@ -1,4 +1,8 @@
-import { IMatches, IOption, ITextAnswer, IQuestion, QuestionType, IAnswerToQuestion, IFeedback } from '../types/survey';
+import { 
+    IMatches, IOption, ITextAnswer, 
+    IQuestion, QuestionType, 
+    IAnswerToQuestion, IFeedback 
+} from '../types/survey';
 
 export const remove = <T>(array: T[], index: number): T[] => {
     const updatedArray: T[] = [...array];
@@ -184,6 +188,44 @@ export const areAllRequiredQuestionsAnswered = (
     return allRequiredQuestionsAreAnswered;
 }
 
+export const areAllQuestionsFilledOut = (questions: IQuestion[], isEvaluated: boolean) => {
+    for (const question of questions) {
+        if (question.topic === '') {
+            return false;
+        }
+
+        if (
+            question.type === QuestionType.OneChoice || 
+            question.type === QuestionType.MultipleChoice
+        ) {
+            for (const option of question.options as IOption[]) {
+                if (option.label === '') {
+                    return false;
+                }
+            }
+        } else if (
+            question.type === QuestionType.ShortTextField ||
+            question.type === QuestionType.DetailedTextField
+        ) {
+            if (isEvaluated && question.correctAnswer?.text === '') {
+                return false;
+            }
+        } else if (
+            question.type === QuestionType.Matchmaking &&
+            isMatches(question.options)
+        ) {
+            for (const option of question.options.leftList) {
+                if (option.label === '') return false;
+            }
+            for (const option of question.options.rightList) {
+                if (option.label === '') return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 export const calculateEarnedScore = (answersToQuestions: IAnswerToQuestion[]): number => {
     let earnedScore: number = 0;
 
@@ -217,7 +259,7 @@ export const calculateMaximumScore = (questions: IQuestion[]) => {
 
     questions.forEach(question => {
         if (
-            question.type === QuestionType.OneChoice ||
+            question.type === QuestionType.OneChoice || 
             question.type === QuestionType.MultipleChoice
         ) {
             if (isSetOfOptions(question.options)) {
@@ -228,19 +270,17 @@ export const calculateMaximumScore = (questions: IQuestion[]) => {
                 })
             }
         } else if (
-            question.type === QuestionType.ShortTextField ||
+            question.type === QuestionType.ShortTextField || 
             question.type === QuestionType.DetailedTextField
         ) {
             if (
-                isTextAnswer(question.correctAnswer) && 
-                question.correctAnswer.score !== undefined &&
-                question.correctAnswer.score > 0
+                isTextAnswer(question.correctAnswer) 
+                && question.correctAnswer.score !== undefined 
+                && question.correctAnswer.score > 0
             ) {
                 maximumScore += question.correctAnswer.score as number;
             }
-        } else if (
-            question.type === QuestionType.Matchmaking
-        ) {
+        } else if (question.type === QuestionType.Matchmaking) {
             if (isMatches(question.options)) {
                 question.options.leftList.forEach(option => {
                     if (option.score !== undefined && option.score > 0) {

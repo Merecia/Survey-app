@@ -3,7 +3,7 @@ import { IAnswer, IAnswerToQuestion, IQuestion, QuestionType } from "../types/su
 
 const option1 = {id: 1, label: '3', score: 1};
 const option2 = {id: 2, label: '-3', score: 1};
-const option3 = {id: 3, label: '3.5', score: 0};
+const option3 = {id: 3, label: '3.5', score: -1};
 
 const question: IQuestion =  {
     id: 1,
@@ -31,12 +31,12 @@ const correctAnswerToQuestion: IAnswerToQuestion = {
 describe('Get feedback', () => {
     test('Incorrect answer', () => {
         expect(getFeedback(incorrectAnswerToQuestion)).toEqual({
-            totalScore: 0, maximumScore: 2, correctAnswers: ['3', '-3'] 
+            totalScore: -1, maximumScore: 2, correctAnswers: ['3', '-3'] 
         });
     })
     test('Partially correct answer', () => {
         expect(getFeedback(partiallyCorrectAnswerToQuestion)).toEqual({
-            totalScore: 1, maximumScore: 2, correctAnswers: ['3', '-3']
+            totalScore: 0, maximumScore: 2, correctAnswers: ['3', '-3']
         })
     })
     test('Correct answer', () => {

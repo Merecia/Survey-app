@@ -5,19 +5,50 @@ import { useTypedSelector } from '../../hooks/useTypedSelector';
 import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
 import { IQuestion, ISurvey } from '../../types/survey';
 import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
+import { Snackbar, Alert } from '@mui/material';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { calculateMaximumScore } from '../../helper';
+import { areAllQuestionsFilledOut, calculateMaximumScore } from '../../helper';
 
 const SurveyConstruct: FC = () => {
     const { questions, surveyInfo } = useTypedSelector(state => state.survey);
     const { addNewQuestion } = useActions();
     const [showSurveyConstructForm, setShowSurveyConstructForm] = useState<boolean>(true);
+    const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
+
+    const [errorAlert, setErrorAlert] = useState<string>('');
     const navigate = useNavigate();
 
     const renderQuestions = () => {
         return questions.map(question => renderQuestion(question));
     }
+
+    const renderErrorAlert = (message: string) => (
+        <Snackbar
+            open={showErrorAlert}
+            autoHideDuration={6000}
+            onClose={() => setShowErrorAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setShowErrorAlert(false)} severity="error">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
+
+    const renderSuccessAlert = (message: string) => (
+        <Snackbar
+            open={showSuccessAlert}
+            autoHideDuration={6000}
+            onClose={() => setShowSuccessAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setShowSuccessAlert(false)} severity="success">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
 
     const renderQuestion = (question: IQuestion) => {
         return (
@@ -29,14 +60,7 @@ const SurveyConstruct: FC = () => {
         );
     }
 
-    const finishCreatingButtonClickHandler = () => {
-        alert('You have finished creating the survey');
-
-        if (surveyInfo.isEvaluated) {
-            surveyInfo.maximumScore = calculateMaximumScore(questions);
-        }
-
-        const survey: ISurvey = { surveyInfo, questions };
+    const saveSurvey = (survey: ISurvey) => {
         const surveysData = localStorage.getItem('surveys');
 
         let surveys;
@@ -46,7 +70,40 @@ const SurveyConstruct: FC = () => {
         } else surveys = [survey];
 
         localStorage.setItem('surveys', JSON.stringify(surveys));
-        navigate('/');
+    }
+
+    const finishCreatingButtonClickHandler = () => {
+        if (questions.length === 0) {
+            setShowErrorAlert(true);
+            setErrorAlert('At least one question should be added');
+            return;
+        }
+
+        if ( !areAllQuestionsFilledOut(questions, surveyInfo.isEvaluated) ) {
+            setShowErrorAlert(true);
+            setErrorAlert('You need to fill out all questions');
+            return;
+        }
+
+        if (surveyInfo.isEvaluated) {
+            const maximumScore = calculateMaximumScore(questions);
+
+            if (maximumScore === 0) {
+                setShowErrorAlert(true);
+                setErrorAlert(`The maximum score for the test can't be equal to 0`);
+                return;
+            }
+
+            surveyInfo.maximumScore = maximumScore;
+        }
+
+        saveSurvey({ surveyInfo, questions });
+        setShowSuccessAlert(true);
+
+        const delay = 1500;
+        setTimeout(() => {
+            navigate('/');
+        }, delay);
     }
 
     const renderSurveyConstructForm = () => {
@@ -60,6 +117,10 @@ const SurveyConstruct: FC = () => {
     const renderQuestionsConstruct = () => {
         return (
             <div className={style.QuestionsConstruct}>
+
+                {showErrorAlert && renderErrorAlert(errorAlert)}
+                {showSuccessAlert && renderSuccessAlert('The survey was successfully created.')}
+
                 <div className={style.Header}>
                     <div className={style.SurveyDetails}>
                         <h2 className={style.Title}> {surveyInfo.title} </h2>
