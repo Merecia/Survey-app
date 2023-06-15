@@ -42,6 +42,7 @@ const ChoiceQuestionConstruct: FC<IChoiceQuestionConstructProps> = ({
     const renderOption = (option: IOption) => (
         <OptionConstruct 
             question = {question}
+            key = {option.id}
             option = {option}
             cssProperties={{
                 width: '100%',

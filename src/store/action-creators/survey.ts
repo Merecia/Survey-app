@@ -1,6 +1,7 @@
 import {
     IAnswerToQuestion,
     IQuestion,
+    ISurvey,
     ISurveyInfo,
     QuestionType,
     SurveyAction,
@@ -10,10 +11,58 @@ import { Dispatch } from "redux";
 import { RootState } from '../reducers';
 
 export const updateAnswersToQuestions = (answersToQuestions: IAnswerToQuestion[]) => {
-    return async(dispatch: Dispatch<SurveyAction>) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
         dispatch({
             type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS,
             payload: answersToQuestions
+        })
+    }
+}
+
+export const updateSurveyCards = (surveyCards: ISurveyInfo[]) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SURVEY_CARDS,
+            payload: surveyCards
+        });
+    }
+}
+
+export const loadSurveyCards = () => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        const surveys = localStorage.getItem('surveys');
+
+        const surveyCards = surveys ? JSON.parse(surveys).map(
+            (survey: ISurvey) => survey.surveyInfo
+        ) : null;
+    
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SURVEY_CARDS,
+            payload: surveyCards
+        });
+    }
+}
+
+export const removeSurveyCard = (id: number) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        const surveyCards = getState().survey.surveyCards
+            .filter((survey: ISurveyInfo) => survey.id !== id)
+            .map((survey: ISurveyInfo, index: number) => {
+                return {
+                    id: index + 1,
+                    title: survey.title,
+                    description: survey.description,
+                    category: survey.category,
+                    imageUrl: survey.imageUrl,
+                    maximumPassingTimeSeconds: survey.maximumPassingTimeSeconds,
+                    maximumScore: survey.maximumScore,
+                    isEvaluated: survey.isEvaluated
+                };
+            });
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SURVEY_CARDS,
+            payload: surveyCards
         })
     }
 }
@@ -127,9 +176,9 @@ export const addNewQuestion = () => {
         const isEvaluated = getState().survey.surveyInfo.isEvaluated;
 
         const lastId = questions.length;
-        const initialOptions = isEvaluated 
+        const initialOptions = isEvaluated
             ? [{ id: 1, label: "", score: 0 }]
-            : [{ id: 1, label: ""}];
+            : [{ id: 1, label: "" }];
 
         const newQuestion = {
             id: lastId + 1,
@@ -144,6 +193,25 @@ export const addNewQuestion = () => {
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
             payload: questions
+        });
+    }
+}
+
+export const loadSurvey = (id: number) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        const surveys = localStorage.getItem('surveys');
+        const survey = surveys
+            ? JSON.parse(surveys).find((survey: ISurvey) => survey.surveyInfo.id === id)
+            : null;
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_QUESTIONS,
+            payload: survey.questions
+        });
+
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SURVEY_INFO,
+            payload: survey.surveyInfo
         });
     }
 }
@@ -198,7 +266,7 @@ export const updateQuestionTopic = (question: IQuestion, topic: string) => {
 }
 
 export const updateQuestionType = (
-    question: IQuestion, 
+    question: IQuestion,
     type: QuestionType,
     isEvaluated: boolean
 ) => {
@@ -213,9 +281,9 @@ export const updateQuestionType = (
                 delete question.correctAnswer;
             }
 
-            const initialOptions = isEvaluated 
+            const initialOptions = isEvaluated
                 ? [{ id: 1, label: "", score: 0 }]
-                : [{ id: 1, label: ""}];
+                : [{ id: 1, label: "" }];
 
             question.options = initialOptions;
         } else if (
@@ -238,7 +306,7 @@ export const updateQuestionType = (
                 delete question.correctAnswer;
             }
 
-            const initialLeftList = isEvaluated 
+            const initialLeftList = isEvaluated
                 ? [{ id: 1, label: '', relatedOptionId: 1, score: 1 }]
                 : [{ id: 1, label: '' }];
 

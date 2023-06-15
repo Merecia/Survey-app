@@ -1,7 +1,7 @@
 import React, { FC, useState, useEffect } from 'react';
 import style from './MainPage.module.scss';
 import { useNavigate } from 'react-router-dom';
-import { ISurvey, ISurveyInfo, SurveyType, SurveyCategory } from '../../types/survey';
+import { ISurveyInfo, SurveyType, SurveyCategory } from '../../types/survey';
 import {
     Typography, IconButton, Button,
     TextField, Avatar, List, ListItemButton,
@@ -12,44 +12,45 @@ import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import QuizIcon from '@mui/icons-material/Quiz';
 import PollIcon from '@mui/icons-material/Poll';
 import SurveyCard from '../SurveyCard/SurveyCard';
+import { useActions } from '../../hooks/useActions';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
 
 const MainPage: FC = () => {
     const navigate = useNavigate();
-    const [surveys, setSurveys] = useState<ISurveyInfo[] | null>(null);
     const [choicedType, setChoicedType] = useState<SurveyType>(SurveyType.Evaluated);
     const [choicedCategory, setChoicedCategory] = useState<SurveyCategory>(SurveyCategory.Study);
     const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
+    const { loadSurveyCards } = useActions();
+    const { surveyCards } = useTypedSelector(state => state.survey);
 
-    const loadSurveys = () => {
-        const surveys = localStorage.getItem('surveys');
-        const surveysInfo = surveys ? JSON.parse(surveys).map(
-            (survey: ISurvey) => survey.surveyInfo
-        ) : null;
-        setSurveys(surveysInfo);
-    }
+    console.log(surveyCards);
 
-    const renderSurveysCards = (surveys: ISurveyInfo[]) => {
-        let filteredSurveys: ISurveyInfo[] = surveys;
+    useEffect(() => {
+        loadSurveyCards();
+    }, [])
+
+    const renderSurveysCards = (surveyCards: ISurveyInfo[]) => {
+        let filteredSurveyCards: ISurveyInfo[] = surveyCards;
 
         if (choicedType === SurveyType.Evaluated) {
-            filteredSurveys = surveys.filter(survey => survey.isEvaluated === true);
+            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.isEvaluated === true);
         } else if (choicedType === SurveyType.Unevaluated) {
-            filteredSurveys = surveys.filter(survey => survey.isEvaluated === false);
+            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.isEvaluated === false);
         }
 
-        filteredSurveys = filteredSurveys.filter(survey => survey.category === choicedCategory);
+        filteredSurveyCards = filteredSurveyCards.filter(surveyCard => surveyCard.category === choicedCategory);
 
         if (searchQuery.length !== 0) {
-            filteredSurveys = filteredSurveys.filter((survey: ISurveyInfo) => (
-                survey.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                survey.description.toLowerCase().includes(searchQuery.toLowerCase())
+            filteredSurveyCards = filteredSurveyCards.filter((surveyCard: ISurveyInfo) => (
+                surveyCard.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                surveyCard.description.toLowerCase().includes(searchQuery.toLowerCase())
             ));
         }
 
-        if (filteredSurveys.length === 0) {
+        if (filteredSurveyCards.length === 0) {
             return (
-                <div className = {style.Message}>
+                <div className={style.Message}>
                     <Typography variant={"h6"} component={"h6"} fontWeight={'300'} >
                         There are no surveys with the category and search query you specified.
                     </Typography>
@@ -62,14 +63,14 @@ const MainPage: FC = () => {
 
         return (
             <div className={style.SurveyCards}>
-                { filteredSurveys.map(survey => renderSurveyCard(survey)) }
+                {filteredSurveyCards.map(surveyCard => renderSurveyCard(surveyCard))}
             </div>
         );
     }
 
     const renderSurveyCard = (survey: ISurveyInfo) => (
         <SurveyCard
-            key = {survey.id}
+            key={survey.id}
             surveyInfo={survey}
             cssProperties={{ marginBottom: '20px' }}
         />
@@ -100,8 +101,9 @@ const MainPage: FC = () => {
     const renderDropdownMenu = () => {
         return (
             <List
-                style={{ position: 'absolute', top: '90px', right: '10px', zIndex: '100' }}
+                // style={{ position: 'absolute', top: '90px', right: '10px', zIndex: '100' }}
                 sx={{ bgcolor: 'background.paper' }}
+                className = {style.DropdownMenu}
             >
                 <ListItem style={{ padding: '5px' }}>
                     <ListItemButton onClick={() => navigate('/survey-constructor')}>
@@ -118,10 +120,6 @@ const MainPage: FC = () => {
     const searchbarChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
     }
-
-    useEffect(() => {
-        loadSurveys();
-    }, [])
 
     return (
         <div className={style.MainPage}>
@@ -188,7 +186,7 @@ const MainPage: FC = () => {
                 {renderCategoriesButtons(Object.keys(SurveyCategory))}
             </div>
 
-            {surveys && renderSurveysCards(surveys)}
+            {surveyCards && renderSurveysCards(surveyCards)}
         </div>
     );
 }

@@ -57,12 +57,6 @@ export interface IAnswerToQuestion {
     answer: IAnswer;
 }
 
-export interface SurveyState {
-    questions: IQuestion[];
-    answersToQuestions: IAnswerToQuestion[];
-    surveyInfo: ISurveyInfo;
-}
-
 export interface ISurveyInfo {
     id: number;
     title: string;
@@ -84,9 +78,21 @@ export interface UpdateQuestionsAction {
     payload: IQuestion[];
 }
 
-export interface UpdateSurveyInfo {
+export interface UpdateSurveyInfoAction {
     type: SurveyActionTypes.UPDATE_SURVEY_INFO;
     payload: ISurveyInfo;
+}
+
+export interface UpdateSurveyCardsAction {
+    type: SurveyActionTypes.UPDATE_SURVEY_CARDS;
+    payload: ISurveyInfo[];
+}
+
+export interface SurveyState {
+    questions: IQuestion[];
+    answersToQuestions: IAnswerToQuestion[];
+    surveyCards: ISurveyInfo[];
+    surveyInfo: ISurveyInfo;
 }
 
 // Enum
@@ -113,16 +119,23 @@ export enum SurveyType {
     Unevaluated = 'Unevaluated' 
 }
 
+export enum SurveyConstructorType {
+    Adding = 'Adding',
+    Editing = 'Editing'
+}
+
 export enum SurveyActionTypes {
     UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_TO_QUESTIONS',
     UPDATE_QUESTIONS = 'UPDATE_QUESTIONS',
-    UPDATE_SURVEY_INFO = 'UPDATE_SURVEY_INFO'
+    UPDATE_SURVEY_INFO = 'UPDATE_SURVEY_INFO',
+    UPDATE_SURVEY_CARDS = 'UPDATE_SURVEY_CARDS'
 }
 
 // Types
 
 export type IAnswer = IOption | IOption[] | ITextAnswer | IMatches;
-export type SurveyAction = UpdateAnswersQuestionsAction | UpdateQuestionsAction | UpdateSurveyInfo
-
-// export type SurveyCategory = 'Study' | 'Psychological' | 'Sociological';
-// export type SurveyType = 'Surveys' | 'Quizes';
+export type SurveyAction = 
+    UpdateAnswersQuestionsAction 
+    | UpdateQuestionsAction 
+    | UpdateSurveyInfoAction 
+    | UpdateSurveyCardsAction

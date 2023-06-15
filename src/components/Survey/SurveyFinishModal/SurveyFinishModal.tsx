@@ -22,7 +22,7 @@ const SurveyFinishModal: FC<ISurveyFinishModalProps> = ({
 
     const viewResultsButtonClickHandler = () => {
         clearQuestions();
-        navigate(`/survey-results/${surveyResultsId}`)
+        navigate(`/survey-answers/${surveyResultsId}`)
     }
 
     const toMainPageButtonClickHandler = () => {

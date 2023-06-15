@@ -1,4 +1,5 @@
 .Header {
+    // position: relative;
     display: flex;
     justify-content: center;
     background-color: white;
@@ -17,7 +18,7 @@
         display: flex;
         justify-content: space-between;
         width: 200px;
-        margin-right: 250px;
+        margin-right: 0px;
 
         .Surveys,
         .Quizes {
@@ -34,11 +35,24 @@
     }
 
     .Avatar_DropdownMenu {
+        position: relative;
+        width: 250px;
+        display: flex;
+        justify-content: right;
+
         .Avatar {
             &:hover {
                 cursor: pointer;
                 box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2), 0 4px 6px rgba(0, 0, 0, 0.2);
             }
+        }
+
+        .DropdownMenu {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
+            position: absolute;
+            top: 65px;
+            right: 0px;
+            z-index: 100;
         }
     }
 }

@@ -1,26 +1,38 @@
-import { FC, useState } from 'react';
-import style from './SurveyConstruct.module.scss';
+import { FC, useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom'
+import style from './SurveyConstructor.module.scss';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
-import { IQuestion, ISurvey } from '../../types/survey';
-import SurveyConstructForm from './SurveyConstructForm/SurveyConstructForm';
-import { Snackbar, Alert } from '@mui/material';
+import { IQuestion, ISurvey, SurveyConstructorType } from '../../types/survey';
+import SurveyConstructorForm from './SurveyConstructorForm/SurveyConstructorForm';
+import { Snackbar, Alert, CircularProgress } from '@mui/material';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { areAllQuestionsFilledOut, calculateMaximumScore } from '../../helper';
+import { 
+    areAllQuestionsFilledOut, 
+    calculateMaximumScore, 
+    createSurvey, 
+    updateSurvey 
+} from '../../helper';
 
-const SurveyConstruct: FC = () => {
+const SurveyConstructor: FC = () => {
     const { questions, surveyInfo } = useTypedSelector(state => state.survey);
-    const { addNewQuestion } = useActions();
-    const [showSurveyConstructForm, setShowSurveyConstructForm] = useState<boolean>(true);
+    const { addNewQuestion, loadSurvey } = useActions();
+    const [showSurveyConstructorForm, setShowSurveyConstructorForm] = useState<boolean>(true);
     const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
-
     const [errorAlert, setErrorAlert] = useState<string>('');
+    const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
-    const renderQuestions = () => {
+    const id = useParams().id;
+    const constructorType = id ? SurveyConstructorType.Editing : SurveyConstructorType.Adding;
+
+    console.log(questions);
+    console.log(surveyInfo);
+
+    const renderQuestions = (questions: IQuestion[]) => {
         return questions.map(question => renderQuestion(question));
     }
 
@@ -60,17 +72,14 @@ const SurveyConstruct: FC = () => {
         );
     }
 
-    const saveSurvey = (survey: ISurvey) => {
-        const surveysData = localStorage.getItem('surveys');
-
-        let surveys;
-        if (surveysData) {
-            surveys = JSON.parse(surveysData);
-            surveys.push(survey);
-        } else surveys = [survey];
-
-        localStorage.setItem('surveys', JSON.stringify(surveys));
-    }
+    useEffect(() => {
+        if (id) {
+            loadSurvey(parseInt(id));
+            setLoading(false);
+        } else {
+            setLoading(false);
+        }
+    }, [])
 
     const finishCreatingButtonClickHandler = () => {
         if (questions.length === 0) {
@@ -97,7 +106,12 @@ const SurveyConstruct: FC = () => {
             surveyInfo.maximumScore = maximumScore;
         }
 
-        saveSurvey({ surveyInfo, questions });
+        if (constructorType === SurveyConstructorType.Adding) {
+            createSurvey({ surveyInfo, questions });
+        } else if (constructorType === SurveyConstructorType.Editing) {
+            updateSurvey({ surveyInfo, questions });
+        }
+
         setShowSuccessAlert(true);
 
         const delay = 1500;
@@ -106,20 +120,39 @@ const SurveyConstruct: FC = () => {
         }, delay);
     }
 
-    const renderSurveyConstructForm = () => {
-        return (
-            <div className={style.SurveyConstructForm}>
-                <SurveyConstructForm setShowForm={setShowSurveyConstructForm} />
-            </div>
-        );
+    const renderSurveyConstructorForm = (survey?: ISurvey) => {
+        if (survey) {
+            return (
+                <div className={style.SurveyConstructForm}>
+                    <SurveyConstructorForm 
+                        setShowForm={setShowSurveyConstructorForm} 
+                        survey={ survey }
+                    />
+                </div>
+            );
+        } else {
+            return (
+                <div className={style.SurveyConstructForm}>
+                    <SurveyConstructorForm 
+                        setShowForm={setShowSurveyConstructorForm} 
+                    />
+                </div>
+            )
+        }
     }
 
-    const renderQuestionsConstruct = () => {
+    const renderQuestionsConstructor = (questions: IQuestion[]) => {
         return (
             <div className={style.QuestionsConstruct}>
 
                 {showErrorAlert && renderErrorAlert(errorAlert)}
-                {showSuccessAlert && renderSuccessAlert('The survey was successfully created.')}
+                {
+                    showSuccessAlert && renderSuccessAlert(
+                        constructorType === SurveyConstructorType.Adding 
+                            ? `The survey was successfully created.`
+                            : `The survey was successfully updated.`
+                    )
+                }
 
                 <div className={style.Header}>
                     <div className={style.SurveyDetails}>
@@ -139,7 +172,7 @@ const SurveyConstruct: FC = () => {
                     />
                 </div>
                 <div className={style.Questions}>
-                    {renderQuestions()}
+                    { renderQuestions(questions) }
                 </div>
                 <div className={style.Footer}>
                     <Button
@@ -164,7 +197,10 @@ const SurveyConstruct: FC = () => {
                             padding: '10px'
                         }}
                     >
-                        Create the survey
+                        {
+                            constructorType === SurveyConstructorType.Adding 
+                                ? 'Create the survey' : 'Edit the survey'
+                        }
                     </Button>
                 </div>
             </div>
@@ -174,13 +210,18 @@ const SurveyConstruct: FC = () => {
     return (
         <div className={style.SurveyConstruct}>
             {
-                showSurveyConstructForm 
-                ? renderSurveyConstructForm() 
-                : renderQuestionsConstruct()
+                loading 
+                ? <CircularProgress sx={{ margin: '200px auto' }}  />
+                : showSurveyConstructorForm 
+                    ? renderSurveyConstructorForm(
+                        constructorType === SurveyConstructorType.Editing 
+                        ? { surveyInfo, questions } as ISurvey : undefined
+                    ) 
+                    : renderQuestionsConstructor(questions)
             }
         </div>
     );
 }
 
-export default SurveyConstruct;
+export default SurveyConstructor;
 

@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom'
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import { IQuestion, ISurvey, ISurveyResults, ISurveyInfo } from '../../types/survey';
+import { IQuestion, ISurveyResults, ISurveyInfo } from '../../types/survey';
 import Question from '../Question/Question';
 import style from './Survey.module.scss';
 import { Button, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
@@ -11,7 +11,7 @@ import SurveyFinishModal from './SurveyFinishModal/SurveyFinishModal';
 import { areAllRequiredQuestionsAnswered, calculateEarnedScore } from '../../helper';
 
 const Survey: FC = () => {
-    const { updateQuestions, updateSurveyInfo } = useActions();
+    const { loadSurvey } = useActions();
     const { answersToQuestions, questions, surveyInfo } = useTypedSelector(state => state.survey);
     const [timeStart, setTimeStart] = useState(new Date());
     const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
@@ -21,16 +21,6 @@ const Survey: FC = () => {
     const [successAlert, setSuccessAlert] = useState<boolean>(false);
     const [warningAlert, setWarningAlert] = useState<boolean>(false);
     const id = useParams().id;
-
-    const loadSurvey = (id: number) => {
-        const surveys = localStorage.getItem('surveys');
-        const survey = surveys
-            ? JSON.parse(surveys).find((survey: ISurvey) => survey.surveyInfo.id === id)
-            : null;
-
-        updateQuestions(survey.questions);
-        updateSurveyInfo(survey.surveyInfo);
-    }
 
     console.log(questions);
 

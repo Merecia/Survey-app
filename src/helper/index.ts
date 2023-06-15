@@ -1,7 +1,7 @@
 import { 
     IMatches, IOption, ITextAnswer, 
     IQuestion, QuestionType, 
-    IAnswerToQuestion, IFeedback 
+    IAnswerToQuestion, IFeedback, ISurvey, ISurveyInfo 
 } from '../types/survey';
 
 export const remove = <T>(array: T[], index: number): T[] => {
@@ -76,6 +76,56 @@ export const replaceLetterWithNumber = (letter: string): number => {
         console.log(error);
         return -1;
     }
+}
+
+export const createSurvey = (survey: ISurvey) => {
+    const surveysData = localStorage.getItem('surveys');
+
+    let surveys;
+    if (surveysData) {
+        surveys = JSON.parse(surveysData);
+        surveys.push(survey);
+    } else {
+        surveys = [survey];
+    }
+
+    localStorage.setItem('surveys', JSON.stringify(surveys));
+}
+
+export const updateSurvey = (survey: ISurvey) => {
+    const surveysData = localStorage.getItem('surveys');
+
+    if (surveysData) {
+        const surveys = JSON.parse(surveysData);
+        surveys[survey.surveyInfo.id - 1] = survey;
+        localStorage.setItem('surveys', JSON.stringify(surveys));
+    }
+}
+
+export const removeSurvey = (id: number) => {
+    const surveysData = localStorage.getItem('surveys');
+
+    if (surveysData) {
+        const surveys = JSON.parse(surveysData)
+            .filter((survey: ISurvey) => survey.surveyInfo.id !== id)
+            .map((survey: ISurvey, index: number) => {
+                return {        
+                    surveyInfo: {
+                        id: index + 1,
+                        title: survey.surveyInfo.title, 
+                        description: survey.surveyInfo.description, 
+                        category: survey.surveyInfo.category,
+                        imageUrl: survey.surveyInfo.imageUrl, 
+                        maximumPassingTimeSeconds: survey.surveyInfo.maximumPassingTimeSeconds,
+                        maximumScore: survey.surveyInfo.maximumScore, 
+                        isEvaluated: survey.surveyInfo.isEvaluated
+                    },
+                    questions: survey.questions
+                }
+            });
+        
+        localStorage.setItem('surveys', JSON.stringify(surveys));  
+    } 
 }
 
 export const getCorrectAnswers = (question: IQuestion) => {
@@ -252,6 +302,10 @@ export const calculateEarnedScore = (answersToQuestions: IAnswerToQuestion[]): n
     })
 
     return earnedScore;
+}
+
+export const deleteSurvey = (id: number) => {
+
 }
 
 export const calculateMaximumScore = (questions: IQuestion[]) => {

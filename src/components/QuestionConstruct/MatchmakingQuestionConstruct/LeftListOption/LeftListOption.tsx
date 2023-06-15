@@ -54,7 +54,14 @@ const LeftListOption: FC<ILeftListOptionProps> = ({
     const renderPossibleRelatedOptions = () => {
         if (isMatches(question.options)) {
             return question.options.rightList.map(option => {
-                return <MenuItem value={option.id}> {option.id} </MenuItem>
+                return (
+                    <MenuItem 
+                        key = {option.id} 
+                        value={option.id}
+                    > 
+                        {option.id} 
+                    </MenuItem>
+                );
             });
         }
     }

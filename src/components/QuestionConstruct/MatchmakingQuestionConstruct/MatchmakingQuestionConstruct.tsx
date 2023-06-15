@@ -61,6 +61,7 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
 
     const renderLeftListOption = (option: IOption) => (
         <LeftListOption
+            key={option.id}
             option={option}
             question={question}
             cssProperties={{ marginBottom: '15px' }}
@@ -69,6 +70,7 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
 
     const renderRightListOption = (option: IOption) => (
         <RightListOption
+            key={option.id}
             option={option}
             question={question}
             cssProperties={{ marginBottom: '15px' }}

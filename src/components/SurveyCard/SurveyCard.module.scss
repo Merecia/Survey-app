@@ -4,6 +4,23 @@
     background-color: white;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
     transition: all 0.8s;
+    position: relative;
+
+    .DeleteIcon {
+        position: absolute;
+        top: 0;
+        right: 0;
+        z-index: 100;
+        color: white;
+    }
+
+    .EditIcon {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 100;
+        color: white;
+    }
     
     .Image {
         width: 100%;

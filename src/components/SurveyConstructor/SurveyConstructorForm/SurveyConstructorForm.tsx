@@ -1,15 +1,16 @@
 import React, { FC } from 'react';
-import style from './SurveyConstructForm.module.scss';
+import style from './SurveyConstructorForm.module.scss';
 import { useForm } from 'react-hook-form';
-import { IOption, ISurveyInfo, QuestionType, SurveyCategory } from '../../../types/survey';
+import { IOption, IQuestion, ISurvey, ISurveyInfo, QuestionType, SurveyCategory, SurveyConstructorType } from '../../../types/survey';
 import { TextField, Button, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import { useActions } from '../../../hooks/useActions';
 
 interface ISurveyConstructFormProps {
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
+    survey?: ISurvey;
 }
 
-const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => {
+const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm, survey }) => {
     const {
         register,
         handleSubmit,
@@ -17,51 +18,38 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
         formState: { errors }
     } = useForm({
         defaultValues: {
-            title: '',
-            category: '',
-            description: '',
-            imageUrl: '',
-            timeLimit: false,
-            maximumPassingTimeSeconds: 600,
-            isEvaluated: false
+            title: survey?.surveyInfo.title || '',
+            category: survey?.surveyInfo.category || '',
+            description: survey?.surveyInfo.description || '',
+            imageUrl: survey?.surveyInfo.imageUrl || '',
+            timeLimit: survey?.surveyInfo.maximumPassingTimeSeconds !== undefined,
+            maximumPassingTimeSeconds: survey?.surveyInfo.maximumPassingTimeSeconds || 600,
+            isEvaluated: survey?.surveyInfo.isEvaluated || false
         }
     });
 
+    const constructorType = survey ? SurveyConstructorType.Editing : SurveyConstructorType.Adding; 
+
     const timeLimit = watch('timeLimit');
     const category = watch('category');
+    const isEvaluated = watch('isEvaluated');
+
+    console.log(survey);
 
     const { updateSurveyInfo, updateQuestions } = useActions();
 
     const renderCategoriesOptions = (categories: string[]) => (
-        categories.map(category => <MenuItem value = {category}> {category} </MenuItem>)
+        categories.map((category, index) => 
+            <MenuItem value = {category} key = {index}> {category} </MenuItem>
+        )
     )
 
-    const onSubmit = handleSubmit(async (data) => {
-        const surveys = localStorage.getItem('surveys');
-
-        let id;
-        if (surveys) id = JSON.parse(surveys).pop().surveyInfo.id + 1;  
-        else id = 1;
-
-        const surveyInfo: ISurveyInfo = {
-            id: id,
-            title: data.title,
-            category: data.category as SurveyCategory,
-            description: data.description,
-            imageUrl: data.imageUrl,
-            isEvaluated: data.isEvaluated
-        };
-
-        if (timeLimit) {
-            surveyInfo.maximumPassingTimeSeconds = data.maximumPassingTimeSeconds;
-        }
-        updateSurveyInfo(surveyInfo);
-
+    const getInitialQuestions = (surveyInfo: ISurveyInfo): IQuestion[] => {
         const initialOption: IOption = { id: 1, label: '' };
 
         if (surveyInfo.isEvaluated) initialOption.score = 0;
 
-        const initialQuestions = [{
+        const initialQuestions: IQuestion[] = [{
             id: 1,
             topic: "",
             type: QuestionType.OneChoice,
@@ -69,7 +57,46 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
             options: [initialOption]
         }];
 
-        updateQuestions(initialQuestions);
+        return initialQuestions;
+    }
+
+    const onSubmit = handleSubmit(async (form) => {
+        const surveys = localStorage.getItem('surveys');
+
+        let id = 1;
+        if (constructorType === SurveyConstructorType.Adding) {
+            if (surveys) {
+                const surveysData = JSON.parse(surveys);
+                if (surveysData.length !== 0) {
+                    id = surveysData.pop().surveyInfo.id + 1;
+                }
+            }  
+        } else if (constructorType === SurveyConstructorType.Editing) {
+            id = (survey as ISurvey).surveyInfo.id;
+        }
+
+        const surveyInfo: ISurveyInfo = {
+            id: id,
+            title: form.title,
+            category: form.category as SurveyCategory,
+            description: form.description,
+            imageUrl: form.imageUrl,
+            isEvaluated: form.isEvaluated
+        };
+
+        if (timeLimit) {
+            surveyInfo.maximumPassingTimeSeconds = form.maximumPassingTimeSeconds;
+        }
+
+        updateSurveyInfo(surveyInfo);
+
+        if (constructorType === SurveyConstructorType.Adding) {
+            const initialQuestions = getInitialQuestions(surveyInfo);
+            updateQuestions(initialQuestions);
+        } else if (constructorType === SurveyConstructorType.Editing) {
+            updateQuestions((survey as ISurvey).questions);
+        }
+
         setShowForm(false);
     })
 
@@ -158,6 +185,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
             <FormControlLabel
                 control={
                     <Checkbox
+                        checked = {timeLimit}
                         { ...register('timeLimit') }
                     />
                 }
@@ -166,8 +194,8 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
             />
 
             {
-                timeLimit 
-                ? <TextField 
+                timeLimit &&
+                <TextField 
                     label = "Enter the maximum time of passing the survey in seconds"
                     size = 'small'
                     fullWidth
@@ -184,12 +212,12 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm }) => 
                     error = {errors.maximumPassingTimeSeconds?.message !== undefined}
                     helperText = {errors.maximumPassingTimeSeconds?.message}
                 />
-                : null
             }
 
             <FormControlLabel
                 control={
                     <Checkbox
+                        checked = {isEvaluated}
                         { ...register('isEvaluated') }
                     />
                 }

@@ -8,6 +8,7 @@ import {
 const initialState: SurveyState = {
     questions: [],
     answersToQuestions: [],
+    surveyCards: [],
     surveyInfo: {
         id: 1, 
         title: '', 
@@ -36,6 +37,11 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
             return {
                 ...state,
                 surveyInfo: action.payload
+            }
+        case SurveyActionTypes.UPDATE_SURVEY_CARDS:
+            return {
+                ...state,
+                surveyCards: action.payload
             }
         default:
             return state
