@@ -1,12 +1,30 @@
-import { FC } from 'react';
+import { FC, useEffect } from 'react';
 import style from './App.module.scss';
 import Survey from './components/Survey/Survey';
 import {Route, Routes} from 'react-router-dom';
 import SurveyConstructor from './components/SurveyConstructor/SurveyConstructor';
 import SurveyAnswers from './components/SurveyAnswers/SurveyAnswers';
 import MainPage from './components/MainPage/MainPage';
+import Auth from './components/Auth/Auth';
+import { auth } from './firebase';
+import { useActions } from './hooks/useActions';
 
 const App: FC = () => {
+  const {updateUser} = useActions();
+
+  useEffect(() => {
+    auth.onAuthStateChanged((authUser) => {
+      if (authUser) {
+        updateUser({
+          uid: authUser.uid,
+          displayName: authUser.displayName || ''
+        });
+      } else {
+        updateUser(null);
+      }
+    })
+  }, []);
+
   return (
     <div className={style.App}>
       <Routes>
@@ -15,6 +33,7 @@ const App: FC = () => {
         <Route path = '/survey-answers/:id' element = {<SurveyAnswers />} />
         <Route path = '/survey-constructor/:id' element = {<SurveyConstructor />} />
         <Route path = '/survey-constructor' element = {<SurveyConstructor />} />
+        <Route path = '/auth' element = {<Auth />} />
       </Routes>
     </div>
   );

@@ -9,6 +9,7 @@ const initialState: SurveyState = {
     questions: [],
     answersToQuestions: [],
     surveyCards: [],
+    user: null,
     surveyInfo: {
         id: 1, 
         title: '', 
@@ -42,6 +43,11 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
             return {
                 ...state,
                 surveyCards: action.payload
+            }
+        case SurveyActionTypes.UPDATE_USER:
+            return {
+                ...state,
+                user: action.payload
             }
         default:
             return state

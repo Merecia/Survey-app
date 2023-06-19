@@ -3,6 +3,7 @@ import {
     IQuestion,
     ISurvey,
     ISurveyInfo,
+    IUser,
     QuestionType,
     SurveyAction,
     SurveyActionTypes
@@ -39,6 +40,15 @@ export const loadSurveyCards = () => {
         dispatch({
             type: SurveyActionTypes.UPDATE_SURVEY_CARDS,
             payload: surveyCards
+        });
+    }
+}
+
+export const updateUser = (user: IUser | null) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_USER,
+            payload: user
         });
     }
 }

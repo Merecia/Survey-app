@@ -9,11 +9,15 @@ import {
 } from '@mui/material';
 import SearchIcon from "@mui/icons-material/Search";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import QuizIcon from '@mui/icons-material/Quiz';
 import PollIcon from '@mui/icons-material/Poll';
 import SurveyCard from '../SurveyCard/SurveyCard';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
+import { stringAvatar } from '../../helper';
+import { signOut } from 'firebase/auth';
+import { auth } from '../../firebase';
 
 const MainPage: FC = () => {
     const navigate = useNavigate();
@@ -21,8 +25,8 @@ const MainPage: FC = () => {
     const [choicedCategory, setChoicedCategory] = useState<SurveyCategory>(SurveyCategory.Study);
     const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
-    const { loadSurveyCards } = useActions();
-    const { surveyCards } = useTypedSelector(state => state.survey);
+    const { loadSurveyCards, updateUser } = useActions();
+    const { surveyCards, user } = useTypedSelector(state => state.survey);
 
     console.log(surveyCards);
 
@@ -68,6 +72,13 @@ const MainPage: FC = () => {
         );
     }
 
+    const signOutHandler = () => {
+        signOut(auth).then(() => {
+            updateUser(null);
+            setShowDropdownMenu(false);
+        })
+    }
+
     const renderSurveyCard = (survey: ISurveyInfo) => (
         <SurveyCard
             key={survey.id}
@@ -101,7 +112,6 @@ const MainPage: FC = () => {
     const renderDropdownMenu = () => {
         return (
             <List
-                // style={{ position: 'absolute', top: '90px', right: '10px', zIndex: '100' }}
                 sx={{ bgcolor: 'background.paper' }}
                 className = {style.DropdownMenu}
             >
@@ -110,7 +120,15 @@ const MainPage: FC = () => {
                         <ListItemIcon>
                             <AddCircleOutlineIcon />
                         </ListItemIcon>
-                        <ListItemText primary="Create a survey" />
+                        <ListItemText primary="Create Survey" />
+                    </ListItemButton>
+                </ListItem>
+                <ListItem style={{ padding: '5px' }}>
+                    <ListItemButton onClick={signOutHandler}>
+                        <ListItemIcon>
+                            <ExitToAppIcon />
+                        </ListItemIcon>
+                        <ListItemText primary="Sign Out" />
                     </ListItemButton>
                 </ListItem>
             </List>
@@ -174,11 +192,23 @@ const MainPage: FC = () => {
                     </div>
                 </div>
                 <div className={style.Avatar_DropdownMenu}>
-                    <Avatar
-                        src="/broken-image.jpg"
-                        onClick={() => setShowDropdownMenu(!showDropdownMenu)}
-                        className={style.Avatar}
-                    />
+                    {
+                        user 
+                        ? <Avatar
+                            {...stringAvatar(user.displayName)}
+                            onClick={() => setShowDropdownMenu(!showDropdownMenu)}
+                            className={style.Avatar}
+                        />
+                        : <Typography
+                            variant={"h6"}
+                            component={"h6"}
+                            onClick={() => navigate('./auth')}
+                            style = {{ cursor: 'pointer' }}
+                        >
+                            Sign in
+                        </Typography>
+                    }
+                    
                     {showDropdownMenu && renderDropdownMenu()}
                 </div>
             </div>

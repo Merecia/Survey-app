@@ -1,5 +1,10 @@
 // Interfaces
 
+export interface IUser {
+    uid: string;
+    displayName: string;
+}
+
 export interface IOption {
     id: number;
     label: string;
@@ -88,11 +93,17 @@ export interface UpdateSurveyCardsAction {
     payload: ISurveyInfo[];
 }
 
+export interface UpdateUserAction {
+    type: SurveyActionTypes.UPDATE_USER;
+    payload: IUser | null;
+}
+
 export interface SurveyState {
     questions: IQuestion[];
     answersToQuestions: IAnswerToQuestion[];
     surveyCards: ISurveyInfo[];
     surveyInfo: ISurveyInfo;
+    user: IUser | null;
 }
 
 // Enum
@@ -128,7 +139,8 @@ export enum SurveyActionTypes {
     UPDATE_ANSWERS_TO_QUESTIONS = 'UPDATE_ANSWERS_TO_QUESTIONS',
     UPDATE_QUESTIONS = 'UPDATE_QUESTIONS',
     UPDATE_SURVEY_INFO = 'UPDATE_SURVEY_INFO',
-    UPDATE_SURVEY_CARDS = 'UPDATE_SURVEY_CARDS'
+    UPDATE_SURVEY_CARDS = 'UPDATE_SURVEY_CARDS',
+    UPDATE_USER = 'UPDATE_USER'
 }
 
 // Types
@@ -139,3 +151,4 @@ export type SurveyAction =
     | UpdateQuestionsAction 
     | UpdateSurveyInfoAction 
     | UpdateSurveyCardsAction
+    | UpdateUserAction
