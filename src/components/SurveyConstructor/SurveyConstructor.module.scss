@@ -1,4 +1,4 @@
-.QuestionsConstruct {
+.QuestionsConstructor {
     width: 900px;
     margin: 30px auto;
 
@@ -45,4 +45,10 @@
         display: flex;
         justify-content: center;
     }
+}
+
+.Loading, .Error {
+    display: flex;
+    justify-content: center;
+    margin-top: 200px;
 }

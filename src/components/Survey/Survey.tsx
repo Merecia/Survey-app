@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { IQuestion, ISurveyResults, ISurveyInfo } from '../../types/survey';
@@ -9,68 +9,34 @@ import { Button, Typography, CircularProgress, Snackbar, Alert } from '@mui/mate
 import useInterval from '../../hooks/useInterval';
 import SurveyFinishModal from './SurveyFinishModal/SurveyFinishModal';
 import { areAllRequiredQuestionsAnswered, calculateEarnedScore } from '../../helper';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../../firebase';
 
 const Survey: FC = () => {
     const { loadSurvey } = useActions();
-    const { answersToQuestions, questions, surveyInfo } = useTypedSelector(state => state.survey);
+    const { answersToQuestions, questions, surveyInfo, loading, error } = useTypedSelector(state => state.survey);
     const [timeStart, setTimeStart] = useState(new Date());
     const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
     const [surveyResults, setSurveyResults] = useState<ISurveyResults | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [errorAlert, setErrorAlert] = useState<boolean>(false);
-    const [successAlert, setSuccessAlert] = useState<boolean>(false);
-    const [warningAlert, setWarningAlert] = useState<boolean>(false);
+    const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
+    const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
+    const [showWarningAlert, setShowWarningAlert] = useState<boolean>(false);
+    const [errorAlert, setErrorAlert] = useState<string>('');
+
     const id = useParams().id;
+    const navigate = useNavigate();
 
     console.log(questions);
 
     useEffect(() => {
         if (id) {
-            loadSurvey(parseInt(id));
+            loadSurvey(id);
             setTimeStart(new Date());
-            setLoading(false);
+        } else {
+            navigate('/')
         }
         // eslint-disable-next-line
     }, [])
-
-    const renderErrorAlert = (message: string) => (
-        <Snackbar
-            open={errorAlert}
-            autoHideDuration={6000}
-            onClose={() => setErrorAlert(false)}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        >
-            <Alert onClose={() => setErrorAlert(false)} severity="error">
-                {message}
-            </Alert>
-        </Snackbar>
-    )
-
-    const renderSuccessAlert = (message: string) => (
-        <Snackbar
-            open={successAlert}
-            autoHideDuration={6000}
-            onClose={() => setSuccessAlert(false)}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        >
-            <Alert onClose={() => setSuccessAlert(false)} severity="success">
-                {message}
-            </Alert>
-        </Snackbar>
-    )
-
-    const renderWarningAlert = (message: string) => (
-        <Snackbar
-            open={warningAlert}
-            autoHideDuration={6000}
-            onClose={() => setWarningAlert(false)}
-            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-        >
-            <Alert onClose={() => setWarningAlert(false)} severity="warning">
-                {message}
-            </Alert>
-        </Snackbar>
-    )
 
     useInterval(() => {
         const maximumPassingTimeSeconds = surveyInfo.maximumPassingTimeSeconds;
@@ -80,13 +46,52 @@ const Survey: FC = () => {
             const dt = (now.getTime() - timeStart.getTime()) / 1000;
 
             if (Math.floor(dt) === Number(maximumPassingTimeSeconds)) {
-                setWarningAlert(true);
+                setShowWarningAlert(true);
                 finishSurvey(maximumPassingTimeSeconds);
             } else {
                 setPassingTimeSeconds(Math.floor(dt));
             }
         }
     }, 1000)
+
+    const renderErrorAlert = (message: string) => (
+        <Snackbar
+            open={showErrorAlert}
+            autoHideDuration={6000}
+            onClose={() => setShowErrorAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setShowErrorAlert(false)} severity="error">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
+
+    const renderSuccessAlert = (message: string) => (
+        <Snackbar
+            open={showSuccessAlert}
+            autoHideDuration={6000}
+            onClose={() => setShowSuccessAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setShowSuccessAlert(false)} severity="success">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
+
+    const renderWarningAlert = (message: string) => (
+        <Snackbar
+            open={showWarningAlert}
+            autoHideDuration={6000}
+            onClose={() => setShowWarningAlert(false)}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert onClose={() => setShowWarningAlert(false)} severity="warning">
+                {message}
+            </Alert>
+        </Snackbar>
+    )
 
     const renderQuestions = (questions: IQuestion[]) => {
         return (
@@ -110,41 +115,37 @@ const Survey: FC = () => {
         );
     }
 
-    const finishSurvey = (passingTimeSeconds: number) => {
-        const allSurveyResultsData = localStorage.getItem('allSurveyResults');
-        let allSurveyResults, id;
-
-        if (allSurveyResultsData) {
-            allSurveyResults = JSON.parse(allSurveyResultsData);
-            const lastSurvey = allSurveyResults[allSurveyResults.length - 1];
-            id = lastSurvey.id + 1;
-        } else {
-            allSurveyResults = [];
-            id = 1;
-        }
-
-        const surveyResults: ISurveyResults = {
-            id,
+    const finishSurvey = async (passingTimeSeconds: number) => {
+        const surveyResults = {
+            surveyId: id,
             surveyInfo,
             passingTimeSeconds,
             answersToQuestions
-        };
+        } as ISurveyResults;
 
         if (surveyInfo.isEvaluated) {
             surveyResults.earnedScore = calculateEarnedScore(answersToQuestions);
         }
 
-        allSurveyResults.push(surveyResults);
-        localStorage.setItem('allSurveyResults', JSON.stringify(allSurveyResults));
-        setSurveyResults(surveyResults);
+        addDoc(collection(db, 'surveyResults'), surveyResults)
+            .then((docRef) => {
+                surveyResults.id = docRef.id;
+                setSurveyResults(surveyResults);
+
+            })
+            .catch((error) => {
+                setShowErrorAlert(true);
+                setErrorAlert(error as string);
+            });
     }
 
-    const finishButtonClickHandler = () => {
+    const finishButtonClickHandler = async () => {
         if (areAllRequiredQuestionsAnswered(questions, answersToQuestions)) {
-            setSuccessAlert(true);
+            setShowSuccessAlert(true);
             finishSurvey(passingTimeSeconds);
         } else {
-            setErrorAlert(true);
+            setShowErrorAlert(true);
+            setErrorAlert('You need to answer all required questions.');
         }
     }
 
@@ -160,9 +161,9 @@ const Survey: FC = () => {
                     />
                 }
 
-                {errorAlert && renderErrorAlert('You need to answer all required questions.')}
-                {successAlert && renderSuccessAlert('Your answers have been successfully saved.')}
-                {warningAlert && renderWarningAlert('The time to pass the survey came out.')}
+                {showErrorAlert && renderErrorAlert(errorAlert)}
+                {showSuccessAlert && renderSuccessAlert('Your answers have been successfully saved.')}
+                {showWarningAlert && renderWarningAlert('The time to pass the survey came out.')}
 
                 {renderSurveyInfo(surveyInfo)}
                 {renderQuestions(questions)}
@@ -216,12 +217,29 @@ const Survey: FC = () => {
         );
     }
 
+    if (loading) {
+        return (
+            <div className = {style.Loading}>
+                <CircularProgress />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <Typography
+                variant={"h1"}
+                component={"h1"}
+                className={style.Error}
+            >
+                {error}
+            </Typography>
+        );
+    }
+
     return (
         <div className={style.Survey}>
-            {
-                loading ? <CircularProgress sx={{ margin: '200px auto' }} />
-                    : renderSurvey(surveyInfo, questions)
-            }
+            { renderSurvey(surveyInfo, questions) }
         </div>
     );
 }

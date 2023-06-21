@@ -1,7 +1,7 @@
-import { 
-    SurveyState, 
-    SurveyAction, 
-    SurveyActionTypes, 
+import {
+    SurveyState,
+    SurveyAction,
+    SurveyActionTypes,
     SurveyCategory
 } from './../../types/survey';
 
@@ -11,15 +11,16 @@ const initialState: SurveyState = {
     surveyCards: [],
     user: null,
     surveyInfo: {
-        id: 1, 
-        title: '', 
+        title: '',
         description: '',
-        category: SurveyCategory.Study, 
+        category: SurveyCategory.Study,
         imageUrl: '',
         maximumPassingTimeSeconds: undefined,
         maximumScore: undefined,
         isEvaluated: false
-    }
+    },
+    loading: false,
+    error: null
 }
 
 export const surveyReducer = (state = initialState, action: SurveyAction): SurveyState => {
@@ -48,6 +49,36 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
             return {
                 ...state,
                 user: action.payload
+            }
+        case SurveyActionTypes.FETCH_START:
+            return {
+                ...state,
+                loading: true
+            }
+        case SurveyActionTypes.FETCH_ERROR:
+            return {
+                ...state,
+                error: action.payload
+            }
+        case SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                surveyCards: action.payload
+            }
+        case SurveyActionTypes.FETCH_SURVEY_SUCCESS:
+            return {
+                ...state,
+                surveyInfo: action.payload.surveyInfo,
+                questions: action.payload.questions,
+                loading: false
+            }
+        case SurveyActionTypes.FETCH_SURVEY_RESULTS_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                answersToQuestions: action.payload.answersToQuestions,
+                surveyInfo: action.payload.surveyInfo
             }
         default:
             return state

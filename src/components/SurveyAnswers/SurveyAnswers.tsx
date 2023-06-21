@@ -10,28 +10,19 @@ import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 const SurveyAnswers: FC = () => {
-    const { answersToQuestions, surveyInfo } = useTypedSelector(state => state.survey);
-    const { updateAnswersToQuestions, updateSurveyInfo, clearAnswersToQuestions } = useActions();
-    const [loading, setLoading] = useState(true);
+    const { answersToQuestions, surveyInfo, error, loading } = useTypedSelector(state => state.survey);
+    const { loadSurveyAnswers, clearAnswersToQuestions } = useActions();
     const navigate = useNavigate();
     const id = useParams().id;
 
     console.log(answersToQuestions);
 
-    const loadSurveyAnswers = (id: number) => {
-        const allSurveyResults = localStorage.getItem('allSurveyResults');
-        const surveyResults = allSurveyResults
-            ? JSON.parse(allSurveyResults).find((surveyResults: ISurveyResults) => surveyResults.id === id)
-            : null;
-
-        updateAnswersToQuestions(surveyResults.answersToQuestions);
-        updateSurveyInfo(surveyResults.surveyInfo);
-    }
-
     useEffect(() => {
         if (id) {
-            loadSurveyAnswers(parseInt(id));
-            setLoading(false);
+            loadSurveyAnswers(id);
+        }
+        else {
+            navigate('/');
         }
         // eslint-disable-next-line
     }, [])
@@ -128,12 +119,29 @@ const SurveyAnswers: FC = () => {
         );
     }
 
+    if (loading) {
+        return (
+            <div className = {style.Loading}>
+                <CircularProgress />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <Typography
+                variant={"h1"}
+                component={"h1"}
+                className={style.Error}
+            >
+                {error}
+            </Typography>
+        );
+    }
+
     return (
         <div className={style.SurveyAnswers}>
-            {
-                loading ? <CircularProgress sx={{ margin: '100px auto' }} />
-                        : renderSurveyAnswers(surveyInfo, answersToQuestions)
-            }
+            { renderSurveyAnswers(surveyInfo, answersToQuestions) }
         </div>
     );
 }

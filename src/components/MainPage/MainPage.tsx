@@ -1,11 +1,11 @@
 import React, { FC, useState, useEffect } from 'react';
 import style from './MainPage.module.scss';
 import { useNavigate } from 'react-router-dom';
-import { ISurveyInfo, SurveyType, SurveyCategory } from '../../types/survey';
+import { SurveyType, SurveyCategory, ISurveyCard } from '../../types/survey';
 import {
     Typography, IconButton, Button,
     TextField, Avatar, List, ListItemButton,
-    ListItemIcon, ListItem, ListItemText
+    ListItemIcon, ListItem, ListItemText, CircularProgress
 } from '@mui/material';
 import SearchIcon from "@mui/icons-material/Search";
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
@@ -26,7 +26,7 @@ const MainPage: FC = () => {
     const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const { loadSurveyCards, updateUser } = useActions();
-    const { surveyCards, user } = useTypedSelector(state => state.survey);
+    const { surveyCards, user, loading, error } = useTypedSelector(state => state.survey);
 
     console.log(surveyCards);
 
@@ -34,21 +34,21 @@ const MainPage: FC = () => {
         loadSurveyCards();
     }, [])
 
-    const renderSurveysCards = (surveyCards: ISurveyInfo[]) => {
-        let filteredSurveyCards: ISurveyInfo[] = surveyCards;
+    const renderSurveysCards = (surveyCards: ISurveyCard[]) => {
+        let filteredSurveyCards: ISurveyCard[] = surveyCards;
 
         if (choicedType === SurveyType.Evaluated) {
-            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.isEvaluated === true);
+            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.surveyInfo.isEvaluated === true);
         } else if (choicedType === SurveyType.Unevaluated) {
-            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.isEvaluated === false);
+            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.surveyInfo.isEvaluated === false);
         }
 
-        filteredSurveyCards = filteredSurveyCards.filter(surveyCard => surveyCard.category === choicedCategory);
+        filteredSurveyCards = filteredSurveyCards.filter(surveyCard => surveyCard.surveyInfo.category === choicedCategory);
 
         if (searchQuery.length !== 0) {
-            filteredSurveyCards = filteredSurveyCards.filter((surveyCard: ISurveyInfo) => (
-                surveyCard.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                surveyCard.description.toLowerCase().includes(searchQuery.toLowerCase())
+            filteredSurveyCards = filteredSurveyCards.filter((surveyCard: ISurveyCard) => (
+                surveyCard.surveyInfo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                surveyCard.surveyInfo.description.toLowerCase().includes(searchQuery.toLowerCase())
             ));
         }
 
@@ -79,10 +79,10 @@ const MainPage: FC = () => {
         })
     }
 
-    const renderSurveyCard = (survey: ISurveyInfo) => (
+    const renderSurveyCard = (surveyCard: ISurveyCard) => (
         <SurveyCard
-            key={survey.id}
-            surveyInfo={survey}
+            key={surveyCard.id}
+            surveyCard={surveyCard}
             cssProperties={{ marginBottom: '20px' }}
         />
     )
@@ -137,6 +137,26 @@ const MainPage: FC = () => {
 
     const searchbarChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSearchQuery(event.target.value);
+    }
+
+    if (loading) {
+        return (
+            <div className = {style.Loading}>
+                <CircularProgress />
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <Typography
+                variant={"h1"}
+                component={"h1"}
+                className={style.Error}
+            >
+                {error}
+            </Typography>
+        );
     }
 
     return (

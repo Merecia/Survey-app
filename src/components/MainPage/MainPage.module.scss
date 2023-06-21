@@ -80,3 +80,9 @@
     align-items: center;
     flex-direction: column;
 }
+
+.Loading, .Error {
+    display: flex;
+    justify-content: center;
+    margin-top: 200px;
+}

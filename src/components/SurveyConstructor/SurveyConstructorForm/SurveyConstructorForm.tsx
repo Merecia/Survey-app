@@ -61,22 +61,7 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm, surve
     }
 
     const onSubmit = handleSubmit(async (form) => {
-        const surveys = localStorage.getItem('surveys');
-
-        let id = 1;
-        if (constructorType === SurveyConstructorType.Adding) {
-            if (surveys) {
-                const surveysData = JSON.parse(surveys);
-                if (surveysData.length !== 0) {
-                    id = surveysData.pop().surveyInfo.id + 1;
-                }
-            }  
-        } else if (constructorType === SurveyConstructorType.Editing) {
-            id = (survey as ISurvey).surveyInfo.id;
-        }
-
         const surveyInfo: ISurveyInfo = {
-            id: id,
             title: form.title,
             category: form.category as SurveyCategory,
             description: form.description,

@@ -1,17 +1,18 @@
 import { FC, useEffect } from 'react';
 import style from './App.module.scss';
 import Survey from './components/Survey/Survey';
-import {Route, Routes} from 'react-router-dom';
+import {Route, Routes, useNavigate, Navigate} from 'react-router-dom';
 import SurveyConstructor from './components/SurveyConstructor/SurveyConstructor';
 import SurveyAnswers from './components/SurveyAnswers/SurveyAnswers';
 import MainPage from './components/MainPage/MainPage';
 import Auth from './components/Auth/Auth';
 import { auth } from './firebase';
 import { useActions } from './hooks/useActions';
+import { useTypedSelector } from './hooks/useTypedSelector';
 
 const App: FC = () => {
   const {updateUser} = useActions();
-
+  const {user} = useTypedSelector(state => state.survey);
   useEffect(() => {
     auth.onAuthStateChanged((authUser) => {
       if (authUser) {
@@ -31,8 +32,14 @@ const App: FC = () => {
         <Route path = '' element = {<MainPage />} />
         <Route path = '/survey/:id' element = {<Survey />} />
         <Route path = '/survey-answers/:id' element = {<SurveyAnswers />} />
-        <Route path = '/survey-constructor/:id' element = {<SurveyConstructor />} />
-        <Route path = '/survey-constructor' element = {<SurveyConstructor />} />
+        <Route 
+          path = '/survey-constructor' 
+          element = { user?.uid ? <SurveyConstructor /> : <Navigate to = '/' /> } 
+        />
+        <Route 
+          path = '/survey-constructor/:id' 
+          element = { user?.uid ? <SurveyConstructor /> : <Navigate to = '/' /> } 
+        />
         <Route path = '/auth' element = {<Auth />} />
       </Routes>
     </div>

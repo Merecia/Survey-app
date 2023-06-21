@@ -6,7 +6,7 @@ import { useActions } from '../../../hooks/useActions';
 import { Typography } from '@mui/material';
 
 interface ISurveyFinishModalProps {
-    surveyResultsId: number;
+    surveyResultsId: string;
     earnedScore?: number | undefined;
     maximumScore?: number | undefined;
 }
