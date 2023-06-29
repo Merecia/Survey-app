@@ -2,7 +2,7 @@ import { FC } from 'react';
 import style from './SurveyFinsihModal.module.scss';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useActions } from '../../../hooks/useActions';
+import { useActions } from '../../hooks/useActions';
 import { Typography } from '@mui/material';
 
 interface ISurveyFinishModalProps {

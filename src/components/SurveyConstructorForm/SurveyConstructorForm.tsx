@@ -1,9 +1,9 @@
 import React, { FC } from 'react';
 import style from './SurveyConstructorForm.module.scss';
 import { useForm } from 'react-hook-form';
-import { IOption, IQuestion, ISurvey, ISurveyInfo, QuestionType, SurveyCategory, SurveyConstructorType } from '../../../types/survey';
+import { IOption, IQuestion, ISurvey, ISurveyInfo, QuestionType, SurveyCategory, SurveyConstructorType } from '../../types/survey';
 import { TextField, Button, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
-import { useActions } from '../../../hooks/useActions';
+import { useActions } from '../../hooks/useActions';
 
 interface ISurveyConstructFormProps {
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>;

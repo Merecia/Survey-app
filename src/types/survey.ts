@@ -101,6 +101,16 @@ export interface UpdateSurveyCardsAction {
     payload: ISurveyCard[];
 }
 
+export interface UpdateSearchQueryAction {
+    type: SurveyActionTypes.UPDATE_SEARCH_QUERY;
+    payload: string;
+}
+
+export interface UpdateChoicedTypeAction {
+    type: SurveyActionTypes.UPDATE_CHOICED_TYPE;
+    payload: SurveyType;
+}
+
 export interface UpdateUserAction {
     type: SurveyActionTypes.UPDATE_USER;
     payload: IUser | null;
@@ -133,6 +143,8 @@ export interface FetchSurveyResultsSuccessAction {
 export interface SurveyState {
     questions: IQuestion[];
     answersToQuestions: IAnswerToQuestion[];
+    searchQuery: string;
+    choicedType: SurveyType;
     surveyCards: ISurveyCard[];
     surveyInfo: ISurveyInfo;
     user: IUser | null;
@@ -179,7 +191,9 @@ export enum SurveyActionTypes {
     FETCH_ERROR = 'FETCH_ERROR',
     FETCH_SURVEY_SUCCESS = 'FETCH_SURVEY_SUCCESS',
     FETCH_SURVEY_CARDS_SUCCESS = 'FETCH_SURVEY_CARDS_SUCCESS',
-    FETCH_SURVEY_RESULTS_SUCCESS = 'FETCH_SURVEY_RESULTS_SUCCESS'
+    FETCH_SURVEY_RESULTS_SUCCESS = 'FETCH_SURVEY_RESULTS_SUCCESS',
+    UPDATE_SEARCH_QUERY = 'UPDATE_SEARCH_QUERY',
+    UPDATE_CHOICED_TYPE = 'UPDATE_CHOICED_TYPE'
 }
 
 // Types
@@ -197,3 +211,5 @@ export type SurveyAction =
     | FetchSurveyCardsSuccessAction
     | FetchSurveySuccessAction
     | FetchSurveyResultsSuccessAction
+    | UpdateSearchQueryAction
+    | UpdateChoicedTypeAction

@@ -3,14 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { IQuestion, ISurveyResults, ISurveyInfo } from '../../types/survey';
-import Question from '../Question/Question';
+import Question from '../../components/Question/Question';
 import style from './Survey.module.scss';
 import { Button, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
 import useInterval from '../../hooks/useInterval';
-import SurveyFinishModal from './SurveyFinishModal/SurveyFinishModal';
+import SurveyFinishModal from '../../components/SurveyFinishModal/SurveyFinishModal';
 import { areAllRequiredQuestionsAnswered, calculateEarnedScore } from '../../helper';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
+import Header from '../../components/Header/Header';
 
 const Survey: FC = () => {
     const { loadSurvey } = useActions();
@@ -200,7 +201,9 @@ const Survey: FC = () => {
                         {surveyInfo.title}
                     </Typography>
                     <hr />
-                    <p className={style.Description}> {surveyInfo.description} </p>
+                    <p className={style.Description}> 
+                        {surveyInfo.description} 
+                    </p>
                 </div>
                 <img
                     src={surveyInfo.imageUrl}
@@ -238,9 +241,12 @@ const Survey: FC = () => {
     }
 
     return (
-        <div className={style.Survey}>
-            { renderSurvey(surveyInfo, questions) }
-        </div>
+        <>
+            <Header />
+            <div className={style.Survey}>
+                { renderSurvey(surveyInfo, questions) }
+            </div>
+        </> 
     );
 }
 

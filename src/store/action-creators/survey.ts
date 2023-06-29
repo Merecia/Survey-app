@@ -7,7 +7,8 @@ import {
     IUser,
     QuestionType,
     SurveyAction,
-    SurveyActionTypes
+    SurveyActionTypes,
+    SurveyType
 } from './../../types/survey';
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
@@ -28,6 +29,24 @@ export const updateSurveyCards = (surveyCards: ISurveyCard[]) => {
         dispatch({
             type: SurveyActionTypes.UPDATE_SURVEY_CARDS,
             payload: surveyCards
+        });
+    }
+}
+
+export const updateSearchQuery = (searchQuery: string) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SEARCH_QUERY,
+            payload: searchQuery
+        });
+    }
+}
+
+export const updateChoicedType = (choicedType: SurveyType) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_CHOICED_TYPE,
+            payload: choicedType
         });
     }
 }

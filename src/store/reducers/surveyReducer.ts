@@ -2,13 +2,16 @@ import {
     SurveyState,
     SurveyAction,
     SurveyActionTypes,
-    SurveyCategory
+    SurveyCategory,
+    SurveyType
 } from './../../types/survey';
 
 const initialState: SurveyState = {
     questions: [],
     answersToQuestions: [],
     surveyCards: [],
+    searchQuery: '',
+    choicedType: SurveyType.Evaluated,
     user: null,
     surveyInfo: {
         title: '',
@@ -49,6 +52,16 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
             return {
                 ...state,
                 user: action.payload
+            }
+        case SurveyActionTypes.UPDATE_SEARCH_QUERY:
+            return {
+                ...state,
+                searchQuery: action.payload
+            }
+        case SurveyActionTypes.UPDATE_CHOICED_TYPE:
+            return {
+                ...state,
+                choicedType: action.payload
             }
         case SurveyActionTypes.FETCH_START:
             return {

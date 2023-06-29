@@ -3,15 +3,16 @@ import { useParams } from 'react-router-dom'
 import style from './SurveyConstructor.module.scss';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import QuestionConstruct from '../QuestionConstruct/QuestionConstruct';
+import QuestionConstruct from '../../components/QuestionConstruct/QuestionConstruct';
 import { IQuestion, ISurvey, SurveyConstructorType } from '../../types/survey';
-import SurveyConstructorForm from './SurveyConstructorForm/SurveyConstructorForm';
+import SurveyConstructorForm from '../../components/SurveyConstructorForm/SurveyConstructorForm';
 import { Snackbar, Alert, CircularProgress, Typography } from '@mui/material';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { areAllQuestionsFilledOut, calculateMaximumScore } from '../../helper';
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import Header from '../../components/Header/Header';
 
 const SurveyConstructor: FC = () => {
     const { questions, surveyInfo, user, loading, error } = useTypedSelector(state => state.survey);
@@ -236,6 +237,7 @@ const SurveyConstructor: FC = () => {
 
     return (
         <div className={style.SurveyConstructor}>
+            <Header />
             {
                 showSurveyConstructorForm
                     ? renderSurveyConstructorForm(

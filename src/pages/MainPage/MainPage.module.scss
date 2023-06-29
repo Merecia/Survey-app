@@ -1,0 +1,29 @@
+.Categories {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 40px 0px;
+}
+
+.SurveyCards {
+    display: flex;
+    width: 90%;
+    justify-content: space-between;
+    margin: 40px auto;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.Message {
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+.Loading, .Error {
+    display: flex;
+    justify-content: center;
+    margin-top: 200px;
+}

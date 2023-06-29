@@ -3,11 +3,12 @@ import { useActions } from '../../hooks/useActions';
 import { useParams } from 'react-router-dom';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import { IAnswerToQuestion, ISurveyInfo, ISurveyResults } from '../../types/survey';
-import Answer from '../Answer/Answer';
+import Answer from '../../components/Answer/Answer';
 import style from './SurveyAnswers.module.scss';
 import { Typography, Button } from '@mui/material';
 import { CircularProgress } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import Header from '../../components/Header/Header';
 
 const SurveyAnswers: FC = () => {
     const { answersToQuestions, surveyInfo, error, loading } = useTypedSelector(state => state.survey);
@@ -61,7 +62,7 @@ const SurveyAnswers: FC = () => {
     const renderSurveyInfo = (surveyInfo: ISurveyInfo) => {
         return (
             <div className={style.Header}>
-                <div className={style.SurveyDetails}>
+                <div className={style.SurveyDetails} style={{ width: '80%' }}>
                     <Typography
                         variant={"h4"}
                         component={"h4"}
@@ -73,20 +74,20 @@ const SurveyAnswers: FC = () => {
                         {surveyInfo.title}
                     </Typography>
                     <hr />
-                    <p className={style.Description}>
-                        {surveyInfo.description}
+                    <p className={style.Description}> 
+                        {surveyInfo.description} 
                     </p>
                 </div>
                 <img
                     src={surveyInfo.imageUrl}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null;
-                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL 
-                        || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
+                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL
+                            || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                     }}
                     style={{ width: '80%' }}
                     className={style.SurveyImage}
-                    alt = {"SurveyImage"}
+                    alt={"SurveyImage"}
                 />
             </div>
         );
@@ -109,7 +110,7 @@ const SurveyAnswers: FC = () => {
                             width: '80%',
                             display: 'flex',
                             justifyContent: 'center',
-                            margin: '20px auto'
+                            margin: '10px auto'
                         }}
                     >
                         Back to main page
@@ -140,9 +141,12 @@ const SurveyAnswers: FC = () => {
     }
 
     return (
-        <div className={style.SurveyAnswers}>
-            { renderSurveyAnswers(surveyInfo, answersToQuestions) }
-        </div>
+        <>
+            <Header />
+            <div className={style.SurveyAnswers}>
+                { renderSurveyAnswers(surveyInfo, answersToQuestions) }
+            </div>
+        </>
     );
 }
 

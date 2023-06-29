@@ -1,10 +1,10 @@
 import { FC, useEffect } from 'react';
 import style from './App.module.scss';
-import Survey from './components/Survey/Survey';
+import Survey from './pages/Survey/Survey';
 import {Route, Routes, useNavigate, Navigate} from 'react-router-dom';
-import SurveyConstructor from './components/SurveyConstructor/SurveyConstructor';
-import SurveyAnswers from './components/SurveyAnswers/SurveyAnswers';
-import MainPage from './components/MainPage/MainPage';
+import SurveyConstructor from './pages/SurveyConstructor/SurveyConstructor';
+import SurveyAnswers from './pages/SurveyAnswers/SurveyAnswers';
+import MainPage from './pages/MainPage/MainPage';
 import Auth from './components/Auth/Auth';
 import { auth } from './firebase';
 import { useActions } from './hooks/useActions';
