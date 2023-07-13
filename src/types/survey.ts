@@ -44,10 +44,13 @@ export interface ISurveyCard {
 export interface ISurveyResults {
     id: string;
     surveyId: string;
-    surveyInfo: ISurveyInfo;
-    passingTimeSeconds: number;
     answersToQuestions: IAnswerToQuestion[];
+    surveyInfo: ISurveyInfo;
+    passingTime: string;
+    completionDate: string;
+    user?: IUser;
     earnedScore?: number;
+    correctAnswersRate?: number;
 }
 
 export interface IQuestion {
@@ -81,6 +84,17 @@ export interface ISurveyInfo {
     isEvaluated: boolean;
 }
 
+export interface ICompletionStatistics {
+    id: string;
+    completionDate: string;
+    passingTime?: string;
+    maximumPassingTime?: string;
+    earnedScore?: number;
+    maximumScore?: number;
+    correctAnswersRate?: number;
+    user?: IUser;
+}
+
 export interface UpdateAnswersQuestionsAction {
     type: SurveyActionTypes.UPDATE_ANSWERS_TO_QUESTIONS;
     payload: IAnswerToQuestion[];
@@ -109,6 +123,11 @@ export interface UpdateSearchQueryAction {
 export interface UpdateChoicedTypeAction {
     type: SurveyActionTypes.UPDATE_CHOICED_TYPE;
     payload: SurveyType;
+}
+
+export interface UpdateSurveyStatisticsAction {
+    type: SurveyActionTypes.UPDATE_SURVEY_STATISTICS;
+    payload: ICompletionStatistics[];
 }
 
 export interface UpdateUserAction {
@@ -140,9 +159,16 @@ export interface FetchSurveyResultsSuccessAction {
     payload: ISurveyResults;
 }
 
+export interface FetchSurveyStatisticsSuccessAction {
+    type: SurveyActionTypes.FETCH_SURVEY_STATISTICS_SUCCESS;
+    payload: ICompletionStatistics[];
+}
+
 export interface SurveyState {
     questions: IQuestion[];
     answersToQuestions: IAnswerToQuestion[];
+    surveyStatistics: ICompletionStatistics[];
+    surveyResults: ISurveyResults | null;
     searchQuery: string;
     choicedType: SurveyType;
     surveyCards: ISurveyCard[];
@@ -186,14 +212,16 @@ export enum SurveyActionTypes {
     UPDATE_QUESTIONS = 'UPDATE_QUESTIONS',
     UPDATE_SURVEY_INFO = 'UPDATE_SURVEY_INFO',
     UPDATE_SURVEY_CARDS = 'UPDATE_SURVEY_CARDS',
+    UPDATE_SURVEY_STATISTICS = 'UPDATE_SURVEY_STATISTICS',
     UPDATE_USER = 'UPDATE_USER',
+    UPDATE_SEARCH_QUERY = 'UPDATE_SEARCH_QUERY',
+    UPDATE_CHOICED_TYPE = 'UPDATE_CHOICED_TYPE',
     FETCH_START = 'FETCH_START',
     FETCH_ERROR = 'FETCH_ERROR',
     FETCH_SURVEY_SUCCESS = 'FETCH_SURVEY_SUCCESS',
     FETCH_SURVEY_CARDS_SUCCESS = 'FETCH_SURVEY_CARDS_SUCCESS',
     FETCH_SURVEY_RESULTS_SUCCESS = 'FETCH_SURVEY_RESULTS_SUCCESS',
-    UPDATE_SEARCH_QUERY = 'UPDATE_SEARCH_QUERY',
-    UPDATE_CHOICED_TYPE = 'UPDATE_CHOICED_TYPE'
+    FETCH_SURVEY_STATISTICS_SUCCESS = 'FETCH_SURVEY_STATISTICS_SUCCESS',
 }
 
 // Types
@@ -211,5 +239,8 @@ export type SurveyAction =
     | FetchSurveyCardsSuccessAction
     | FetchSurveySuccessAction
     | FetchSurveyResultsSuccessAction
+    | FetchSurveyStatisticsSuccessAction
     | UpdateSearchQueryAction
     | UpdateChoicedTypeAction
+    | UpdateSurveyStatisticsAction
+    

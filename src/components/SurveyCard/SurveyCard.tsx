@@ -14,13 +14,14 @@ import {
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import LeaderboardIcon from '@mui/icons-material/Leaderboard';
+import { deleteDoc, doc } from 'firebase/firestore';
+import { db } from '../../firebase';
+import { useTypedSelector } from '../../hooks/useTypedSelector';
 import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
-import { deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase';
-import { useTypedSelector } from '../../hooks/useTypedSelector';
 
 interface ISurveyCardProps {
     surveyCard: ISurveyCard;
@@ -74,24 +75,31 @@ const SurveyCard: FC<ISurveyCardProps> = ({ surveyCard, cssProperties }) => {
 
             { 
                 user !== null && user.uid === surveyCard.userId && 
-                <IconButton 
-                    className = {style.DeleteIcon}
-                    aria-label="delete" 
-                    onClick={openAlertRemoveDialog}
-                >
-                    <DeleteIcon />
-                </IconButton>
-            }
-            
-            {
-                user !== null && user.uid === surveyCard.userId &&
-                <IconButton 
-                className = {style.EditIcon}
-                onClick={() => navigate(`/survey-constructor/${id}`)}
-                aria-label="edit"
-                >
-                    <EditIcon />
-                </IconButton>
+                <>
+                    <IconButton 
+                        className = {style.DeleteIcon}
+                        aria-label="delete" 
+                        onClick={openAlertRemoveDialog}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+
+                    <IconButton 
+                        className = {style.StatisticsIcon}
+                        aria-label="statistics" 
+                        onClick={() => navigate(`/survey-statistics/${id}`)}
+                    >
+                        <LeaderboardIcon />
+                    </IconButton>
+
+                    <IconButton 
+                        className = {style.EditIcon}
+                        onClick={() => navigate(`/survey-constructor/${id}`)}
+                        aria-label="edit"
+                    >
+                        <EditIcon />
+                    </IconButton>
+                </>
             }
             
 

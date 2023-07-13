@@ -3,25 +3,30 @@ import {
     SurveyAction,
     SurveyActionTypes,
     SurveyCategory,
-    SurveyType
+    SurveyType,
+    ISurveyInfo
 } from './../../types/survey';
+
+const initialSurveyInfo: ISurveyInfo = {
+    title: '',
+    description: '',
+    category: SurveyCategory.Study,
+    imageUrl: '',
+    maximumPassingTimeSeconds: undefined,
+    maximumScore: undefined,
+    isEvaluated: false
+}
 
 const initialState: SurveyState = {
     questions: [],
     answersToQuestions: [],
     surveyCards: [],
+    surveyResults: null,
+    surveyStatistics: [],
     searchQuery: '',
     choicedType: SurveyType.Evaluated,
     user: null,
-    surveyInfo: {
-        title: '',
-        description: '',
-        category: SurveyCategory.Study,
-        imageUrl: '',
-        maximumPassingTimeSeconds: undefined,
-        maximumScore: undefined,
-        isEvaluated: false
-    },
+    surveyInfo: initialSurveyInfo,
     loading: false,
     error: null
 }
@@ -63,14 +68,21 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
                 ...state,
                 choicedType: action.payload
             }
+        case SurveyActionTypes.UPDATE_SURVEY_STATISTICS:
+            return {
+                ...state,
+                surveyStatistics: action.payload
+            }
         case SurveyActionTypes.FETCH_START:
             return {
                 ...state,
+                error: null,
                 loading: true
             }
         case SurveyActionTypes.FETCH_ERROR:
             return {
                 ...state,
+                loading: false,
                 error: action.payload
             }
         case SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS:
@@ -90,8 +102,13 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
             return {
                 ...state,
                 loading: false,
-                answersToQuestions: action.payload.answersToQuestions,
-                surveyInfo: action.payload.surveyInfo
+                surveyResults: action.payload
+            }
+        case SurveyActionTypes.FETCH_SURVEY_STATISTICS_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                surveyStatistics: action.payload
             }
         default:
             return state

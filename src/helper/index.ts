@@ -254,10 +254,6 @@ export const calculateEarnedScore = (answersToQuestions: IAnswerToQuestion[]): n
     return earnedScore;
 }
 
-export const deleteSurvey = (id: number) => {
-
-}
-
 export const calculateMaximumScore = (questions: IQuestion[]) => {
     let maximumScore: number = 0;
 
@@ -325,4 +321,60 @@ export const stringAvatar = (name: string) => {
       },
       children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
     };
+}
+
+const getTwoDigitsString = (number: number) => {
+    let twoDigitString = '';
+
+    try {
+        if (String(number).length > 2) {
+            throw new Error('Something is wrong');
+        } else if (String(number).length === 2) {
+            twoDigitString = String(number);
+        } else if (String(number).length === 1) {
+            twoDigitString = '0' + String(number);
+        } else if (String(number).length === 0) {
+            twoDigitString = '00';
+        }
+    } catch(error) {
+        console.log(error);
+    }
+
+    return twoDigitString;
+}
+
+export const getPrettyPassingTime = (passingTimeSeconds: number) => {
+    if (passingTimeSeconds < 0) return undefined;
+    if (passingTimeSeconds === 0) return '00:00:00';
+
+    const hours = Math.floor(passingTimeSeconds / 3600);
+    const minutes = Math.floor( ( passingTimeSeconds - (hours * 3600) ) / 60 );
+    const seconds = passingTimeSeconds - ( ( minutes * 60 ) + ( hours * 3600 ) );
+
+    const prettyHours = getTwoDigitsString(hours);
+    const prettyMinutes = getTwoDigitsString(minutes);
+    const prettySeconds = getTwoDigitsString(seconds);
+
+    return prettyHours + ':' + prettyMinutes + ':' + prettySeconds;
+}
+
+export const getPrettyDateTime = (date: Date) => {
+    const prettyDate = getTwoDigitsString(date.getDate());
+    const prettyMonth = getTwoDigitsString(date.getMonth() + 1);
+    const prettyYear = date.getFullYear();
+    
+    const prettyHours = getTwoDigitsString(date.getHours());
+    const prettyMinutes = getTwoDigitsString(date.getMinutes());
+    const prettyTime =  prettyHours + ':' + prettyMinutes;
+
+    return prettyDate + '.' + prettyMonth + '.' + prettyYear + ' ' + prettyTime;
+}
+
+export const roundWithAccuracy = (number: number, accuracy: number) => {
+    return Math.round(number * 10 ** accuracy) / (10 ** accuracy);
+}
+
+export const getCorrectAnswersRate = (earnedScore: number, maximumScore: number) => {
+    if (earnedScore <= 0) return 0;
+    return roundWithAccuracy(earnedScore / maximumScore * 100, 2);
 }

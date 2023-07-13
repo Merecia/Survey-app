@@ -1,9 +1,11 @@
 import {
     IAnswerToQuestion,
+    ICompletionStatistics,
     IQuestion,
     ISurvey,
     ISurveyCard,
     ISurveyInfo,
+    ISurveyResults,
     IUser,
     QuestionType,
     SurveyAction,
@@ -12,7 +14,7 @@ import {
 } from './../../types/survey';
 import { Dispatch } from "redux";
 import { RootState } from '../reducers';
-import { collection, doc, getDoc, getDocs } from "firebase/firestore"; 
+import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from "firebase/firestore"; 
 import { db } from '../../firebase';
 
 export const updateAnswersToQuestions = (answersToQuestions: IAnswerToQuestion[]) => {
@@ -86,59 +88,144 @@ export const loadSurvey = (id: string) => {
             type: SurveyActionTypes.FETCH_START
         });
 
-        const docRef = doc(db, 'surveys', id);
-        const docSnap = await getDoc(docRef); 
-
-        if (docSnap.exists()) {
-            const { userId, questions, surveyInfo } = docSnap.data();
-            dispatch({
-                type: SurveyActionTypes.FETCH_SURVEY_SUCCESS,
-                payload: {
-                    id: docSnap.id,
-                    userId,
-                    questions,
-                    surveyInfo
-                }
-            });
-        } else {
+        try {
+            const docRef = doc(db, 'surveys', id);
+            const docSnap = await getDoc(docRef); 
+    
+            if (docSnap.exists()) {
+                const { userId, questions, surveyInfo } = docSnap.data();
+                dispatch({
+                    type: SurveyActionTypes.FETCH_SURVEY_SUCCESS,
+                    payload: {
+                        id: docSnap.id,
+                        userId,
+                        questions,
+                        surveyInfo
+                    }
+                });
+            } else {
+                dispatch({
+                    type: SurveyActionTypes.FETCH_ERROR,
+                    payload: 'Not found!'
+                });
+            }
+        } catch(error) {
             dispatch({
                 type: SurveyActionTypes.FETCH_ERROR,
-                payload: 'No such survey!'
-            });
+                payload: error as string
+            })
         }
     }
 }
 
-export const loadSurveyAnswers = (id: string) => {
+export const loadSurveyResults = (id: string) => {
     return async (dispatch: Dispatch<SurveyAction>) => {
         dispatch({
             type: SurveyActionTypes.FETCH_START
         });
 
-        const docRef = doc(db, 'surveyResults', id);
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-            const { 
-                surveyId, surveyInfo, passingTimeSeconds,
-                answersToQuestions, earnedScore
-            } = docSnap.data();
-
-            dispatch({
-                type: SurveyActionTypes.FETCH_SURVEY_RESULTS_SUCCESS,
-                payload: {
-                    id: docSnap.id,
-                    surveyId,
-                    surveyInfo,
-                    passingTimeSeconds,
-                    answersToQuestions,
-                    earnedScore
-                }
-            })
-        } else {
+        try {
+            const docRef = doc(db, 'surveyResults', id);
+            const docSnap = await getDoc(docRef);
+    
+            if (docSnap.exists()) {
+                const { 
+                    surveyId, 
+                    surveyInfo, 
+                    passingTime,
+                    completionDate,
+                    answersToQuestions, 
+                    user,
+                    earnedScore,
+                    correctAnswersRate
+                } = docSnap.data();
+    
+                dispatch({
+                    type: SurveyActionTypes.FETCH_SURVEY_RESULTS_SUCCESS,
+                    payload: {
+                        id: docSnap.id,
+                        surveyId,
+                        surveyInfo,
+                        passingTime,
+                        completionDate,
+                        answersToQuestions,
+                        user,
+                        earnedScore,
+                        correctAnswersRate
+                    }
+                });
+            } else {
+                dispatch({
+                    type: SurveyActionTypes.FETCH_ERROR,
+                    payload: 'Not found!'
+                });
+            }
+        } catch(error) {
             dispatch({
                 type: SurveyActionTypes.FETCH_ERROR,
-                payload: 'No such survey results!'
+                payload: error as string
+            })
+        }
+    }
+}
+
+export const loadSurveyStatistics = (surveyId: string) => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.FETCH_START
+        });
+        
+        try {
+            const q = query(
+                collection(db, 'surveyResults'), 
+                where('surveyId', '==', surveyId)
+            );
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const surveyStatistics: ICompletionStatistics[] = [];
+    
+                console.log(querySnapshot);
+    
+                querySnapshot.forEach(doc => {
+                    const { 
+                        completionDate,
+                        passingTime,
+                        maximumPassingTime,
+                        earnedScore,
+                        maximumScore,
+                        correctAnswersRate,
+                        user
+                    } = doc.data();
+    
+                    surveyStatistics.push({
+                        id: doc.id,
+                        completionDate,
+                        passingTime,
+                        maximumPassingTime,
+                        earnedScore,
+                        maximumScore,
+                        correctAnswersRate,
+                        user
+                    })
+                })
+    
+                console.log(surveyStatistics)
+    
+                dispatch({
+                    type: SurveyActionTypes.FETCH_SURVEY_STATISTICS_SUCCESS,
+                    payload: surveyStatistics
+                });
+            } else {
+                dispatch({
+                    type: SurveyActionTypes.FETCH_SURVEY_STATISTICS_SUCCESS,
+                    payload: []
+                });
+            }
+        } catch(error) {
+            dispatch({
+                type: SurveyActionTypes.FETCH_ERROR,
+                payload: error as string
             })
         }
     }
@@ -321,13 +408,24 @@ export const deleteQuestion = (question: IQuestion) => {
                         correctAnswer: item.correctAnswer
                     }
                 }
-
             });
 
         dispatch({
             type: SurveyActionTypes.UPDATE_QUESTIONS,
             payload: questions
         });
+    }
+}
+
+export const deleteSurveyResults = (id: string) => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        await deleteDoc(doc(db, 'surveyResults', id));
+        const surveyStatistics = getState().survey.surveyStatistics.filter(item => item.id !== id);
+        
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SURVEY_STATISTICS,
+            payload: surveyStatistics
+        });   
     }
 }
 

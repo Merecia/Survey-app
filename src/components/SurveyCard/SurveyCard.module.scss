@@ -9,7 +9,7 @@
     .DeleteIcon {
         position: absolute;
         top: 0;
-        right: 0;
+        left: 0;
         z-index: 100;
         color: white;
     }
@@ -17,7 +17,15 @@
     .EditIcon {
         position: absolute;
         top: 0;
-        left: 0;
+        left: 40px;
+        z-index: 100;
+        color: white;
+    }
+
+    .StatisticsIcon {
+        position: absolute;
+        top: 0;
+        right: 0px;
         z-index: 100;
         color: white;
     }

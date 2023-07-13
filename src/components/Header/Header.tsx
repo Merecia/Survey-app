@@ -23,8 +23,7 @@ const Header: FC = () => {
     const { 
         updateUser, 
         updateChoicedType, 
-        updateSearchQuery, 
-        clearAnswersToQuestions 
+        updateSearchQuery
     } = useActions();
     const { user, choicedType, searchQuery } = useTypedSelector(state => state.survey);
 
@@ -83,18 +82,13 @@ const Header: FC = () => {
         })
     }
 
-    const appNameClickHandler = () => {
-        clearAnswersToQuestions();
-        navigate('/');
-    }
-
     return (
         <div className={style.Header}>
             <Typography
                 variant={"h4"}
                 component={"h4"}
                 className={style.AppName}
-                onClick = {appNameClickHandler}
+                onClick = {() => navigate('/')}
             >
                 Survey App
             </Typography>

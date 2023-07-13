@@ -1,0 +1,18 @@
+.SurveyResultsTable {
+    display: flex;
+    width: 97%;
+    justify-content: center;
+    margin: 30px auto;
+
+    .Table {
+        width: 97%;
+        // height: 400px;
+        background-color: white;
+    }
+}
+
+.Loading, .Error {
+    display: flex;
+    justify-content: center;
+    margin-top: 200px;
+}

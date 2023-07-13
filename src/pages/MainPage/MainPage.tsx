@@ -88,21 +88,28 @@ const MainPage: FC = () => {
 
     if (loading) {
         return (
-            <div className = {style.Loading}>
-                <CircularProgress />
-            </div>
+            <>
+                <Header />
+                <div className={style.Loading}>
+                    <CircularProgress />
+                </div>
+            </>
         );
     }
 
     if (error) {
         return (
-            <Typography
-                variant={"h1"}
-                component={"h1"}
-                className={style.Error}
-            >
-                {error}
-            </Typography>
+            <>
+                <Header />
+                <div className={style.Error}>
+                    <Typography
+                        variant={"h1"}
+                        component={"h1"}
+                    >
+                        {error}
+                    </Typography>
+                </div>
+            </>
         );
     }
 

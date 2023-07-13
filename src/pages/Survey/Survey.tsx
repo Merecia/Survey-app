@@ -8,14 +8,18 @@ import style from './Survey.module.scss';
 import { Button, Typography, CircularProgress, Snackbar, Alert } from '@mui/material';
 import useInterval from '../../hooks/useInterval';
 import SurveyFinishModal from '../../components/SurveyFinishModal/SurveyFinishModal';
-import { areAllRequiredQuestionsAnswered, calculateEarnedScore } from '../../helper';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
 import Header from '../../components/Header/Header';
+import {
+    areAllRequiredQuestionsAnswered,
+    calculateEarnedScore,
+    getCorrectAnswersRate,
+    getPrettyDateTime,
+    getPrettyPassingTime
+} from '../../helper';
 
 const Survey: FC = () => {
-    const { loadSurvey } = useActions();
-    const { answersToQuestions, questions, surveyInfo, loading, error } = useTypedSelector(state => state.survey);
     const [timeStart, setTimeStart] = useState(new Date());
     const [passingTimeSeconds, setPassingTimeSeconds] = useState<number>(0);
     const [surveyResults, setSurveyResults] = useState<ISurveyResults | null>(null);
@@ -23,6 +27,15 @@ const Survey: FC = () => {
     const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
     const [showWarningAlert, setShowWarningAlert] = useState<boolean>(false);
     const [errorAlert, setErrorAlert] = useState<string>('');
+    const { loadSurvey, clearAnswersToQuestions } = useActions();
+    const {
+        answersToQuestions,
+        questions,
+        surveyInfo,
+        loading,
+        error,
+        user
+    } = useTypedSelector(state => state.survey);
 
     const id = useParams().id;
     const navigate = useNavigate();
@@ -32,6 +45,7 @@ const Survey: FC = () => {
     useEffect(() => {
         if (id) {
             loadSurvey(id);
+            clearAnswersToQuestions();
             setTimeStart(new Date());
         } else {
             navigate('/')
@@ -41,17 +55,17 @@ const Survey: FC = () => {
 
     useInterval(() => {
         const maximumPassingTimeSeconds = surveyInfo.maximumPassingTimeSeconds;
+        const now = new Date();
+        const dt = (now.getTime() - timeStart.getTime()) / 1000;
 
-        if (maximumPassingTimeSeconds) {
-            const now = new Date();
-            const dt = (now.getTime() - timeStart.getTime()) / 1000;
-
-            if (Math.floor(dt) === Number(maximumPassingTimeSeconds)) {
-                setShowWarningAlert(true);
-                finishSurvey(maximumPassingTimeSeconds);
-            } else {
-                setPassingTimeSeconds(Math.floor(dt));
-            }
+        if (
+            maximumPassingTimeSeconds &&
+            Math.floor(dt) === Number(maximumPassingTimeSeconds)
+        ) {
+            setShowWarningAlert(true);
+            finishSurvey(maximumPassingTimeSeconds);
+        } else {
+            setPassingTimeSeconds(Math.floor(dt));
         }
     }, 1000)
 
@@ -105,13 +119,7 @@ const Survey: FC = () => {
     const renderQuestion = (question: IQuestion) => {
         return (
             <li className={style.Question} key={question.id}>
-                <Question
-                    question={question}
-                    cssProperties={{
-                        margin: '20px 0px',
-                        width: '80%'
-                    }}
-                />
+                <Question question={question} />
             </li>
         );
     }
@@ -120,13 +128,24 @@ const Survey: FC = () => {
         const surveyResults = {
             surveyId: id,
             surveyInfo,
-            passingTimeSeconds,
+            passingTime: getPrettyPassingTime(passingTimeSeconds),
+            completionDate: getPrettyDateTime(new Date()),
             answersToQuestions
         } as ISurveyResults;
 
-        if (surveyInfo.isEvaluated) {
-            surveyResults.earnedScore = calculateEarnedScore(answersToQuestions);
+        if (user) {
+            surveyResults.user = user;
         }
+
+        if (surveyInfo.isEvaluated) {
+            const earnedScore = calculateEarnedScore(answersToQuestions);
+            const maximumScore = surveyInfo.maximumScore || 0;
+
+            surveyResults.earnedScore = earnedScore;
+            surveyResults.correctAnswersRate = getCorrectAnswersRate(earnedScore, maximumScore);
+        }
+
+        console.log(surveyResults);
 
         addDoc(collection(db, 'surveyResults'), surveyResults)
             .then((docRef) => {
@@ -201,8 +220,8 @@ const Survey: FC = () => {
                         {surveyInfo.title}
                     </Typography>
                     <hr />
-                    <p className={style.Description}> 
-                        {surveyInfo.description} 
+                    <p className={style.Description}>
+                        {surveyInfo.description}
                     </p>
                 </div>
                 <img
@@ -212,7 +231,6 @@ const Survey: FC = () => {
                         currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL
                             || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                     }}
-                    style={{ width: '80%' }}
                     className={style.SurveyImage}
                     alt={"SurveyImage"}
                 />
@@ -222,21 +240,28 @@ const Survey: FC = () => {
 
     if (loading) {
         return (
-            <div className = {style.Loading}>
-                <CircularProgress />
-            </div>
+            <>
+                <Header />
+                <div className={style.Loading}>
+                    <CircularProgress />
+                </div>
+            </>
         );
     }
 
     if (error) {
         return (
-            <Typography
-                variant={"h1"}
-                component={"h1"}
-                className={style.Error}
-            >
-                {error}
-            </Typography>
+            <>
+                <Header />
+                <div className={style.Error}>
+                    <Typography
+                        variant={"h1"}
+                        component={"h1"}
+                    >
+                        {error}
+                    </Typography>
+                </div>
+            </>
         );
     }
 
@@ -244,9 +269,9 @@ const Survey: FC = () => {
         <>
             <Header />
             <div className={style.Survey}>
-                { renderSurvey(surveyInfo, questions) }
+                {renderSurvey(surveyInfo, questions)}
             </div>
-        </> 
+        </>
     );
 }
 
