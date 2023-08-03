@@ -1,17 +1,17 @@
 import { FC, useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'
-import style from './SurveyConstructor.module.scss';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
-import QuestionConstruct from '../../components/QuestionConstruct/QuestionConstruct';
 import { IQuestion, ISurvey, SurveyConstructorType } from '../../types/survey';
-import SurveyConstructorForm from '../../components/SurveyConstructorForm/SurveyConstructorForm';
 import { Snackbar, Alert, CircularProgress, Typography } from '@mui/material';
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { areAllQuestionsFilledOut, calculateMaximumScore } from '../../helper';
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
+import style from './SurveyConstructor.module.scss';
+import SurveyConstructorForm from '../../components/SurveyConstructorForm/SurveyConstructorForm';
+import QuestionConstruct from '../../components/QuestionConstruct/QuestionConstruct';
 import Header from '../../components/Header/Header';
 
 const SurveyConstructor: FC = () => {

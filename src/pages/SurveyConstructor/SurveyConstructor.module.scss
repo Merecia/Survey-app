@@ -9,7 +9,6 @@
             margin: 20px auto;
             width: 80%;
             height: 250px;
-            border: 1px solid black;
             border-radius: 10px;
             background-color: white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
@@ -18,18 +17,19 @@
         .SurveyDetails {
             width: 80%;
             margin: 20px auto;
-            border: 1px solid black;
+            padding: 10px 0px;
             border-radius: 10px;
             background-color: white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
-
+    
             .Title {
                 text-align: center;
                 margin: 10px 0px;
             }
-
+    
             .Description {
                 padding: 5px 20px;
+                font-size: 20px;
             }
         }
     }

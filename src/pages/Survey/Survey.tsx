@@ -206,30 +206,58 @@ const Survey: FC = () => {
     }
 
     const renderSurveyInfo = (surveyInfo: ISurveyInfo) => {
+        const { 
+            title,
+            maximumPassingTimeSeconds,
+            description,
+            imageUrl 
+        } = surveyInfo;
+
         return (
             <div className={style.Header}>
-                <div className={style.SurveyDetails} style={{ width: '80%' }}>
-                    <Typography
-                        variant={"h4"}
-                        component={"h4"}
-                        sx={{
-                            textAlign: 'center',
-                            margin: '10px auto'
+                <div className={style.SurveyDetails}>
+                    <div 
+                        className = {style.SurveyDetails_Header}
+                        style = {{
+                            display: 'flex',
+                            justifyContent: 
+                                maximumPassingTimeSeconds 
+                                ? 'space-around' 
+                                : 'center'
                         }}
                     >
-                        {surveyInfo.title}
-                    </Typography>
+                        <Typography
+                            variant={"h4"}
+                            component={"h4"}
+                        >
+                            {title}
+                        </Typography>
+                        {
+                            maximumPassingTimeSeconds &&
+                            <Typography
+                                variant={"h4"}
+                                component={"h4"}
+                            >
+                                {
+                                    getPrettyPassingTime(
+                                        maximumPassingTimeSeconds - 
+                                        passingTimeSeconds
+                                    )
+                                }
+                            </Typography>
+                        }
+                    </div>
                     <hr />
-                    <p className={style.Description}>
-                        {surveyInfo.description}
+                    <p className={style.SurveyDetails_Description}>
+                        {description}
                     </p>
                 </div>
                 <img
-                    src={surveyInfo.imageUrl}
+                    src={imageUrl}
                     onError={({ currentTarget }) => {
                         currentTarget.onerror = null;
-                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL
-                            || 'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
+                        currentTarget.src = process.env.REACT_APP_DEFAULT_SURVEY_IMAGE_URL || 
+                        'https://fpprt.ru/wp-content/uploads/2021/02/file.jpg';
                     }}
                     className={style.SurveyImage}
                     alt={"SurveyImage"}

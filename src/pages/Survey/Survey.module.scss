@@ -20,18 +20,18 @@
             }
         
             .SurveyDetails {
+                width: 80%;
                 margin: 20px auto;
                 padding: 10px 0px;
                 border-radius: 10px;
                 background-color: white;
                 box-shadow: 0 2px 5px rgba(0,0,0,0.2), 0 4px 6px rgba(0,0,0,0.2);
-    
-                .Title {
-                    text-align: center;
+
+                .SurveyDetails_Header {
                     margin: 10px 0px;
                 }
     
-                .Description {
+                .SurveyDetails_Description {
                     padding: 5px 20px;
                     font-size: 20px;
                 }
