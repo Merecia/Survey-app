@@ -20,12 +20,8 @@ import {
 const Header: FC = () => {
     const navigate = useNavigate();
     const [showDropdownMenu, setShowDropdownMenu] = useState<boolean>(false);
-    const { 
-        updateUser, 
-        updateChoicedType, 
-        updateSearchQuery
-    } = useActions();
     const { user, choicedType, searchQuery } = useTypedSelector(state => state.survey);
+    const { updateUser, updateChoicedType, updateSearchQuery, loadSurveyCards } = useActions();
 
     const black = '#000000';
     const grey = '#e0e0e0';
@@ -60,12 +56,19 @@ const Header: FC = () => {
         updateSearchQuery(event.target.value);
     }
 
+    const searchbarPressHandler = (event: React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            navigate('/');
+        }
+    }
+
     const renderSearchbar = (searchQuery: string) => {
         return (
             <TextField
                 id="search-bar"
                 className={style.Searchbar}
                 onChange={searchbarChangeHandler}
+                onKeyUp={searchbarPressHandler}
                 variant="outlined"
                 placeholder="Search..."
                 value = {searchQuery}
@@ -80,6 +83,12 @@ const Header: FC = () => {
             updateUser(null);
             setShowDropdownMenu(false);
         })
+    }
+
+    const chooseSurveyType = (surveyType: SurveyType) => {
+        navigate('/');
+        updateChoicedType(surveyType);
+        loadSurveyCards();
     }
 
     return (
@@ -99,12 +108,15 @@ const Header: FC = () => {
                         [searchQuery]
                     ) 
                 }
-                <IconButton aria-label="search">
+                <IconButton aria-label="search" onClick = {() => navigate('/')}>
                     <SearchIcon style={{ fill: "black" }} />
                 </IconButton>
             </div>
             <div className={style.Types}>
-                <div className={style.Surveys} onClick={() => updateChoicedType(SurveyType.Unevaluated)}>
+                <div 
+                    className={style.Surveys} 
+                    onClick={() => chooseSurveyType(SurveyType.Unevaluated)}
+                >
                     <Typography
                         variant={"h6"}
                         component={"h6"}
@@ -117,7 +129,10 @@ const Header: FC = () => {
                         style={{ fill: choicedType === SurveyType.Unevaluated ? black : grey }}
                     />
                 </div>
-                <div className={style.Quizes} onClick={() => updateChoicedType(SurveyType.Evaluated)}>
+                <div 
+                    className={style.Quizes} 
+                    onClick={() => chooseSurveyType(SurveyType.Evaluated)}
+                >
                     <Typography
                         variant={"h6"}
                         component={"h6"}

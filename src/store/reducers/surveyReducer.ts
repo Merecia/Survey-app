@@ -14,7 +14,8 @@ const initialSurveyInfo: ISurveyInfo = {
     imageUrl: '',
     maximumPassingTimeSeconds: undefined,
     maximumScore: undefined,
-    isEvaluated: false
+    isEvaluated: false,
+    creationDate: ''
 }
 
 const initialState: SurveyState = {
@@ -25,6 +26,7 @@ const initialState: SurveyState = {
     surveyStatistics: [],
     searchQuery: '',
     choicedType: SurveyType.Evaluated,
+    choicedCategory: SurveyCategory.Study,
     user: null,
     surveyInfo: initialSurveyInfo,
     loading: false,
@@ -68,6 +70,11 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
                 ...state,
                 choicedType: action.payload
             }
+        case SurveyActionTypes.UPDATE_CHOICED_CATEGORY:
+            return {
+                ...state,
+                choicedCategory: action.payload
+            }
         case SurveyActionTypes.UPDATE_SURVEY_STATISTICS:
             return {
                 ...state,
@@ -84,6 +91,14 @@ export const surveyReducer = (state = initialState, action: SurveyAction): Surve
                 ...state,
                 loading: false,
                 error: action.payload
+            }
+        case SurveyActionTypes.CLEAR_SURVEY:
+            return {
+                ...state,
+                surveyInfo: initialSurveyInfo,
+                questions: [],
+                error: null,
+                loading: false
             }
         case SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS:
             return {

@@ -38,7 +38,17 @@ const Question: FC<IQuestionProps> = ({ question, cssProperties }) => {
         }
     }
 
-    const renderTopic = (topic: string) => <p className = {style.Topic}> {topic} </p>
+    const renderTopic = (topic: string) => {
+        return (
+            <div className = {style.Topic}>
+                <p className = {style.QuestionText}> {topic} </p>
+                {
+                    question.required && 
+                    <span className = {style.RequiredLabel}> * </span>
+                }
+            </div>
+        );
+    }
 
     return (
         <div className={style.Question} style={cssProperties}>

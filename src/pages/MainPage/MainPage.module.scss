@@ -22,8 +22,8 @@
     flex-direction: column;
 }
 
-.Loading, .Error {
+.Loading, .Error, .LoadingMoreButton {
     display: flex;
     justify-content: center;
-    margin-top: 200px;
+    margin: 100px 0px;
 }

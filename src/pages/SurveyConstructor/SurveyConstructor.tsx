@@ -16,7 +16,7 @@ import Header from '../../components/Header/Header';
 
 const SurveyConstructor: FC = () => {
     const { questions, surveyInfo, user, loading, error } = useTypedSelector(state => state.survey);
-    const { addNewQuestion, loadSurvey } = useActions();
+    const { addNewQuestion, loadSurvey, clearSurvey } = useActions();
     const [showSurveyConstructorForm, setShowSurveyConstructorForm] = useState<boolean>(true);
     const [showErrorAlert, setShowErrorAlert] = useState<boolean>(false);
     const [showSuccessAlert, setShowSuccessAlert] = useState<boolean>(false);
@@ -30,9 +30,8 @@ const SurveyConstructor: FC = () => {
     console.log(surveyInfo);
 
     useEffect(() => {
-        if (id) {
-            loadSurvey(id);
-        }
+        if (id) loadSurvey(id);
+        else clearSurvey();
     }, [])
 
     const renderQuestions = (questions: IQuestion[]) => {
@@ -217,21 +216,28 @@ const SurveyConstructor: FC = () => {
 
     if (loading) {
         return (
-            <div className = {style.Loading}>
-                <CircularProgress />
-            </div>
+            <>
+                <Header />
+                <div className = {style.Loading}>
+                    <CircularProgress />
+                </div>
+            </>
         );
     }
 
     if (error) {
         return (
-            <Typography
-                variant={"h1"}
-                component={"h1"}
-                className={style.Error}
-            >
-                {error}
-            </Typography>
+            <>
+                <Header />
+                <div className={style.Error}>
+                    <Typography
+                        variant={'h3'}
+                        component={'h3'}
+                    >
+                        {error}
+                    </Typography>
+                </div>
+            </>
         );
     }
 

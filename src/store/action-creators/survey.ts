@@ -1,3 +1,6 @@
+import { Dispatch } from "redux";
+import { RootState } from '../reducers';
+import { db } from '../../firebase';
 import {
     IAnswerToQuestion,
     ICompletionStatistics,
@@ -10,12 +13,23 @@ import {
     QuestionType,
     SurveyAction,
     SurveyActionTypes,
+    SurveyCategory,
     SurveyType
 } from './../../types/survey';
-import { Dispatch } from "redux";
-import { RootState } from '../reducers';
-import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from "firebase/firestore"; 
-import { db } from '../../firebase';
+import { 
+    collection, 
+    deleteDoc, 
+    doc, 
+    endAt, 
+    getDoc, 
+    getDocs, 
+    limit, 
+    orderBy, 
+    query, 
+    startAfter, 
+    startAt, 
+    where 
+} from "firebase/firestore"; 
 
 export const updateAnswersToQuestions = (answersToQuestions: IAnswerToQuestion[]) => {
     return async (dispatch: Dispatch<SurveyAction>) => {
@@ -53,30 +67,116 @@ export const updateChoicedType = (choicedType: SurveyType) => {
     }
 }
 
-export const loadSurveyCards = () => {
+export const updateChoicedCategory = (choicedCategory: SurveyCategory) => {
     return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.UPDATE_CHOICED_CATEGORY,
+            payload: choicedCategory
+        });
+    }
+}
+
+export const loadSurveyCards = () => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
+        dispatch({
+            type: SurveyActionTypes.FETCH_START
+        });
+        dispatch({
+            type: SurveyActionTypes.UPDATE_SURVEY_CARDS,
+            payload: []
+        });
+
+        try {
+            const isEvaluated = getState().survey.choicedType === 'Evaluated';
+            const category = getState().survey.choicedCategory;
+            const surveyCardsLimit = parseInt(process.env.REACT_APP_SURVEY_CARDS_LIMIT || '6');
+
+            const q = query(
+                collection(db, 'surveys'), 
+                where('surveyInfo.category', '==', category),
+                where('surveyInfo.isEvaluated', '==', isEvaluated),
+                orderBy('surveyInfo.creationDate', 'desc'),
+                limit(surveyCardsLimit)
+            );
+
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const surveyCards: ISurveyCard[] = [];
+
+                querySnapshot.forEach(document => {
+                    const { surveyInfo, userId } = document.data(); 
+                    surveyCards.push({ id: document.id, surveyInfo, userId });
+                });
+
+                console.log(surveyCards);
+
+                dispatch({
+                    type: SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS,
+                    payload: surveyCards
+                });
+            } else {
+                dispatch({
+                    type: SurveyActionTypes.FETCH_ERROR,
+                    payload: 'There is nothing in the database'
+                });
+            }
+        } catch(error) {
+            dispatch({
+                type: SurveyActionTypes.FETCH_ERROR,
+                payload: String(error)
+            });
+        }
+    }
+}
+
+export const loadMoreSurveyCards = () => {
+    return async (dispatch: Dispatch<SurveyAction>, getState: () => RootState) => {
         dispatch({
             type: SurveyActionTypes.FETCH_START
         });
 
         try {
-            const surveyCards: ISurveyCard[] = [];
-            const querySnapshot = await getDocs(collection(db, "surveys"));
+            const isEvaluated = getState().survey.choicedType === 'Evaluated';
+            const category = getState().survey.choicedCategory;
+            const surveyCards = getState().survey.surveyCards;
+            const lastSurveyCard = surveyCards.slice(-1)[0];
+            const surveyCardsLimit = parseInt(process.env.REACT_APP_SURVEY_CARDS_LIMIT || '6');
 
-            querySnapshot.forEach(document => {
-                const { surveyInfo, userId } = document.data(); 
-                surveyCards.push({ id: document.id, surveyInfo, userId });
-            });
+            const q = query(
+                collection(db, 'surveys'), 
+                where('surveyInfo.category', '==', category),
+                where('surveyInfo.isEvaluated', '==', isEvaluated),
+                orderBy('surveyInfo.creationDate', 'desc'),
+                startAfter(lastSurveyCard.surveyInfo.creationDate),
+                limit(surveyCardsLimit)
+            );
 
-            dispatch({
-                type: SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS,
-                payload: surveyCards                
-            });
-        }
-        catch(error) {
+            const querySnapshot = await getDocs(q);
+            console.log(querySnapshot);
+
+            if (!querySnapshot.empty) {
+                querySnapshot.forEach(document => {
+                    const { surveyInfo, userId } = document.data(); 
+                    surveyCards.push({ id: document.id, surveyInfo, userId });
+                });
+
+                console.log(surveyCards);
+
+                dispatch({
+                    type: SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS,
+                    payload: surveyCards
+                });
+            } else {
+                dispatch({
+                    type: SurveyActionTypes.FETCH_ERROR,
+                    payload: 'There are no more records in the database'
+                });
+            }
+        } catch(error) {
             dispatch({
                 type: SurveyActionTypes.FETCH_ERROR,
-                payload: error as string
+                payload: String(error)
             });
         }
     }
@@ -112,7 +212,7 @@ export const loadSurvey = (id: string) => {
         } catch(error) {
             dispatch({
                 type: SurveyActionTypes.FETCH_ERROR,
-                payload: error as string
+                payload: String(error)
             })
         }
     }
@@ -163,7 +263,7 @@ export const loadSurveyResults = (id: string) => {
         } catch(error) {
             dispatch({
                 type: SurveyActionTypes.FETCH_ERROR,
-                payload: error as string
+                payload: String(error)
             })
         }
     }
@@ -225,7 +325,7 @@ export const loadSurveyStatistics = (surveyId: string) => {
         } catch(error) {
             dispatch({
                 type: SurveyActionTypes.FETCH_ERROR,
-                payload: error as string
+                payload: String(error)
             })
         }
     }
@@ -352,6 +452,14 @@ export const updateSurveyInfo = (surveyInfo: ISurveyInfo) => {
             type: SurveyActionTypes.UPDATE_SURVEY_INFO,
             payload: surveyInfo
         })
+    }
+}
+
+export const clearSurvey = () => {
+    return async (dispatch: Dispatch<SurveyAction>) => {
+        dispatch({
+            type: SurveyActionTypes.CLEAR_SURVEY
+        });
     }
 }
 

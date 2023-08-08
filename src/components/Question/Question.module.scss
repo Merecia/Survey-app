@@ -6,6 +6,17 @@
     width: 80%;
 
     .Topic {
-        font-size: 20px;
+        display: flex;
+        
+        .QuestionText {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+    
+        .RequiredLabel {
+            font-weight: bold;
+            font-size: 18px;
+            color: red;
+        }
     }
 }

@@ -82,6 +82,7 @@ export interface ISurveyInfo {
     maximumPassingTimeSeconds?: number;
     maximumScore?: number;
     isEvaluated: boolean;
+    creationDate: string;
 }
 
 export interface ICompletionStatistics {
@@ -125,6 +126,11 @@ export interface UpdateChoicedTypeAction {
     payload: SurveyType;
 }
 
+export interface UpdateChoicedCategoryAction {
+    type: SurveyActionTypes.UPDATE_CHOICED_CATEGORY;
+    payload: SurveyCategory;
+}
+
 export interface UpdateSurveyStatisticsAction {
     type: SurveyActionTypes.UPDATE_SURVEY_STATISTICS;
     payload: ICompletionStatistics[];
@@ -164,6 +170,10 @@ export interface FetchSurveyStatisticsSuccessAction {
     payload: ICompletionStatistics[];
 }
 
+export interface ClearSurveyAction {
+    type: SurveyActionTypes.CLEAR_SURVEY;
+}
+
 export interface SurveyState {
     questions: IQuestion[];
     answersToQuestions: IAnswerToQuestion[];
@@ -171,6 +181,7 @@ export interface SurveyState {
     surveyResults: ISurveyResults | null;
     searchQuery: string;
     choicedType: SurveyType;
+    choicedCategory: SurveyCategory;
     surveyCards: ISurveyCard[];
     surveyInfo: ISurveyInfo;
     user: IUser | null;
@@ -216,12 +227,14 @@ export enum SurveyActionTypes {
     UPDATE_USER = 'UPDATE_USER',
     UPDATE_SEARCH_QUERY = 'UPDATE_SEARCH_QUERY',
     UPDATE_CHOICED_TYPE = 'UPDATE_CHOICED_TYPE',
+    UPDATE_CHOICED_CATEGORY = 'UPDATE_CHOICED_CATEGORY',
     FETCH_START = 'FETCH_START',
     FETCH_ERROR = 'FETCH_ERROR',
     FETCH_SURVEY_SUCCESS = 'FETCH_SURVEY_SUCCESS',
     FETCH_SURVEY_CARDS_SUCCESS = 'FETCH_SURVEY_CARDS_SUCCESS',
     FETCH_SURVEY_RESULTS_SUCCESS = 'FETCH_SURVEY_RESULTS_SUCCESS',
     FETCH_SURVEY_STATISTICS_SUCCESS = 'FETCH_SURVEY_STATISTICS_SUCCESS',
+    CLEAR_SURVEY = 'CLEAR_SURVEY'
 }
 
 // Types
@@ -234,13 +247,15 @@ export type SurveyAction =
     | UpdateSurveyInfoAction 
     | UpdateSurveyCardsAction
     | UpdateUserAction
+    | UpdateSearchQueryAction
+    | UpdateChoicedTypeAction
+    | UpdateChoicedCategoryAction
+    | UpdateSurveyStatisticsAction
     | FetchStartAction
     | FetchErrorAction
     | FetchSurveyCardsSuccessAction
     | FetchSurveySuccessAction
     | FetchSurveyResultsSuccessAction
     | FetchSurveyStatisticsSuccessAction
-    | UpdateSearchQueryAction
-    | UpdateChoicedTypeAction
-    | UpdateSurveyStatisticsAction
+    | ClearSurveyAction
     

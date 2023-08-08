@@ -1,18 +1,15 @@
-import { FC, useState, useEffect } from 'react';
-import style from './MainPage.module.scss';
-import { SurveyType, SurveyCategory, ISurveyCard } from '../../types/survey';
+import { FC, useEffect } from 'react';
+import { SurveyCategory, ISurveyCard } from '../../types/survey';
 import { Typography, Button, CircularProgress } from '@mui/material';
-import SurveyCard from '../../components/SurveyCard/SurveyCard';
 import { useActions } from '../../hooks/useActions';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
 import Header from '../../components/Header/Header';
+import SurveyCard from '../../components/SurveyCard/SurveyCard';
+import style from './MainPage.module.scss';
 
 const MainPage: FC = () => {
-    const [choicedCategory, setChoicedCategory] = useState<SurveyCategory>(SurveyCategory.Study);
-    const { surveyCards, loading, error, searchQuery, choicedType } = useTypedSelector(state => state.survey);
-    const { loadSurveyCards } = useActions();
-
-    console.log(surveyCards);
+    const { surveyCards, loading, error, choicedCategory, searchQuery } = useTypedSelector(state => state.survey);
+    const { loadSurveyCards, loadMoreSurveyCards, updateChoicedCategory } = useActions();
 
     useEffect(() => {
         loadSurveyCards();
@@ -21,14 +18,6 @@ const MainPage: FC = () => {
     const renderSurveysCards = (surveyCards: ISurveyCard[]) => {
         let filteredSurveyCards: ISurveyCard[] = surveyCards;
 
-        if (choicedType === SurveyType.Evaluated) {
-            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.surveyInfo.isEvaluated === true);
-        } else if (choicedType === SurveyType.Unevaluated) {
-            filteredSurveyCards = surveyCards.filter(surveyCard => surveyCard.surveyInfo.isEvaluated === false);
-        }
-
-        filteredSurveyCards = filteredSurveyCards.filter(surveyCard => surveyCard.surveyInfo.category === choicedCategory);
-
         if (searchQuery.length !== 0) {
             filteredSurveyCards = filteredSurveyCards.filter((surveyCard: ISurveyCard) => (
                 surveyCard.surveyInfo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -36,36 +25,40 @@ const MainPage: FC = () => {
             ));
         }
 
-        if (filteredSurveyCards.length === 0) {
-            return (
-                <div className={style.Message}>
-                    <Typography variant={"h6"} component={"h6"} fontWeight={'300'} >
-                        There are no surveys with the category and search query you specified.
-                    </Typography>
-                    <Typography variant={"h6"} component={"h6"} fontWeight={'300'}>
-                        Try changing the category or changing the search query.
-                    </Typography>
-                </div>
-            );
-        }
-
         return (
             <div className={style.SurveyCards}>
-                {filteredSurveyCards.map(surveyCard => renderSurveyCard(surveyCard))}
+                { filteredSurveyCards.map(surveyCard => renderSurveyCard(surveyCard)) }
             </div>
         );
     }
 
-    const renderSurveyCard = (surveyCard: ISurveyCard) => (
-        <SurveyCard
-            key={surveyCard.id}
-            surveyCard={surveyCard}
-            cssProperties={{ marginBottom: '20px' }}
-        />
-    )
+    const renderSurveyCard = (surveyCard: ISurveyCard) => {
+        return (
+            <SurveyCard
+                key={surveyCard.id}
+                surveyCard={surveyCard}
+                cssProperties={{ marginBottom: '20px' }}
+            />
+        );
+    }
+        
 
     const renderCategoriesButtons = (categories: string[]) => {
-        return categories.map((category, index) => renderCategoryButton(category, index));
+        return (
+            <div className={style.Categories}>
+                { 
+                    categories.map((category, index) => 
+                        renderCategoryButton(category, index)
+                    ) 
+                }
+            </div>
+        );
+    }
+
+
+    const categoryButtonClickHandler = (category: string) => {
+        updateChoicedCategory(SurveyCategory[category as keyof typeof SurveyCategory]);
+        loadSurveyCards();
     }
 
     const renderCategoryButton = (category: string, index: number) => {
@@ -73,53 +66,60 @@ const MainPage: FC = () => {
             <Button
                 key={index}
                 variant={category === choicedCategory ? 'contained' : 'outlined'}
-                size="medium"
+                size='medium'
                 sx={{ p: 1.5 }}
-                onClick={() =>
-                    setChoicedCategory(
-                        SurveyCategory[category as keyof typeof SurveyCategory]
-                    )
-                }
+                onClick={() => categoryButtonClickHandler(category)}
             >
                 {category}
             </Button>
-        )
-    }
-
-    if (loading) {
-        return (
-            <>
-                <Header />
-                <div className={style.Loading}>
-                    <CircularProgress />
-                </div>
-            </>
         );
     }
 
-    if (error) {
+    const renderLoading = () => {
         return (
-            <>
-                <Header />
-                <div className={style.Error}>
-                    <Typography
-                        variant={"h1"}
-                        component={"h1"}
-                    >
-                        {error}
-                    </Typography>
-                </div>
-            </>
+            <div className={style.Loading}>
+                <CircularProgress />
+            </div>
+        );
+    }
+
+    const renderError = (error: string) => {
+        return (
+            <div className={style.Error}>
+                <Typography
+                    variant={'h3'}
+                    component={'h3'}
+                >
+                    {error}
+                </Typography>
+            </div>
+        );
+    }
+
+    const renderLoadingMoreButton = () => {
+        return (
+            <div className = {style.LoadingMoreButton}>
+                <Button
+                    variant={'outlined'}
+                    size='large'
+                    sx={{ width: '30%' }}
+                    onClick={async () => loadMoreSurveyCards()}
+                    className = {style.LoadingMoreButton}
+                >
+                    Load more
+                </Button>
+            </div>
         );
     }
 
     return (
         <div className={style.MainPage}>
             <Header />
-            <div className={style.Categories}>
-                {renderCategoriesButtons(Object.keys(SurveyCategory))}
-            </div>
-            {surveyCards && renderSurveysCards(surveyCards)}
+            { renderCategoriesButtons(Object.keys(SurveyCategory)) }
+            { surveyCards && renderSurveysCards(surveyCards) }
+            { loading && renderLoading() }
+            { error && renderError(error) }
+            { !loading && !error && renderLoadingMoreButton() }
         </div>
     );
 }

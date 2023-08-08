@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { IOption, IQuestion, ISurvey, ISurveyInfo, QuestionType, SurveyCategory, SurveyConstructorType } from '../../types/survey';
 import { TextField, Button, MenuItem, FormControlLabel, Checkbox } from '@mui/material';
 import { useActions } from '../../hooks/useActions';
+import { getPrettyDateTime } from '../../helper';
 
 interface ISurveyConstructFormProps {
     setShowForm: React.Dispatch<React.SetStateAction<boolean>>;
@@ -66,7 +67,8 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm, surve
             category: form.category as SurveyCategory,
             description: form.description,
             imageUrl: form.imageUrl,
-            isEvaluated: form.isEvaluated
+            isEvaluated: form.isEvaluated,
+            creationDate: getPrettyDateTime(new Date())
         };
 
         if (timeLimit) {
@@ -199,17 +201,20 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm, surve
                 />
             }
 
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked = {isEvaluated}
-                        { ...register('isEvaluated') }
-                    />
-                }
-                label="Will the questions be graded?"
-                sx = {{ marginBottom: '20px' }}
-            />
-
+            {
+                constructorType === SurveyConstructorType.Adding &&
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked = {isEvaluated}
+                            { ...register('isEvaluated') }
+                        />
+                    }
+                    label="Will the questions be graded?"
+                    sx = {{ marginBottom: '20px' }}
+                />
+            }
+            
             <Button variant = 'contained' type = 'submit' fullWidth> 
                 Go to create questions 
             </Button>
