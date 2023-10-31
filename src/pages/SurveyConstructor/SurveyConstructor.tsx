@@ -26,9 +26,6 @@ const SurveyConstructor: FC = () => {
     const id = useParams().id;
     const constructorType = id ? SurveyConstructorType.Editing : SurveyConstructorType.Adding;
 
-    console.log(questions);
-    console.log(surveyInfo);
-
     useEffect(() => {
         if (id) loadSurvey(id);
         else clearSurvey();

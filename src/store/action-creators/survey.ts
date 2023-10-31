@@ -5,10 +5,8 @@ import {
     IAnswerToQuestion,
     ICompletionStatistics,
     IQuestion,
-    ISurvey,
     ISurveyCard,
     ISurveyInfo,
-    ISurveyResults,
     IUser,
     QuestionType,
     SurveyAction,
@@ -20,14 +18,12 @@ import {
     collection, 
     deleteDoc, 
     doc, 
-    endAt, 
     getDoc, 
     getDocs, 
     limit, 
     orderBy, 
     query, 
     startAfter, 
-    startAt, 
     where 
 } from "firebase/firestore"; 
 
@@ -109,8 +105,6 @@ export const loadSurveyCards = () => {
                     surveyCards.push({ id: document.id, surveyInfo, userId });
                 });
 
-                console.log(surveyCards);
-
                 dispatch({
                     type: SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS,
                     payload: surveyCards
@@ -153,15 +147,12 @@ export const loadMoreSurveyCards = () => {
             );
 
             const querySnapshot = await getDocs(q);
-            console.log(querySnapshot);
 
             if (!querySnapshot.empty) {
                 querySnapshot.forEach(document => {
                     const { surveyInfo, userId } = document.data(); 
                     surveyCards.push({ id: document.id, surveyInfo, userId });
                 });
-
-                console.log(surveyCards);
 
                 dispatch({
                     type: SurveyActionTypes.FETCH_SURVEY_CARDS_SUCCESS,
@@ -285,8 +276,6 @@ export const loadSurveyStatistics = (surveyId: string) => {
             if (!querySnapshot.empty) {
                 const surveyStatistics: ICompletionStatistics[] = [];
     
-                console.log(querySnapshot);
-    
                 querySnapshot.forEach(doc => {
                     const { 
                         completionDate,
@@ -309,8 +298,6 @@ export const loadSurveyStatistics = (surveyId: string) => {
                         user
                     })
                 })
-    
-                console.log(surveyStatistics)
     
                 dispatch({
                     type: SurveyActionTypes.FETCH_SURVEY_STATISTICS_SUCCESS,
@@ -371,8 +358,6 @@ export const updateAnswerToQuestion = (answerToQuestion: IAnswerToQuestion) => {
         const index = answeredQuestions.findIndex(answeredQuestion =>
             JSON.stringify(answeredQuestion) === JSON.stringify(currentQuestion)
         );
-
-        console.log(index);
 
         if (index === -1) {
             dispatch({

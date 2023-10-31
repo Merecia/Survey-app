@@ -35,8 +35,6 @@ const SurveyConstructForm: FC<ISurveyConstructFormProps> = ({ setShowForm, surve
     const category = watch('category');
     const isEvaluated = watch('isEvaluated');
 
-    console.log(survey);
-
     const { updateSurveyInfo, updateQuestions } = useActions();
 
     const renderCategoriesOptions = (categories: string[]) => (

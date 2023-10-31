@@ -40,8 +40,6 @@ const Survey: FC = () => {
     const id = useParams().id;
     const navigate = useNavigate();
 
-    console.log(questions);
-
     useEffect(() => {
         if (id) {
             loadSurvey(id);
@@ -144,8 +142,6 @@ const Survey: FC = () => {
             surveyResults.earnedScore = earnedScore;
             surveyResults.correctAnswersRate = getCorrectAnswersRate(earnedScore, maximumScore);
         }
-
-        console.log(surveyResults);
 
         addDoc(collection(db, 'surveyResults'), surveyResults)
             .then((docRef) => {

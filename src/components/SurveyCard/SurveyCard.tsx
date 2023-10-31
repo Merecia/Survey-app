@@ -101,8 +101,7 @@ const SurveyCard: FC<ISurveyCardProps> = ({ surveyCard, cssProperties }) => {
                     </IconButton>
                 </>
             }
-            
-
+                        
             <img
                 src={surveyInfo.imageUrl}
                 onError={({ currentTarget }) => {

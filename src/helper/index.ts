@@ -45,7 +45,6 @@ export const replaceNumberWithLetter = (number: number): string => {
             return alphabet[number - 1];
         }
     } catch (error) {
-        console.log(error);
         return '';
     }
 }
@@ -73,7 +72,6 @@ export const replaceLetterWithNumber = (letter: string): number => {
         }
 
     } catch (error) {
-        console.log(error);
         return -1;
     }
 }
@@ -337,7 +335,7 @@ const getTwoDigitsString = (number: number) => {
             twoDigitString = '00';
         }
     } catch(error) {
-        console.log(error);
+        return undefined;
     }
 
     return twoDigitString;

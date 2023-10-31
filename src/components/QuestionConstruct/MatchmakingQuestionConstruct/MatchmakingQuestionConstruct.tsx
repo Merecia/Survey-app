@@ -27,8 +27,6 @@ const MatchmakingQuestionConstruct: FC<IMatchmakingQuestionConstructProps> = ({
         return rightList.map(option => renderRightListOption(option));
     }
 
-    console.log(question);
-
     const updateLeftList = (leftList: IOption[]) => {
         if (isMatches(question.options)) {
             question.options.leftList = leftList;

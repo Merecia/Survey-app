@@ -136,7 +136,6 @@ const Auth: FC = () => {
             createUserWithEmailAndPassword(auth, email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    console.log(user);
                     updateProfile(user, {displayName: `${firstName} ${lastName}`});
                     navigate('/');
                 })
@@ -149,7 +148,6 @@ const Auth: FC = () => {
             signInWithEmailAndPassword(auth, email, password)
                 .then(userCredential => {
                     const user = userCredential.user;
-                    console.log(user);
                     navigate('/');
                 })
                 .catch(error => {

@@ -1,39 +1,23 @@
 import { FC, useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'
-import style from './SurveyStatistics.module.scss';
-import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import { Typography, CircularProgress } from '@mui/material';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import { Button } from '@mui/material';
-import {
-    DataGrid,
-    GridColDef,
-    GridActionsCellItem,
-    GridRowsProp
-} from '@mui/x-data-grid';
-import {
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle
-} from '@mui/material';
+import { DataGrid, GridColDef, GridActionsCellItem } from '@mui/x-data-grid';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import { useActions } from '../../hooks/useActions';
-import { deleteDoc, doc } from 'firebase/firestore';
-import { db } from '../../firebase';
 import { useTypedSelector } from '../../hooks/useTypedSelector';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import DeleteIcon from '@mui/icons-material/DeleteOutlined';
 import Header from '../../components/Header/Header';
+import style from './SurveyStatistics.module.scss';
 
 const SurveyResultsTable: FC = () => {
     const [showAlertRemoveDialog, setShowAlertRemoveDialog] = useState<boolean>(false);
     const [removedResultsId, setRemovedResultsId] = useState<string>('');
-    const [rows, setRows] = useState<GridRowsProp>([]);
     const surveyId = useParams().id;
     const navigate = useNavigate();
     const { loadSurveyStatistics, deleteSurveyResults } = useActions();
     const { loading, error, surveyStatistics } = useTypedSelector(state => state.survey);
-
-    console.log(rows);
 
     useEffect(() => {
         if (surveyId) {
@@ -163,8 +147,6 @@ const SurveyResultsTable: FC = () => {
             >
                 {showAlertRemoveDialog && renderAlertRemoveDialog(removedResultsId)}
                 {
-                    // surveyStatistics !== undefined
-                    // && surveyStatistics.length !== 0 &&
                     <DataGrid
                         autoHeight
                         rows={renderRows()}
